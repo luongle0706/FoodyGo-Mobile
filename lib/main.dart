@@ -14,11 +14,13 @@ class Main extends StatelessWidget {
   Main({super.key});
 
   final storage = FlutterSecureStorage();
+
   final List<String> publicRoutes = ['/login', '/register'];
 
   Future<bool> isAuthenticated() async {
-    String? token = await storage.read(key: 'token');
-    return token != null;
+    // String? token = await storage.read(key: 'token');
+    // return token != null;
+    return true;
   }
 
   GoRouter get _router => GoRouter(

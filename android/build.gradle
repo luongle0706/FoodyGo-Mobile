@@ -3,6 +3,12 @@ allprojects {
         google()
         mavenCentral()
     }
+
+    tasks.withType(JavaCompile).configureEach {
+        javaCompiler = javaToolchains.compilerFor {
+            languageVersion.set(JavaLanguageVersion.of(21))
+        }
+    }
 }
 
 rootProject.buildDir = "../build"
