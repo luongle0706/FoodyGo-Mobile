@@ -1,34 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:foodygo/api/api_service.dart';
-import 'package:foodygo/components/button.dart';
-import 'package:foodygo/components/image_tile.dart';
-import 'package:foodygo/components/text_field.dart';
-import 'package:foodygo/model/login_model.dart';
-import 'package:go_router/go_router.dart';
+import 'package:foodygo/service/auth_service.dart';
+import 'package:foodygo/utils/injection.dart';
+import 'package:foodygo/view/components/button.dart';
+import 'package:foodygo/view/components/image_tile.dart';
+import 'package:foodygo/view/components/text_field.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
-  final storage = FlutterSecureStorage();
-
-  Future<bool> signIn() async {
-    LoginRequestModel request = LoginRequestModel(
-      email: usernameController.text,
-      password: passwordController.text,
-    );
-
-    ApiService apiService = ApiService();
-    var response = await apiService.login(request);
-
-    if (response.token.isNotEmpty) {
-      await storage.write(key: 'token', value: response.token);
-      return true;
-    }
-    return false;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,11 +80,8 @@ class LoginPage extends StatelessWidget {
 
               // Sign in button
               MyButton(
-                onTap: () async {
-                  await signIn() && context.mounted
-                      ? GoRouter.of(context).go('/')
-                      : null;
-                },
+                onTap: () => locator.get<AuthService>().signIn(
+                    usernameController.text, passwordController.text, context),
                 text: 'Sign in',
               ),
 
@@ -146,11 +124,11 @@ class LoginPage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ImageTile(imagePath: 'lib/images/google.png'),
+                  ImageTile(imagePath: 'lib/view/images/google.png'),
                   SizedBox(width: 10),
-                  ImageTile(imagePath: 'lib/images/apple.png'),
+                  ImageTile(imagePath: 'lib/view/images/apple.png'),
                   SizedBox(width: 10),
-                  ImageTile(imagePath: 'lib/images/facebook.png'),
+                  ImageTile(imagePath: 'lib/view/images/facebook.png'),
                 ],
               ),
 

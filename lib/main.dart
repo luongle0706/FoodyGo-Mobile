@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:foodygo/pages/home.dart';
-import 'package:foodygo/pages/login.dart';
-import 'package:foodygo/pages/profile.dart';
-import 'package:foodygo/pages/register.dart';
+import 'package:foodygo/utils/constants.dart';
+import 'package:foodygo/utils/injection.dart';
+import 'package:foodygo/view/pages/home.dart';
+import 'package:foodygo/view/pages/login.dart';
+import 'package:foodygo/view/pages/profile.dart';
+import 'package:foodygo/view/pages/register.dart';
 import 'package:go_router/go_router.dart';
 
 void main() {
+  setupInjection();
   runApp(Main());
 }
 
 class Main extends StatelessWidget {
-  Main({super.key});
-
-  final storage = FlutterSecureStorage();
-
-  final List<String> publicRoutes = ['/login', '/register'];
+  const Main({super.key});
 
   Future<bool> isAuthenticated() async {
-    // String? token = await storage.read(key: 'token');
-    // return token != null;
-    return true;
+    String? savedUser = await locator<FlutterSecureStorage>().read(key: 'user');
+    return savedUser != null;
   }
 
   GoRouter get _router => GoRouter(
@@ -56,10 +54,13 @@ class Main extends StatelessWidget {
         ],
         redirect: (context, state) async {
           final isAuthenticated = await this.isAuthenticated();
-          final isPublicRoute = publicRoutes.contains(state.matchedLocation);
-          if (!isAuthenticated && !isPublicRoute) return '/login';
-          if (isAuthenticated && state.matchedLocation == '/login') return '/';
-          return null;
+          final isProtectedRoute =
+              globalProtectedRoutes.contains(state.matchedLocation);
+          if (isProtectedRoute && !isAuthenticated) {
+            return '/login';
+          } else {
+            return null;
+          }
         },
       );
 
