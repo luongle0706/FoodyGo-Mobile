@@ -22,7 +22,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/',
+        initialLocation: '/register',
         routes: [
           GoRoute(
               name: 'home',
@@ -44,12 +44,9 @@ class Main extends StatelessWidget {
               }),
           GoRoute(
               name: 'profile',
-              path: '/profile/:username',
+              path: '/profile',
               pageBuilder: (context, state) {
-                return MaterialPage(
-                    child: ProfilePage(
-                  username: state.pathParameters['username'],
-                ));
+                return MaterialPage(child: ProfilePage());
               })
         ],
         redirect: (context, state) async {

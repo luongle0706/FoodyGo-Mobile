@@ -22,10 +22,15 @@ class HomePage extends StatelessWidget {
               ElevatedButton(
                 child: Text('Profile'),
                 onPressed: () {
-                  GoRouter.of(context).pushNamed('profile',
-                      pathParameters: {'username': 'The Anh'});
+                  GoRouter.of(context).pushNamed('profile');
                 },
-              )
+              ),
+              ElevatedButton(
+                child: Text('Register'),
+                onPressed: () {
+                  GoRouter.of(context).pushNamed('register');
+                },
+              ),
             ],
           ),
         ));

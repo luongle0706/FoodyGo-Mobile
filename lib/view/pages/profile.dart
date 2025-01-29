@@ -6,9 +6,7 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/utils/injection.dart';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key, this.username});
-
-  final String? username;
+  const ProfilePage({super.key});
 
   Future<SavedUser> get user async {
     String? savedUser = await locator<FlutterSecureStorage>().read(key: 'user');
