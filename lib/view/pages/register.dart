@@ -52,7 +52,8 @@ class RegisterPage extends StatelessWidget {
                   SizedBox(height: 5),
                   ShadowInputField(
                       inputController: fullNameController,
-                      hintText: 'Full name'),
+                      hintText: 'Full name',
+                      obsureText: false),
                   SizedBox(height: 20),
                   Text('Email address',
                       style:
@@ -60,7 +61,8 @@ class RegisterPage extends StatelessWidget {
                   SizedBox(height: 5),
                   ShadowInputField(
                       inputController: emailController,
-                      hintText: 'Email address'),
+                      hintText: 'Email address',
+                      obsureText: false),
                   SizedBox(height: 20),
                   Text('Mobile number',
                       style:
@@ -68,7 +70,8 @@ class RegisterPage extends StatelessWidget {
                   SizedBox(height: 5),
                   ShadowInputField(
                       inputController: mobileController,
-                      hintText: 'Mobile number'),
+                      hintText: 'Mobile number',
+                      obsureText: false),
                   SizedBox(height: 20),
                   Text('Password',
                       style:
@@ -76,7 +79,8 @@ class RegisterPage extends StatelessWidget {
                   SizedBox(height: 5),
                   ShadowInputField(
                       inputController: passwordController,
-                      hintText: 'Password'),
+                      hintText: 'Password',
+                      obsureText: true),
                   SizedBox(height: 20),
                 ],
               ),
