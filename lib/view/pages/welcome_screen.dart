@@ -9,12 +9,26 @@ class WelcomeScreen extends StatelessWidget {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-
           Padding(
             padding: const EdgeInsets.only(top: 80),
-            child: Image.asset(
-              'lib/view/images/welcome_images/logo.png',
+            child: Container(
               height: 250,
+              child: PageView(
+                children: [
+                  Image.asset(
+                    'lib/view/images/apple.png',
+                    fit: BoxFit.cover,
+                  ),
+                  Image.asset(
+                    'lib/view/images/facebook.png',
+                    fit: BoxFit.cover,
+                  ),
+                  Image.asset(
+                    'lib/view/images/google.png',
+                    fit: BoxFit.cover,
+                  ),
+                ],
+              ),
             ),
           ),
 

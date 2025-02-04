@@ -24,17 +24,17 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/',
+        initialLocation: '/splash',
         routes: [
-          // GoRoute(
-          //     name: 'home',
-          //     path: '/',
-          //     pageBuilder: (context, state) {
-          //       return MaterialPage(child: HomePage());
-          //     }),
+          GoRoute(
+              name: 'home',
+              path: '/',
+              pageBuilder: (context, state) {
+                return MaterialPage(child: HomePage());
+              }),
           GoRoute(
               name: 'splash_screen',
-              path: '/',
+              path: '/splash',
               pageBuilder: (context, state) {
                 return MaterialPage(child: SplashScreen());
               }),
