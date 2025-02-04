@@ -6,6 +6,8 @@ import 'package:foodygo/view/pages/home.dart';
 import 'package:foodygo/view/pages/login.dart';
 import 'package:foodygo/view/pages/profile.dart';
 import 'package:foodygo/view/pages/register.dart';
+import 'package:foodygo/view/pages/splash_screen.dart';
+import 'package:foodygo/view/pages/welcome_screen.dart';
 import 'package:go_router/go_router.dart';
 
 void main() {
@@ -24,11 +26,23 @@ class Main extends StatelessWidget {
   GoRouter get _router => GoRouter(
         initialLocation: '/',
         routes: [
+          // GoRoute(
+          //     name: 'home',
+          //     path: '/',
+          //     pageBuilder: (context, state) {
+          //       return MaterialPage(child: HomePage());
+          //     }),
           GoRoute(
-              name: 'home',
+              name: 'splash_screen',
               path: '/',
               pageBuilder: (context, state) {
-                return MaterialPage(child: HomePage());
+                return MaterialPage(child: SplashScreen());
+              }),
+          GoRoute(
+              name: 'welcome_screen',
+              path: '/welcome',
+              pageBuilder: (context, state) {
+                return MaterialPage(child: WelcomeScreen());
               }),
           GoRoute(
               name: 'login',
@@ -51,6 +65,10 @@ class Main extends StatelessWidget {
         ],
         redirect: (context, state) async {
           final isAuthenticated = await this.isAuthenticated();
+          final isSplash = state.matchedLocation == '/';
+          if (isSplash) {
+            return null;
+          }
           final isProtectedRoute =
               globalProtectedRoutes.contains(state.matchedLocation);
           if (isProtectedRoute && !isAuthenticated) {
