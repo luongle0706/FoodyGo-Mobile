@@ -65,10 +65,6 @@ class Main extends StatelessWidget {
         ],
         redirect: (context, state) async {
           final isAuthenticated = await this.isAuthenticated();
-          final isSplash = state.matchedLocation == '/';
-          if (isSplash) {
-            return null;
-          }
           final isProtectedRoute =
               globalProtectedRoutes.contains(state.matchedLocation);
           if (isProtectedRoute && !isAuthenticated) {
