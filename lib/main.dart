@@ -3,13 +3,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodygo/utils/constants.dart';
 import 'package:foodygo/utils/injection.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
-import 'package:foodygo/view/pages/home.dart';
 import 'package:foodygo/view/pages/login.dart';
-import 'package:foodygo/view/pages/profile.dart';
 import 'package:foodygo/view/pages/protected_routes.dart';
 import 'package:foodygo/view/pages/register.dart';
-import 'package:foodygo/view/pages/splash_screen.dart';
-import 'package:foodygo/view/pages/welcome_screen.dart';
 import 'package:go_router/go_router.dart';
 
 void main() {
