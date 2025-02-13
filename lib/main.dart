@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodygo/utils/constants.dart';
 import 'package:foodygo/utils/injection.dart';
+import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/home.dart';
 import 'package:foodygo/view/pages/login.dart';
 import 'package:foodygo/view/pages/profile.dart';
+import 'package:foodygo/view/pages/protected_routes.dart';
 import 'package:foodygo/view/pages/register.dart';
 import 'package:foodygo/view/pages/splash_screen.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
@@ -24,26 +26,67 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/splash',
+        initialLocation: '/protected/home',
         routes: [
-          GoRoute(
-              name: 'home',
-              path: '/',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: HomePage());
-              }),
-          GoRoute(
-              name: 'splash_screen',
-              path: '/splash',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: SplashScreen());
-              }),
-          GoRoute(
-              name: 'welcome_screen',
-              path: '/welcome',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: WelcomeScreen());
-              }),
+          ShellRoute(
+              builder: (context, state, child) {
+                return ProtectedRoutes(child: child);
+              },
+              routes: [
+                GoRoute(
+                  name: 'protected_home',
+                  path: '/protected/home',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: EmptyPage());
+                  },
+                ),
+                GoRoute(
+                  name: 'protected_order',
+                  path: '/protected/order',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: EmptyPage());
+                  },
+                ),
+                GoRoute(
+                  name: 'protected_wallet',
+                  path: '/protected/wallet',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: EmptyPage());
+                  },
+                ),
+                GoRoute(
+                  name: 'protected_notification',
+                  path: '/protected/notification',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: EmptyPage());
+                  },
+                ),
+                GoRoute(
+                  name: 'protected_user',
+                  path: '/protected/user',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: EmptyPage());
+                  },
+                )
+              ]),
+          // GoRoute(
+          //     name: 'home',
+          //     path: '/',
+          //     pageBuilder: (context, state) {
+          //       return MaterialPage(child: HomePage());
+          //     }),
+          // GoRoute(
+          //     name: 'splash_screen',
+          //     path: '/splash',
+          //     pageBuilder: (context, state) {
+          //       return MaterialPage(child: SplashScreen());
+          //     }),
+          // GoRoute(
+          //     name: 'welcome_screen',
+          //     path: '/welcome',
+          //     pageBuilder: (context, state) {
+          //       return MaterialPage(child: WelcomeScreen());
+          //     }),
           GoRoute(
               name: 'login',
               path: '/login',
@@ -55,12 +98,6 @@ class Main extends StatelessWidget {
               path: '/register',
               pageBuilder: (context, state) {
                 return MaterialPage(child: RegisterPage());
-              }),
-          GoRoute(
-              name: 'profile',
-              path: '/profile',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: ProfilePage());
               })
         ],
         redirect: (context, state) async {
