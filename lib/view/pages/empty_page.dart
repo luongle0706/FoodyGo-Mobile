@@ -11,10 +11,18 @@ class EmptyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SingleChildScrollView(
-      child: Center(
-        child: Text(_getCurrentPath(context)),
-      ),
-    ));
+        backgroundColor: Colors.green,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                _getCurrentPath(context),
+                textAlign: TextAlign.center,
+              )
+            ],
+          ),
+        ));
   }
 }

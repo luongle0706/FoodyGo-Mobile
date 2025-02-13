@@ -4,6 +4,7 @@ import 'package:foodygo/utils/constants.dart';
 import 'package:foodygo/utils/injection.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/login.dart';
+import 'package:foodygo/view/pages/profile.dart';
 import 'package:foodygo/view/pages/protected_routes.dart';
 import 'package:foodygo/view/pages/register.dart';
 import 'package:go_router/go_router.dart';
@@ -61,7 +62,7 @@ class Main extends StatelessWidget {
                   name: 'protected_user',
                   path: '/protected/user',
                   pageBuilder: (context, state) {
-                    return MaterialPage(child: EmptyPage());
+                    return MaterialPage(child: ProfilePage());
                   },
                 )
               ]),
@@ -98,8 +99,7 @@ class Main extends StatelessWidget {
         ],
         redirect: (context, state) async {
           final isAuthenticated = await this.isAuthenticated();
-          final isProtectedRoute =
-              globalProtectedRoutes.contains(state.matchedLocation);
+          final isProtectedRoute = state.matchedLocation.contains('protected');
           if (isProtectedRoute && !isAuthenticated) {
             return '/login';
           } else {

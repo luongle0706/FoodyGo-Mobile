@@ -11,7 +11,7 @@ class ProtectedRoutes extends StatelessWidget {
     return Scaffold(
         bottomNavigationBar: FoodyGoNavigationBar(),
         resizeToAvoidBottomInset: true,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.green,
         body: child);
   }
 }

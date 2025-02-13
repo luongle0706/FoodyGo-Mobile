@@ -3,12 +3,32 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/service/auth_service.dart';
 import 'package:foodygo/utils/injection.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
-  Future<SavedUser> get user async {
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  Future<SavedUser>? _userFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  void _loadUser() {
+    setState(() {
+      _userFuture = _fetchUser();
+    });
+  }
+
+  Future<SavedUser> _fetchUser() async {
     String? savedUser = await locator<FlutterSecureStorage>().read(key: 'user');
     if (savedUser == null) {
       throw Exception('User not found!');
@@ -23,7 +43,7 @@ class ProfilePage extends StatelessWidget {
         title: Text('Profile'),
       ),
       body: FutureBuilder(
-          future: user,
+          future: _userFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -32,12 +52,16 @@ class ProfilePage extends StatelessWidget {
               return Center(child: Text('Error!'));
             }
             final user = snapshot.data!;
-            return Center(
+            return SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text('Username: ${user.email}'),
                   Text('Token: ${user.token}'),
+                  OutlinedButton(
+                    onPressed: () => locator<AuthService>().signOut(context),
+                    child: Text("Sign out"),
+                  ),
                 ],
               ),
             );

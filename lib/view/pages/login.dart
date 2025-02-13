@@ -124,11 +124,11 @@ class LoginPage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ImageTile(imagePath: 'lib/view/images/google.png'),
+                  ImageTile(imagePath: 'assets/images/google.png'),
                   SizedBox(width: 10),
-                  ImageTile(imagePath: 'lib/view/images/apple.png'),
+                  ImageTile(imagePath: 'assets/images/apple.png'),
                   SizedBox(width: 10),
-                  ImageTile(imagePath: 'lib/view/images/facebook.png'),
+                  ImageTile(imagePath: 'assets/images/facebook.png'),
                 ],
               ),
 

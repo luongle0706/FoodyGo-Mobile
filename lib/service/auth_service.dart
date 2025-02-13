@@ -17,7 +17,14 @@ class AuthService {
     locator<FlutterSecureStorage>()
         .write(key: 'user', value: json.encode(user.toJson()));
     if (context.mounted) {
-      GoRouter.of(context).pushNamed('profile');
+      GoRouter.of(context).go('/protected/home');
+    }
+  }
+
+  void signOut(BuildContext context) async {
+    locator<FlutterSecureStorage>().delete(key: 'user');
+    if (context.mounted) {
+      GoRouter.of(context).go('/login');
     }
   }
 }
