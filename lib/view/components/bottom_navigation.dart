@@ -25,7 +25,7 @@ class FoodyGoNavigationBar extends StatelessWidget {
         ),
         Text(
           name,
-          style: TextStyle(fontSize: 13),
+          style: TextStyle(fontSize: 13, color: Colors.black),
         ),
       ],
     );

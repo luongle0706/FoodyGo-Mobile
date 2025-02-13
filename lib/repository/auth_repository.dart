@@ -11,6 +11,8 @@ class AuthRepository {
       body: json.encode(request.toJson()),
     );
 
+    print(response.body);
+
     if (response.statusCode == 200 || response.statusCode == 400) {
       return LoginResponseDTO.fromJson(json.decode(response.body));
     } else {

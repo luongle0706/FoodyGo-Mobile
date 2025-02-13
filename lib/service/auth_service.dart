@@ -9,16 +9,49 @@ import 'package:go_router/go_router.dart';
 
 class AuthService {
   void signIn(String email, String password, BuildContext context) async {
-    LoginResponseDTO loginResponseDTO = await locator<AuthRepository>()
-        .login(LoginRequestDTO(email: email, password: password));
+    try {
+      LoginResponseDTO loginResponseDTO = await locator<AuthRepository>()
+          .login(LoginRequestDTO(email: email, password: password));
 
-    SavedUser user = SavedUser(token: loginResponseDTO.token, email: email);
+      if (loginResponseDTO.token.isNotEmpty) {
+        SavedUser user = SavedUser(token: loginResponseDTO.token, email: email);
+        await locator<FlutterSecureStorage>()
+            .write(key: 'user', value: json.encode(user.toJson()));
 
-    locator<FlutterSecureStorage>()
-        .write(key: 'user', value: json.encode(user.toJson()));
-    if (context.mounted) {
-      GoRouter.of(context).go('/protected/home');
+        if (context.mounted) {
+          GoRouter.of(context).go('/protected/home');
+        }
+      } else {
+        if (context.mounted) {
+          _showErrorDialog(context, "Login failed. Please try again.");
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        _showErrorDialog(
+            context, "Login failed. Please check your credentials.");
+      }
     }
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Login Error"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void signOut(BuildContext context) async {
