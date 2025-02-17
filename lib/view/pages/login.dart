@@ -3,6 +3,7 @@ import 'package:foodygo/service/auth_service.dart';
 import 'package:foodygo/utils/injection.dart';
 import 'package:foodygo/view/components/button.dart';
 import 'package:foodygo/view/components/image_tile.dart';
+import 'package:foodygo/view/components/login/login_input_field.dart';
 import 'package:foodygo/view/components/text_field.dart';
 import 'package:foodygo/view/theme.dart';
 
@@ -33,19 +34,21 @@ class LoginPage extends StatelessWidget {
               SizedBox(height: 50),
 
               // Username textfield
-              MyTextField(
+              LoginTextField(
                 controller: usernameController,
                 hintText: 'Địa chỉ Email',
                 obscureText: false,
+                iconPath: 'assets/icons/email-icon.png',
               ),
 
               SizedBox(height: 10),
 
               // Password textfield
-              MyTextField(
+              LoginTextField(
                 controller: passwordController,
                 hintText: 'Mật khẩu',
                 obscureText: true,
+                iconPath: 'assets/icons/password-icon.png',
               ),
 
               SizedBox(height: 10),
