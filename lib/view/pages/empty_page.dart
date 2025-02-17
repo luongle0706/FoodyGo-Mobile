@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class EmptyPage extends StatelessWidget {
@@ -11,7 +12,7 @@ class EmptyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.background,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodygo/view/components/bottom_navigation.dart';
+import 'package:foodygo/view/theme.dart';
 
 class ProtectedRoutes extends StatelessWidget {
   final Widget child;
@@ -11,7 +12,7 @@ class ProtectedRoutes extends StatelessWidget {
     return Scaffold(
         bottomNavigationBar: FoodyGoNavigationBar(),
         resizeToAvoidBottomInset: true,
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.background,
         body: child);
   }
 }

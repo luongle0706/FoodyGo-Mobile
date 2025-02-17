@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/service/auth_service.dart';
 import 'package:foodygo/utils/injection.dart';
+import 'package:foodygo/view/theme.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -39,7 +40,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text('Profile'),
       ),
