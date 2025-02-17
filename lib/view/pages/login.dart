@@ -4,7 +4,6 @@ import 'package:foodygo/utils/injection.dart';
 import 'package:foodygo/view/components/button.dart';
 import 'package:foodygo/view/components/image_tile.dart';
 import 'package:foodygo/view/components/login/login_input_field.dart';
-import 'package:foodygo/view/components/text_field.dart';
 import 'package:foodygo/view/theme.dart';
 
 class LoginPage extends StatelessWidget {
