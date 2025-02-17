@@ -5,10 +5,6 @@ import 'package:go_router/go_router.dart';
 class WalletHomepage extends StatelessWidget {
   const WalletHomepage({super.key});
 
-  String _getCurrentPath(BuildContext context) {
-    return GoRouterState.of(context).matchedLocation;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,29 +52,30 @@ class WalletHomepage extends StatelessWidget {
             child: ListView(
               padding: EdgeInsets.all(16),
               children: <Widget>[
-                GestureDetector(
-                  onTap: () {
-                    GoRouter.of(context).go('/protected/wallet/topup');
-                  },
-                  child: WalletOptionCard(
-                      icon: Icons.money,
-                      title: 'Mua điểm',
-                      subtitle:
-                          'Mua điểm FoodyXu dễ dàng thông qua các hình thức thanh toán'),
-                ),
+                WalletOptionCard(
+                    icon: Icons.money,
+                    title: 'Mua điểm',
+                    subtitle:
+                        'Mua điểm FoodyXu dễ dàng thông qua các hình thức thanh toán',
+                    onTap: () {
+                      GoRouter.of(context).go('/protected/wallet/topup');
+                    }),
                 WalletOptionCard(
                     icon: Icons.swap_horiz,
                     title: 'Chuyển điểm',
-                    subtitle: 'Chuyển điểm FoodyXu cho bạn bè và người thân'),
+                    subtitle: 'Chuyển điểm FoodyXu cho bạn bè và người thân',
+                    onTap: () {}),
                 WalletOptionCard(
                     icon: Icons.attach_money,
                     title: 'Rút tiền',
                     subtitle:
-                        'Rút tiền từ FoodyPay dễ dàng thông qua các hình thức thanh toán'),
+                        'Rút tiền từ FoodyPay dễ dàng thông qua các hình thức thanh toán',
+                    onTap: () {}),
                 WalletOptionCard(
                     icon: Icons.history,
                     title: 'Lịch sử thanh toán',
-                    subtitle: 'Xem lại lịch sử thanh toán các đơn hàng'),
+                    subtitle: 'Xem lại lịch sử thanh toán các đơn hàng',
+                    onTap: () {}),
               ],
             ),
           ),
