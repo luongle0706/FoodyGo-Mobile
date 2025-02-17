@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodygo/utils/injection.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
+import 'package:foodygo/view/pages/food_detail.dart';
 import 'package:foodygo/view/pages/foodyxu_history_page.dart';
 import 'package:foodygo/view/pages/login.dart';
 import 'package:foodygo/view/pages/profile.dart';
@@ -28,7 +29,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/register',
+        initialLocation: '/login',
         routes: [
           ShellRoute(
               builder: (context, state, child) {
@@ -98,7 +99,7 @@ class Main extends StatelessWidget {
                   pageBuilder: (context, state) {
                     return MaterialPage(child: ProfilePage());
                   },
-                )
+                ),
               ]),
           // GoRoute(
           //     name: 'home',
@@ -142,6 +143,13 @@ class Main extends StatelessWidget {
               pageBuilder: (context, state) {
                 return MaterialPage(child: OtpPage());
               }),
+          GoRoute(
+            name: 'protected_food_detail',
+            path: '/protected/product',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: FoodDetailPage());
+            },
+          ),
         ],
         redirect: (context, state) async {
           final isAuthenticated = await this.isAuthenticated();
