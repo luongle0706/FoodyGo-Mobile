@@ -6,6 +6,7 @@ import 'package:foodygo/view/pages/login.dart';
 import 'package:foodygo/view/pages/profile.dart';
 import 'package:foodygo/view/pages/protected_routes.dart';
 import 'package:foodygo/view/pages/register.dart';
+import 'package:foodygo/view/pages/otp.dart';
 import 'package:go_router/go_router.dart';
 
 void main() {
@@ -22,7 +23,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/register',
+        initialLocation: '/otp',
         routes: [
           ShellRoute(
               builder: (context, state, child) {
@@ -94,6 +95,12 @@ class Main extends StatelessWidget {
               path: '/register',
               pageBuilder: (context, state) {
                 return MaterialPage(child: RegisterPage());
+              }),
+          GoRoute(
+              name: 'otp',
+              path: '/otp',
+              pageBuilder: (context, state) {
+                return MaterialPage(child: OtpPage());
               })
         ],
         redirect: (context, state) async {
