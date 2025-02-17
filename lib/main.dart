@@ -7,6 +7,7 @@ import 'package:foodygo/view/pages/profile.dart';
 import 'package:foodygo/view/pages/protected_routes.dart';
 import 'package:foodygo/view/pages/register.dart';
 import 'package:foodygo/view/pages/register_info.dart';
+import 'package:foodygo/view/pages/otp.dart';
 import 'package:go_router/go_router.dart';
 
 void main() {
@@ -101,7 +102,13 @@ class Main extends StatelessWidget {
               path: '/register-info',
               pageBuilder: (context, state) {
                 return MaterialPage(child: RegisterInfo());
-              })
+              }),
+          GoRoute(
+              name: 'otp',
+              path: '/otp',
+              pageBuilder: (context, state) {
+                return MaterialPage(child: OtpPage());
+              }),
         ],
         redirect: (context, state) async {
           final isAuthenticated = await this.isAuthenticated();
