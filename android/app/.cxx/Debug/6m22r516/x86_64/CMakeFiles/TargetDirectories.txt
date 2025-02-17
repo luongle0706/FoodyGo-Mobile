@@ -1,0 +1,2 @@
+D:/workspace/swd391-foodygo-mobile/android/app/.cxx/Debug/6m22r516/x86_64/CMakeFiles/edit_cache.dir
+D:/workspace/swd391-foodygo-mobile/android/app/.cxx/Debug/6m22r516/x86_64/CMakeFiles/rebuild_cache.dir

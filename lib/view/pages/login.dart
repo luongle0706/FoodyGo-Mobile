@@ -3,8 +3,9 @@ import 'package:foodygo/service/auth_service.dart';
 import 'package:foodygo/utils/injection.dart';
 import 'package:foodygo/view/components/button.dart';
 import 'package:foodygo/view/components/image_tile.dart';
-import 'package:foodygo/view/components/login/login_input_field.dart';
+import 'package:foodygo/view/components/input_field_w_icon.dart';
 import 'package:foodygo/view/theme.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -33,7 +34,7 @@ class LoginPage extends StatelessWidget {
               SizedBox(height: 50),
 
               // Username textfield
-              LoginTextField(
+              IconTextField(
                 controller: usernameController,
                 hintText: 'Địa chỉ Email',
                 obscureText: false,
@@ -43,7 +44,7 @@ class LoginPage extends StatelessWidget {
               SizedBox(height: 10),
 
               // Password textfield
-              LoginTextField(
+              IconTextField(
                 controller: passwordController,
                 hintText: 'Mật khẩu',
                 obscureText: true,
@@ -76,6 +77,7 @@ class LoginPage extends StatelessWidget {
                 onTap: () => locator.get<AuthService>().signIn(
                     usernameController.text, passwordController.text, context),
                 text: 'Đăng nhập',
+                color: AppColors.primary,
               ),
 
               SizedBox(height: 50),
@@ -136,14 +138,16 @@ class LoginPage extends StatelessWidget {
                       fontSize: 12,
                     ),
                   ),
-                  SizedBox(
-                    width: 4,
+                  TextButton(
+                    onPressed: () {
+                      GoRouter.of(context).go('/register');
+                    },
+                    child: Text('Đăng ký',
+                        style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold)),
                   ),
-                  Text('Đăng ký',
-                      style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold)),
                 ],
               )
             ],

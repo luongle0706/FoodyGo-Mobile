@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class LoginTextField extends StatelessWidget {
+class IconTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final bool obscureText;
   final String iconPath;
 
-  const LoginTextField(
+  const IconTextField(
       {super.key,
       required this.controller,
       required this.hintText,
@@ -23,7 +23,7 @@ class LoginTextField extends StatelessWidget {
           prefixIcon: SizedBox(
             height: 2,
             width: 2,
-            child: Padding(padding: EdgeInsets.all(15), 
+            child: Padding(padding: EdgeInsets.all(10), 
             child: Image.asset(
             iconPath,
             ),

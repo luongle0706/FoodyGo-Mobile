@@ -89,14 +89,14 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 Text("Tôi đồng ý với Điều khoản & Dịch vụ", style: TextStyle(
-                  fontSize: 17
+                  fontSize: 16
                 ),)
               ],
             ),
             SizedBox(height: 20),
             RegisterButton(
               text: "Tiếp tục",
-              onTap: () {},
+              onTap: () {GoRouter.of(context).push('/register-info');},
             ),
             SizedBox(height: 10),
             Row(
