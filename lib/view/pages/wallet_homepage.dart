@@ -64,18 +64,25 @@ class WalletHomepage extends StatelessWidget {
                     icon: Icons.swap_horiz,
                     title: 'Chuyển điểm',
                     subtitle: 'Chuyển điểm FoodyXu cho bạn bè và người thân',
-                    onTap: () {}),
+                    onTap: () {
+                      GoRouter.of(context).go('/protected/wallet/transfer');
+                    }),
                 WalletOptionCard(
                     icon: Icons.attach_money,
                     title: 'Rút tiền',
                     subtitle:
                         'Rút tiền từ FoodyPay dễ dàng thông qua các hình thức thanh toán',
-                    onTap: () {}),
+                    onTap: () {
+                      GoRouter.of(context).go('/protected/wallet/withdraw');
+                    }),
                 WalletOptionCard(
                     icon: Icons.history,
                     title: 'Lịch sử thanh toán',
                     subtitle: 'Xem lại lịch sử thanh toán các đơn hàng',
-                    onTap: () {}),
+                    onTap: () {
+                      GoRouter.of(context)
+                          .go('/protected/wallet/transaction-history');
+                    }),
               ],
             ),
           ),
