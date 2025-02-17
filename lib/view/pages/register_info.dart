@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:foodygo/view/components/button.dart';
 import 'package:foodygo/view/components/date_picker_field.dart';
 import 'package:foodygo/view/components/input_field_w_icon.dart';
-import 'package:foodygo/view/pages/otp.dart';
 import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
