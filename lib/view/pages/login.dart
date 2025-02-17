@@ -4,6 +4,7 @@ import 'package:foodygo/utils/injection.dart';
 import 'package:foodygo/view/components/button.dart';
 import 'package:foodygo/view/components/image_tile.dart';
 import 'package:foodygo/view/components/text_field.dart';
+import 'package:foodygo/view/theme.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -15,7 +16,7 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.grey[300],
+        backgroundColor: AppColors.background,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -23,28 +24,18 @@ class LoginPage extends StatelessWidget {
               SizedBox(height: 50),
 
               // Logo
-              Icon(
-                Icons.lock,
-                size: 100,
+              Image.asset(
+                "assets/icons/foodygo-logo.png",
+                width: 150,
+                height: 150,
               ),
 
               SizedBox(height: 50),
 
-              // Welcome back, you've been missed!
-              Text(
-                'Welcome back, you\'ve been missed!',
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontSize: 16,
-                ),
-              ),
-
-              SizedBox(height: 25),
-
               // Username textfield
               MyTextField(
                 controller: usernameController,
-                hintText: 'Username',
+                hintText: 'Địa chỉ Email',
                 obscureText: false,
               ),
 
@@ -53,7 +44,7 @@ class LoginPage extends StatelessWidget {
               // Password textfield
               MyTextField(
                 controller: passwordController,
-                hintText: 'Password',
+                hintText: 'Mật khẩu',
                 obscureText: true,
               ),
 
@@ -66,9 +57,9 @@ class LoginPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      'Forgot password?',
+                      'Quên mật khẩu?',
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: Colors.grey[700],
                         fontSize: 12,
                       ),
                     ),
@@ -82,7 +73,7 @@ class LoginPage extends StatelessWidget {
               MyButton(
                 onTap: () => locator.get<AuthService>().signIn(
                     usernameController.text, passwordController.text, context),
-                text: 'Sign in',
+                text: 'Đăng nhập',
               ),
 
               SizedBox(height: 50),
@@ -101,7 +92,7 @@ class LoginPage extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: Text(
-                        'Or continue with',
+                        'Hoặc',
                         style: TextStyle(
                           color: Colors.grey[700],
                           fontSize: 12,
@@ -120,15 +111,13 @@ class LoginPage extends StatelessWidget {
 
               SizedBox(height: 25),
 
-              // Google + Apple + Facebook Sign in buttons
+              // Google + Facebook Sign in buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ImageTile(imagePath: 'assets/images/google.png'),
+                  ImageTile(imagePath: 'assets/images/facebook.png', text: 'Facebook'),
                   SizedBox(width: 10),
-                  ImageTile(imagePath: 'assets/images/apple.png'),
-                  SizedBox(width: 10),
-                  ImageTile(imagePath: 'assets/images/facebook.png'),
+                  ImageTile(imagePath: 'assets/images/google.png', text: 'Google'),
                 ],
               ),
 
@@ -139,7 +128,7 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Not a member?',
+                    'Chưa có tài khoản?',
                     style: TextStyle(
                       color: Colors.grey[700],
                       fontSize: 12,
@@ -148,7 +137,7 @@ class LoginPage extends StatelessWidget {
                   SizedBox(
                     width: 4,
                   ),
-                  Text('Register now',
+                  Text('Đăng ký',
                       style: TextStyle(
                           color: Colors.blue,
                           fontSize: 12,
