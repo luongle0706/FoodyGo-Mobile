@@ -1,5 +1,7 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/utils/injection.dart';
 import 'package:foodygo/view/pages/add_to_cart_page.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
@@ -19,7 +21,14 @@ import 'package:foodygo/view/pages/wallet_homepage.dart';
 import 'package:foodygo/view/pages/withdraw_page.dart';
 import 'package:go_router/go_router.dart';
 
-void main() {
+void main() async {
+  // Setup Firebase
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   setupInjection();
   runApp(Main());
 }
@@ -33,7 +42,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/registerSuccess',
+        initialLocation: '/protected/home',
         routes: [
           ShellRoute(
               builder: (context, state, child) {

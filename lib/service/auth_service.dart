@@ -3,11 +3,52 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodygo/dto/login_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/repository/auth_repository.dart';
 import 'package:foodygo/utils/injection.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
+  // final _auth = FirebaseAuth.instance;
+
+  void signInWithGoogle(BuildContext context) async {
+    // UserCredential result;
+
+    try {
+      final googleSignIn = GoogleSignIn(clientId: flutter_client_id, scopes: [
+        'email',
+        // 'profile'
+        // 'https://www.googleapis.com/auth/contacts.readonly',
+      ]);
+
+      final googleUser = await googleSignIn.signIn();
+
+      final googleAuth = await googleUser?.authentication;
+
+      print("GOOGLE AUTH ID TOKEN: ");
+      print(googleAuth?.idToken);
+
+      print("GOOGLE AUTH ACCESS TOKEN: ");
+      print(googleAuth?.accessToken);
+
+      // final cred = GoogleAuthProvider.credential(
+      //     idToken: googleAuth?.idToken, accessToken: googleAuth?.accessToken);
+
+      // print("ID TOKEN: ");
+      // print(googleAuth?.idToken);
+
+      // print("ACCESS TOKEN: ");
+      // print(googleAuth?.accessToken);
+
+      // result = await _auth.signInWithCredential(cred);
+
+      // print(result.toString());
+    } catch (error) {
+      print(error.toString());
+    }
+  }
+
   void signIn(String email, String password, BuildContext context) async {
     try {
       LoginResponseDTO loginResponseDTO = await locator<AuthRepository>()
