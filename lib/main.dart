@@ -11,6 +11,7 @@ import 'package:foodygo/view/pages/register_info.dart';
 import 'package:foodygo/view/pages/otp.dart';
 import 'package:foodygo/view/pages/topup_page.dart';
 import 'package:foodygo/view/pages/transaction_detail_detail.dart';
+import 'package:foodygo/view/pages/transfer_points_page.dart';
 import 'package:foodygo/view/pages/wallet_homepage.dart';
 import 'package:go_router/go_router.dart';
 
@@ -28,7 +29,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/register',
+        initialLocation: '/protected/wallet/topup',
         routes: [
           ShellRoute(
               builder: (context, state, child) {
@@ -83,6 +84,13 @@ class Main extends StatelessWidget {
                   path: '/protected/wallet/topup',
                   pageBuilder: (context, state) {
                     return MaterialPage(child: TopupPage());
+                  },
+                ),
+                GoRoute(
+                  name: 'protected_wallet_transfer',
+                  path: '/protected/wallet/transfer',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: TransferPointsPage());
                   },
                 ),
                 GoRoute(
