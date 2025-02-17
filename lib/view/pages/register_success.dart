@@ -20,7 +20,7 @@ class RegisterSuccessPage extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.asset(
-                'assets/images/successRegister.png',
+                'assets/images/success_register.png',
                 width: double.infinity,
                 height: 250,
                 fit: BoxFit.cover,
