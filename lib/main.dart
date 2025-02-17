@@ -8,11 +8,14 @@ import 'package:foodygo/view/pages/login.dart';
 import 'package:foodygo/view/pages/profile.dart';
 import 'package:foodygo/view/pages/protected_routes.dart';
 import 'package:foodygo/view/pages/register.dart';
+import 'package:foodygo/view/pages/registerSuccess.dart';
 import 'package:foodygo/view/pages/register_info.dart';
 import 'package:foodygo/view/pages/otp.dart';
 import 'package:foodygo/view/pages/topup_page.dart';
 import 'package:foodygo/view/pages/transaction_detail_detail.dart';
+import 'package:foodygo/view/pages/transfer_points_page.dart';
 import 'package:foodygo/view/pages/wallet_homepage.dart';
+import 'package:foodygo/view/pages/withdraw_page.dart';
 import 'package:go_router/go_router.dart';
 
 void main() {
@@ -87,6 +90,20 @@ class Main extends StatelessWidget {
                   },
                 ),
                 GoRoute(
+                  name: 'protected_wallet_transfer',
+                  path: '/protected/wallet/transfer',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: TransferPointsPage());
+                  },
+                ),
+                GoRoute(
+                  name: 'protected_wallet_withdraw',
+                  path: '/protected/wallet/withdraw',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: WithdrawPage());
+                  },
+                ),
+                GoRoute(
                   name: 'protected_notification',
                   path: '/protected/notification',
                   pageBuilder: (context, state) {
@@ -148,6 +165,13 @@ class Main extends StatelessWidget {
             path: '/protected/product',
             pageBuilder: (context, state) {
               return MaterialPage(child: FoodDetailPage());
+            },
+          ),
+          GoRoute(
+            name: 'registerSuccess',
+            path: '/registerSuccess',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: RegisterSuccessPage());
             },
           ),
         ],
