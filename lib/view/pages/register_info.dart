@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:foodygo/view/components/button.dart';
 import 'package:foodygo/view/components/date_picker_field.dart';
 import 'package:foodygo/view/components/input_field_w_icon.dart';
+import 'package:foodygo/view/pages/otp.dart';
 import 'package:foodygo/view/theme.dart';
+import 'package:go_router/go_router.dart';
 
 class RegisterInfo extends StatefulWidget {
   const RegisterInfo({super.key});
@@ -20,7 +22,6 @@ final mobileController = TextEditingController();
 final buildingController = TextEditingController();
 
 class _RegisterInfoState extends State<RegisterInfo> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,16 +33,21 @@ class _RegisterInfoState extends State<RegisterInfo> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 30),
+            SizedBox(height: 40),
 
             //Back icon
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: 20,
-                  child: Image.asset(
-                    'assets/icons/back-icon.png',
+                InkWell(
+                  onTap: () {
+                    context.pop();
+                  },
+                  child: SizedBox(
+                    height: 20,
+                    child: Image.asset(
+                      'assets/icons/back-icon.png',
+                    ),
                   ),
                 ),
               ],
@@ -79,8 +85,8 @@ class _RegisterInfoState extends State<RegisterInfo> {
               height: 20,
             ),
             DatePickerField(
-              controller: dobController, 
-              hintText: "Ngày sinh", 
+              controller: dobController,
+              hintText: "Ngày sinh",
               iconPath: 'assets/icons/calendar-icon.png',
             ),
             SizedBox(
@@ -105,14 +111,11 @@ class _RegisterInfoState extends State<RegisterInfo> {
             SizedBox(
               height: 50,
             ),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                MyButton(onTap: () => {}, text: 'Bỏ qua'),
-                MyButton(onTap: () => {}, text: 'Đăng ký')
-              ],
-            )
+            MyButton(
+              onTap: () => {GoRouter.of(context).push('/otp')},
+              text: 'Đăng ký',
+              color: AppColors.primary,
+            ),
           ],
         ),
       ),

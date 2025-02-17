@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:foodygo/view/theme.dart';
 
 class MyButton extends StatelessWidget {
-  const MyButton({super.key, required this.onTap, required this.text});
+  const MyButton({super.key, required this.onTap, required this.text, required this.color});
 
   final Function()? onTap;
   final String text;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class MyButton extends StatelessWidget {
         padding: EdgeInsets.all(15),
         margin: EdgeInsets.symmetric(horizontal: 25),
         decoration: BoxDecoration(
-          color: AppColors.primary,
+          color: color,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Center(

@@ -48,7 +48,7 @@ class _OtpPageState extends State<OtpPage> {
             const SizedBox(height: 40),
             GestureDetector(
               onTap: () {
-                GoRouter.of(context).go("/register");
+                GoRouter.of(context).pop();
               },
               child: Icon(Icons.arrow_back),
             ),

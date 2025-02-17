@@ -24,7 +24,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/register-info',
+        initialLocation: '/register',
         routes: [
           ShellRoute(
               builder: (context, state, child) {

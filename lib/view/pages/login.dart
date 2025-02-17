@@ -77,6 +77,7 @@ class LoginPage extends StatelessWidget {
                 onTap: () => locator.get<AuthService>().signIn(
                     usernameController.text, passwordController.text, context),
                 text: 'Đăng nhập',
+                color: AppColors.primary,
               ),
 
               SizedBox(height: 50),
