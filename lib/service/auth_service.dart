@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodygo/dto/login_dto.dart';
@@ -10,10 +11,10 @@ import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
-  // final _auth = FirebaseAuth.instance;
+  final _auth = FirebaseAuth.instance;
 
   void signInWithGoogle(BuildContext context) async {
-    // UserCredential result;
+    UserCredential result;
 
     try {
       final googleSignIn = GoogleSignIn(clientId: flutter_client_id, scopes: [
@@ -26,22 +27,19 @@ class AuthService {
 
       final googleAuth = await googleUser?.authentication;
 
-      print("GOOGLE AUTH ID TOKEN: ");
-      print(googleAuth?.idToken);
-
-      print("GOOGLE AUTH ACCESS TOKEN: ");
-      print(googleAuth?.accessToken);
-
-      // final cred = GoogleAuthProvider.credential(
-      //     idToken: googleAuth?.idToken, accessToken: googleAuth?.accessToken);
-
-      // print("ID TOKEN: ");
-      // print(googleAuth?.idToken);
+      final cred = GoogleAuthProvider.credential(
+          idToken: googleAuth?.idToken, accessToken: googleAuth?.accessToken);
 
       // print("ACCESS TOKEN: ");
       // print(googleAuth?.accessToken);
 
-      // result = await _auth.signInWithCredential(cred);
+      result = await _auth.signInWithCredential(cred);
+      String? idToken = await result.user?.getIdToken();
+
+      locator<AuthRepository>().test(idToken!);
+
+      print("REAL ID TOKEN: ");
+      print(idToken);
 
       // print(result.toString());
     } catch (error) {

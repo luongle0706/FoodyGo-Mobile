@@ -17,4 +17,15 @@ class AuthRepository {
       throw Exception('Failed to load data!');
     }
   }
+
+  void test(String idToken) async {
+    final response = await http.get(Uri.parse(
+        '$globalURL/api/v1/authentications/firebase-decode-token?authorizationHeader=$idToken'));
+
+    if (response.statusCode == 200) {
+      print('Success');
+    } else {
+      throw Exception('Failed to load data!');
+    }
+  }
 }
