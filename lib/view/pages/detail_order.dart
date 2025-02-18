@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
-import 'package:go_router/go_router.dart';
 
 class DetailOrder extends StatelessWidget {
+  final int status = 3;
 
-  final int status = 3; // 1: Đơn hàng đã được xác nhận,
+  const DetailOrder({super.key}); // 1: Đơn hàng đã được xác nhận,
   // 2: Đơn đang được chuẩn bị,
   // 3: Đơn hàng đang được giao,
   // 4: Đơn hàng đã đến nơi,
@@ -24,7 +24,8 @@ class DetailOrder extends StatelessWidget {
           },
         ),
       ),
-      body: SingleChildScrollView( // thêm vào để cuon man hình
+      body: SingleChildScrollView(
+        // thêm vào để cuon man hình
         physics: BouncingScrollPhysics(), // Scroll smouth
         child: Padding(
           padding: EdgeInsets.all(16.0),
@@ -38,11 +39,15 @@ class DetailOrder extends StatelessWidget {
                     children: [
                       Text(
                         getStatusText(status),
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.orange),
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange),
                       ),
                       SizedBox(height: 16),
                       Container(
-                        margin: EdgeInsets.only(left: 8, right: 8, top: 40, bottom: 20),
+                        margin: EdgeInsets.only(
+                            left: 8, right: 8, top: 40, bottom: 20),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -96,7 +101,9 @@ class DetailOrder extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Từ', style: TextStyle(fontWeight: FontWeight.bold)),
+                              Text('Từ',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                               SizedBox(height: 4),
                               Text(
                                 'Xoài non mắm ruốc - Cửa hàng Gì Lê\nNhà văn hóa sinh viên, Quận 9, TP.Thủ Đức',
@@ -125,7 +132,9 @@ class DetailOrder extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Đến', style: TextStyle(fontWeight: FontWeight.bold)),
+                              Text('Đến',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                               SizedBox(height: 4),
                               Text(
                                 'Lưu Hữu Phước, Đông Hòa, Dĩ An, Bình Dương, Việt Nam, TP.HCM\nQuân Nguyễn - 0823574803',
@@ -150,43 +159,48 @@ class DetailOrder extends StatelessWidget {
 
               // List san pham
               Column(
-                children: List.generate(5, (index) => // 5 sản pham
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        color: Colors.grey[300],
-                        child: Center(child: Text('Ảnh $index')),
-                      ),
-                      SizedBox(width: 16),
-
-                      Expanded(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('1 x Xoài non', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                Text('Muối tôm', style: TextStyle(color: Colors.grey)),
-                              ],
-                            ),
-                            Spacer(), // đẩy 2 vật giống space-bêtween
-
-                            Text(
-                              '59.000 đ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.right,
-                            ),
-                          ],
+                children: List.generate(
+                  5,
+                  (index) => // 5 sản pham
+                      Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 80,
+                          height: 80,
+                          color: Colors.grey[300],
+                          child: Center(child: Text('Ảnh $index')),
                         ),
-                      ),
-                    ],
+                        SizedBox(width: 16),
+                        Expanded(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('1 x Xoài non',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold)),
+                                  Text('Muối tôm',
+                                      style: TextStyle(color: Colors.grey)),
+                                ],
+                              ),
+                              Spacer(), // đẩy 2 vật giống space-bêtween
+
+                              Text(
+                                '59.000 đ',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.right,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
                 ),
               ),
 
@@ -198,8 +212,10 @@ class DetailOrder extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Tổng (5 món)', style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text('295.000đ', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('Tổng (5 món)',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('295.000đ',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
@@ -219,8 +235,14 @@ class DetailOrder extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Tổng cộng', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                        Text('311.000đ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red)),
+                        Text('Tổng cộng',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text('311.000đ',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red)),
                       ],
                     ),
                   ),
@@ -233,9 +255,12 @@ class DetailOrder extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Row(
                       children: [
-                        Text('Ghi chú', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('Ghi chú',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
                         Spacer(),
-                        Text('Không có', textAlign: TextAlign.right, style: TextStyle(color: Colors.grey)),
+                        Text('Không có',
+                            textAlign: TextAlign.right,
+                            style: TextStyle(color: Colors.grey)),
                       ],
                     ),
                   ),
@@ -243,9 +268,12 @@ class DetailOrder extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Row(
                       children: [
-                        Text('Mã đơn hàng', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('Mã đơn hàng',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
                         Spacer(),
-                        Text('O1111', textAlign: TextAlign.right, style: TextStyle(color: Colors.grey)),
+                        Text('O1111',
+                            textAlign: TextAlign.right,
+                            style: TextStyle(color: Colors.grey)),
                       ],
                     ),
                   ),
@@ -253,9 +281,12 @@ class DetailOrder extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Row(
                       children: [
-                        Text('Thời gian đặt hàng', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('Thời gian đặt hàng',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
                         Spacer(),
-                        Text('Hôm nay 11:02', textAlign: TextAlign.right, style: TextStyle(color: Colors.grey)),
+                        Text('Hôm nay 11:02',
+                            textAlign: TextAlign.right,
+                            style: TextStyle(color: Colors.grey)),
                       ],
                     ),
                   ),
@@ -263,9 +294,12 @@ class DetailOrder extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Row(
                       children: [
-                        Text('Thanh toán', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('Thanh toán',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
                         Spacer(),
-                        Text('FoodyXu', textAlign: TextAlign.right, style: TextStyle(color: Colors.grey)),
+                        Text('FoodyXu',
+                            textAlign: TextAlign.right,
+                            style: TextStyle(color: Colors.grey)),
                       ],
                     ),
                   ),
@@ -284,7 +318,8 @@ class DetailOrder extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,
               padding: EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
             onPressed: () {
               Navigator.push(
@@ -292,7 +327,8 @@ class DetailOrder extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => WelcomeScreen()),
               );
             },
-            child: Text('Đặt lại', style: TextStyle(fontSize: 18, color: Colors.white)),
+            child: Text('Đặt lại',
+                style: TextStyle(fontSize: 18, color: Colors.white)),
           ),
         ),
       ),
