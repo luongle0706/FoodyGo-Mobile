@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/utils/injection.dart';
 import 'package:foodygo/view/pages/add_to_cart_page.dart';
+import 'package:foodygo/view/pages/detail_order.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/food_detail.dart';
 import 'package:foodygo/view/pages/foodyxu_history_page.dart';
@@ -152,7 +153,13 @@ class Main extends StatelessWidget {
           //     path: '/welcome',
           //     pageBuilder: (context, state) {
           //       return MaterialPage(child: WelcomeScreen());
-          //     }),
+                  //     }),
+          GoRoute(
+              name: 'detail_order',
+              path: '/protected/detail-order',
+              pageBuilder: (context, state) {
+                return MaterialPage(child: DetailOrder());
+              }),
           GoRoute(
               name: 'login',
               path: '/login',
