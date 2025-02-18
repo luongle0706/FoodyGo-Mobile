@@ -19,31 +19,45 @@ class AuthService {
     try {
       final googleSignIn = GoogleSignIn(clientId: flutter_client_id, scopes: [
         'email',
-        // 'profile'
-        // 'https://www.googleapis.com/auth/contacts.readonly',
       ]);
-
       final googleUser = await googleSignIn.signIn();
-
       final googleAuth = await googleUser?.authentication;
-
       final cred = GoogleAuthProvider.credential(
           idToken: googleAuth?.idToken, accessToken: googleAuth?.accessToken);
-
-      // print("ACCESS TOKEN: ");
-      // print(googleAuth?.accessToken);
 
       result = await _auth.signInWithCredential(cred);
       String? idToken = await result.user?.getIdToken();
 
-      locator<AuthRepository>().test(idToken!);
-
-      print("REAL ID TOKEN: ");
+      print("ID TOKEN: ");
       print(idToken);
 
+      LoginResponseDTO loginResponseDTO =
+          await locator<AuthRepository>().loginByGoogle(idToken!);
+
+      print(loginResponseDTO.token);
+
+      if (loginResponseDTO.token.isNotEmpty) {
+        SavedUser user = SavedUser(
+            token: loginResponseDTO.token,
+            email: loginResponseDTO.email,
+            fullName: loginResponseDTO.fullName);
+
+        await locator<FlutterSecureStorage>()
+            .write(key: 'user', value: json.encode(user.toJson()));
+
+        if (context.mounted) {
+          GoRouter.of(context).go('/protected/home');
+        }
+      } else {
+        if (context.mounted) {
+          _showErrorDialog(context, "Login failed. Please try again.");
+        }
+      }
       // print(result.toString());
     } catch (error) {
-      print(error.toString());
+      if (context.mounted) {
+        _showErrorDialog(context, "Google failed");
+      }
     }
   }
 
@@ -53,7 +67,10 @@ class AuthService {
           .login(LoginRequestDTO(email: email, password: password));
 
       if (loginResponseDTO.token.isNotEmpty) {
-        SavedUser user = SavedUser(token: loginResponseDTO.token, email: email);
+        SavedUser user = SavedUser(
+            token: loginResponseDTO.token,
+            email: email,
+            fullName: loginResponseDTO.fullName);
         await locator<FlutterSecureStorage>()
             .write(key: 'user', value: json.encode(user.toJson()));
 
