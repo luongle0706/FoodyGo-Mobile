@@ -15,6 +15,7 @@ import 'package:foodygo/view/pages/register_success.dart';
 import 'package:foodygo/view/pages/topup_page.dart';
 import 'package:foodygo/view/pages/transaction_detail_detail.dart';
 import 'package:foodygo/view/pages/transfer_points_page.dart';
+import 'package:foodygo/view/pages/view_cart.dart';
 import 'package:foodygo/view/pages/wallet_homepage.dart';
 import 'package:foodygo/view/pages/withdraw_page.dart';
 import 'package:go_router/go_router.dart';
@@ -33,7 +34,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/registerSuccess',
+        initialLocation: '/login',
         routes: [
           ShellRoute(
               builder: (context, state, child) {
@@ -124,7 +125,13 @@ class Main extends StatelessWidget {
                   pageBuilder: (context, state) {
                     return MaterialPage(child: AddToCartPage());
                   },
-                )
+                ),
+                GoRoute(
+                    name: 'protected_view_cart',
+                    path: '/protected/view-cart',
+                    pageBuilder: (context, state) {
+                      return MaterialPage(child: ViewCartPage());
+                    })
               ]),
           // GoRoute(
           //     name: 'home',
@@ -144,6 +151,7 @@ class Main extends StatelessWidget {
           //     pageBuilder: (context, state) {
           //       return MaterialPage(child: WelcomeScreen());
           //     }),
+
           GoRoute(
               name: 'login',
               path: '/login',

@@ -6,7 +6,7 @@ class AddToCartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.5), // Làm mờ màn hình trước
+      backgroundColor: Color.fromRGBO(150, 150, 150, 0.82),
       body: Column(
         children: [
           const Expanded(
