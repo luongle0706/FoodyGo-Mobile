@@ -19,19 +19,14 @@ class LoginResponseDTO {
   final String message;
   final String token;
   final String refreshToken;
+  final String fullName;
+  final String email;
 
   LoginResponseDTO(
       {required this.code,
       required this.message,
       required this.token,
-      required this.refreshToken});
-
-  factory LoginResponseDTO.fromJson(Map<String, dynamic> json) {
-    return LoginResponseDTO(
-      code: json["code"] ?? "",
-      message: json["message"] ?? "",
-      token: json["token"] ?? "",
-      refreshToken: json["refreshToken"] ?? "",
-    );
-  }
+      required this.refreshToken,
+      required this.fullName,
+      required this.email});
 }

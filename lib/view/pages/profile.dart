@@ -34,7 +34,11 @@ class _ProfilePageState extends State<ProfilePage> {
     if (savedUser == null) {
       throw Exception('User not found!');
     }
-    return SavedUser.fromJson(json.decode(savedUser));
+    Map<String, dynamic> userMap = json.decode(savedUser);
+    return SavedUser(
+        email: userMap['email'],
+        token: userMap['token'],
+        fullName: userMap['fullName']);
   }
 
   @override
@@ -51,14 +55,24 @@ class _ProfilePageState extends State<ProfilePage> {
               return Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError) {
-              return Center(child: Text('Error!'));
+              print(snapshot.error);
+              return Column(
+                children: [
+                  OutlinedButton(
+                    onPressed: () => locator<AuthService>().signOut(context),
+                    child: Text("Sign out"),
+                  ),
+                  Center(child: Text('Error!')),
+                ],
+              );
             }
             final user = snapshot.data!;
             return SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Username: ${user.email}'),
+                  Text('Email: ${user.email}'),
+                  Text('Full Name: ${user.fullName}'),
                   Text('Token: ${user.token}'),
                   OutlinedButton(
                     onPressed: () => locator<AuthService>().signOut(context),

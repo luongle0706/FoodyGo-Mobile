@@ -1,7 +1,10 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/utils/injection.dart';
 import 'package:foodygo/view/pages/add_to_cart_page.dart';
+import 'package:foodygo/view/pages/detail_order.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/food_detail.dart';
 import 'package:foodygo/view/pages/foodyxu_history_page.dart';
@@ -20,7 +23,14 @@ import 'package:foodygo/view/pages/wallet_homepage.dart';
 import 'package:foodygo/view/pages/withdraw_page.dart';
 import 'package:go_router/go_router.dart';
 
-void main() {
+void main() async {
+  // Setup Firebase
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   setupInjection();
   runApp(Main());
 }
@@ -34,7 +44,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/login',
+        initialLocation: '/protected/home',
         routes: [
           ShellRoute(
               builder: (context, state, child) {
@@ -151,7 +161,12 @@ class Main extends StatelessWidget {
           //     pageBuilder: (context, state) {
           //       return MaterialPage(child: WelcomeScreen());
           //     }),
-
+          GoRoute(
+              name: 'detail_order',
+              path: '/protected/detail-order',
+              pageBuilder: (context, state) {
+                return MaterialPage(child: DetailOrder());
+              }),
           GoRoute(
               name: 'login',
               path: '/login',

@@ -119,9 +119,18 @@ class LoginPage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ImageTile(imagePath: 'assets/images/facebook.png', text: 'Facebook'),
+                  ImageTile(
+                    imagePath: 'assets/images/facebook.png',
+                    text: 'Facebook',
+                    onTap: () {},
+                  ),
                   SizedBox(width: 10),
-                  ImageTile(imagePath: 'assets/images/google.png', text: 'Google'),
+                  ImageTile(
+                    imagePath: 'assets/images/google.png',
+                    text: 'Google',
+                    onTap: () =>
+                        locator.get<AuthService>().signInWithGoogle(context),
+                  ),
                 ],
               ),
 

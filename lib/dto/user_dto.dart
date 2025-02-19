@@ -1,25 +1,19 @@
 class SavedUser {
   String email;
   String token;
+  String fullName;
 
   SavedUser({
     required this.email,
     required this.token,
+    required this.fullName,
   });
 
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> map = {
-      'email': email.trim(),
-      'token': token.trim(),
+  toJson() {
+    return {
+      'email': email,
+      'token': token,
+      'fullName': fullName,
     };
-
-    return map;
-  }
-
-  factory SavedUser.fromJson(Map<String, dynamic> json) {
-    return SavedUser(
-      email: json["email"] ?? "",
-      token: json["token"] ?? "",
-    );
   }
 }
