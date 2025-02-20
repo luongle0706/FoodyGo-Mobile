@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foodygo/view/pages/order_success.dart';
 import 'package:go_router/go_router.dart';
 
 class ConfirmOrderPage extends StatelessWidget {
@@ -81,6 +82,16 @@ class ConfirmOrderPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                     child: Image.network(
                       'https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chorizo-mozarella-gnocchi-bake-cropped-9ab73a3.jpg?resize=768,574',
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) {
+                          return child;
+                        } else {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons.error);
+                      },
                       fit: BoxFit.cover,
                       width: 60,
                       height: 60,
@@ -133,18 +144,20 @@ class ConfirmOrderPage extends StatelessWidget {
             ),
             Spacer(),
             // Order Button
-            Container(
+            SizedBox(
               width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 189, 75, 3),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Text(
-                  "Đặt đơn - 59🙂",
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 189, 75, 3),
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
+                onPressed: () {
+                  GoRouter.of(context).go("/order-success");
+                },
+                child: Text("Đặt Đơn", style: TextStyle(color: Colors.white)),
               ),
             ),
           ],

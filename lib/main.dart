@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/utils/injection.dart';
-import 'package:foodygo/view/pages/add_to_cart_page.dart';
-import 'package:foodygo/view/pages/confirm_order-page.dart';
+import 'package:foodygo/view/pages/add_to_cart.dart';
+import 'package:foodygo/view/pages/confirm_order.dart';
 import 'package:foodygo/view/pages/detail_order.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/food_detail.dart';
 import 'package:foodygo/view/pages/foodyxu_history_page.dart';
 import 'package:foodygo/view/pages/login.dart';
+import 'package:foodygo/view/pages/order_success.dart';
 import 'package:foodygo/view/pages/profile.dart';
 import 'package:foodygo/view/pages/protected_routes.dart';
 import 'package:foodygo/view/pages/register.dart';
@@ -93,6 +94,13 @@ class Main extends StatelessWidget {
                       transactionDateTime: DateTime.now().toIso8601String(),
                       currentBalance: '500.0',
                     ));
+                  },
+                ),
+                GoRoute(
+                  name: 'order_success',
+                  path: '/order-success',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: OrderSuccessPage());
                   },
                 ),
                 GoRoute(

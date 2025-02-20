@@ -87,6 +87,20 @@ class ViewCartPage extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(8),
                                     child: Image.network(
                                       'https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chorizo-mozarella-gnocchi-bake-cropped-9ab73a3.jpg?resize=768,574',
+                                      loadingBuilder:
+                                          (context, child, progress) {
+                                        if (progress == null) {
+                                          return child;
+                                        } else {
+                                          return Center(
+                                              child:
+                                                  CircularProgressIndicator());
+                                        }
+                                      },
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Icon(Icons.error);
+                                      },
                                       fit: BoxFit.cover,
                                       width: 60,
                                       height: 60,
@@ -280,9 +294,9 @@ class ViewCartPage extends StatelessWidget {
                                                         decoration:
                                                             BoxDecoration(
                                                           color: Color.fromARGB(
-                                                              255, 189, 75, 3),
+                                                              255, 235, 93, 4),
                                                           border: Border.all(
-                                                              width: 0),
+                                                              width: 1),
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(5),
@@ -316,7 +330,8 @@ class ViewCartPage extends StatelessWidget {
                                   children: [
                                     Icon(Icons.shopping_basket,
                                         size: 50,
-                                        color: Color.fromARGB(255, 189, 75, 3)),
+                                        color:
+                                            Color.fromARGB(255, 251, 132, 13)),
                                     Positioned(
                                       right: 0,
                                       top: -10,
@@ -324,7 +339,7 @@ class ViewCartPage extends StatelessWidget {
                                         padding: EdgeInsets.all(6),
                                         decoration: BoxDecoration(
                                           color:
-                                              Color.fromARGB(255, 189, 75, 3),
+                                              Color.fromARGB(255, 251, 132, 13),
                                           shape: BoxShape.circle,
                                         ),
                                         child: Text(
@@ -350,7 +365,7 @@ class ViewCartPage extends StatelessWidget {
                                   onPressed: () {},
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
-                                        const Color.fromARGB(255, 189, 75, 3),
+                                        const Color.fromARGB(255, 251, 132, 13),
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 16, vertical: 12),
                                   ),
