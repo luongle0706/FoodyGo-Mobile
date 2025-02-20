@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/utils/injection.dart';
 import 'package:foodygo/view/pages/add_to_cart_page.dart';
+import 'package:foodygo/view/pages/confirm_order-page.dart';
 import 'package:foodygo/view/pages/detail_order.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/food_detail.dart';
@@ -44,7 +45,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/protected/home',
+        initialLocation: '/confirm-order',
         routes: [
           ShellRoute(
               builder: (context, state, child) {
@@ -166,6 +167,12 @@ class Main extends StatelessWidget {
               path: '/protected/detail-order',
               pageBuilder: (context, state) {
                 return MaterialPage(child: DetailOrder());
+              }),
+          GoRoute(
+              name: 'confirm_order',
+              path: '/confirm-order',
+              pageBuilder: (context, state) {
+                return MaterialPage(child: ConfirmOrderPage());
               }),
           GoRoute(
               name: 'login',

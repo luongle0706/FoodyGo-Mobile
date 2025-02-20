@@ -75,23 +75,22 @@ class ViewCartPage extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment
                                   .start, // Align items vertically at the start
                               children: [
-                                SizedBox(
-                                  width: 80,
+                                Container(
+                                  width: 60,
                                   height: 60,
-                                  child: Image.network(
-                                    'https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chorizo-mozarella-gnocchi-bake-cropped-9ab73a3.jpg?resize=768,574',
-                                    loadingBuilder: (context, child, progress) {
-                                      if (progress == null) {
-                                        return child;
-                                      } else {
-                                        return Center(
-                                            child: CircularProgressIndicator());
-                                      }
-                                    },
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Icon(Icons.error);
-                                    },
-                                    fit: BoxFit.cover,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[300],
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      'https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chorizo-mozarella-gnocchi-bake-cropped-9ab73a3.jpg?resize=768,574',
+                                      fit: BoxFit.cover,
+                                      width: 60,
+                                      height: 60,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(
@@ -281,9 +280,9 @@ class ViewCartPage extends StatelessWidget {
                                                         decoration:
                                                             BoxDecoration(
                                                           color: Color.fromARGB(
-                                                              255, 235, 93, 4),
+                                                              255, 189, 75, 3),
                                                           border: Border.all(
-                                                              width: 1),
+                                                              width: 0),
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(5),
@@ -316,14 +315,16 @@ class ViewCartPage extends StatelessWidget {
                                   clipBehavior: Clip.none,
                                   children: [
                                     Icon(Icons.shopping_basket,
-                                        size: 50, color: Colors.red),
+                                        size: 50,
+                                        color: Color.fromARGB(255, 189, 75, 3)),
                                     Positioned(
                                       right: 0,
                                       top: -10,
                                       child: Container(
                                         padding: EdgeInsets.all(6),
                                         decoration: BoxDecoration(
-                                          color: Colors.red,
+                                          color:
+                                              Color.fromARGB(255, 189, 75, 3),
                                           shape: BoxShape.circle,
                                         ),
                                         child: Text(
@@ -348,7 +349,8 @@ class ViewCartPage extends StatelessWidget {
                                 ElevatedButton(
                                   onPressed: () {},
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 189, 75, 3),
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 16, vertical: 12),
                                   ),
