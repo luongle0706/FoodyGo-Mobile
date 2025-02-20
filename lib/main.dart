@@ -4,12 +4,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/service/notification_service.dart';
 import 'package:foodygo/utils/injection.dart';
-import 'package:foodygo/view/pages/add_to_cart_page.dart';
+import 'package:foodygo/view/pages/add_to_cart.dart';
+import 'package:foodygo/view/pages/confirm_order.dart';
 import 'package:foodygo/view/pages/detail_order.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/food_detail.dart';
 import 'package:foodygo/view/pages/foodyxu_history_page.dart';
 import 'package:foodygo/view/pages/login.dart';
+import 'package:foodygo/view/pages/order_success.dart';
 import 'package:foodygo/view/pages/profile.dart';
 import 'package:foodygo/view/pages/protected_routes.dart';
 import 'package:foodygo/view/pages/register.dart';
@@ -19,6 +21,7 @@ import 'package:foodygo/view/pages/register_success.dart';
 import 'package:foodygo/view/pages/topup_page.dart';
 import 'package:foodygo/view/pages/transaction_detail_detail.dart';
 import 'package:foodygo/view/pages/transfer_points_page.dart';
+import 'package:foodygo/view/pages/view_cart.dart';
 import 'package:foodygo/view/pages/wallet_homepage.dart';
 import 'package:foodygo/view/pages/withdraw_page.dart';
 import 'package:go_router/go_router.dart';
@@ -46,7 +49,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/protected/home',
+        initialLocation: '/confirm-order',
         routes: [
           ShellRoute(
               builder: (context, state, child) {
@@ -97,6 +100,13 @@ class Main extends StatelessWidget {
                   },
                 ),
                 GoRoute(
+                  name: 'order_success',
+                  path: '/order-success',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: OrderSuccessPage());
+                  },
+                ),
+                GoRoute(
                   name: 'protected_wallet_topup',
                   path: '/protected/wallet/topup',
                   pageBuilder: (context, state) {
@@ -137,7 +147,13 @@ class Main extends StatelessWidget {
                   pageBuilder: (context, state) {
                     return MaterialPage(child: AddToCartPage());
                   },
-                )
+                ),
+                GoRoute(
+                    name: 'protected_view_cart',
+                    path: '/protected/view-cart',
+                    pageBuilder: (context, state) {
+                      return MaterialPage(child: ViewCartPage());
+                    })
               ]),
           // GoRoute(
           //     name: 'home',
@@ -162,6 +178,12 @@ class Main extends StatelessWidget {
               path: '/protected/detail-order',
               pageBuilder: (context, state) {
                 return MaterialPage(child: DetailOrder());
+              }),
+          GoRoute(
+              name: 'confirm_order',
+              path: '/confirm-order',
+              pageBuilder: (context, state) {
+                return MaterialPage(child: ConfirmOrderPage());
               }),
           GoRoute(
               name: 'login',
