@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodygo/firebase_options.dart';
+import 'package:foodygo/service/notification_service.dart';
 import 'package:foodygo/utils/injection.dart';
 import 'package:foodygo/view/pages/add_to_cart_page.dart';
 import 'package:foodygo/view/pages/detail_order.dart';
@@ -28,7 +29,9 @@ void main() async {
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-  );
+  ).then((value) => print('Firebase here, HELLO'));
+
+  await NotificationService.instance.initialize();
 
   setupInjection();
   runApp(Main());
@@ -153,7 +156,7 @@ class Main extends StatelessWidget {
           //     path: '/welcome',
           //     pageBuilder: (context, state) {
           //       return MaterialPage(child: WelcomeScreen());
-                  //     }),
+          //     }),
           GoRoute(
               name: 'detail_order',
               path: '/protected/detail-order',

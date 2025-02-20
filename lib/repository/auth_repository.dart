@@ -11,6 +11,8 @@ class AuthRepository {
       body: json.encode(request.toJson()),
     );
 
+    print("HELLO");
+
     if (response.statusCode == 200 || response.statusCode == 400) {
       final Map<String, dynamic> jsonResponse = json.decode(response.body);
       final Map<String, dynamic> data = jsonResponse['data'];
