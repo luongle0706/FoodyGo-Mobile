@@ -10,6 +10,7 @@ import 'package:foodygo/view/pages/detail_order.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/food_detail.dart';
 import 'package:foodygo/view/pages/foodyxu_history_page.dart';
+import 'package:foodygo/view/pages/home.dart';
 import 'package:foodygo/view/pages/login.dart';
 import 'package:foodygo/view/pages/order_history.dart';
 import 'package:foodygo/view/pages/order_success.dart';
@@ -50,7 +51,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/confirm-order',
+        initialLocation: '/protected/home',
         routes: [
           ShellRoute(
               builder: (context, state, child) {
@@ -61,7 +62,7 @@ class Main extends StatelessWidget {
                   name: 'protected_home',
                   path: '/protected/home',
                   pageBuilder: (context, state) {
-                    return MaterialPage(child: EmptyPage());
+                    return MaterialPage(child: HomePage());
                   },
                 ),
                 GoRoute(

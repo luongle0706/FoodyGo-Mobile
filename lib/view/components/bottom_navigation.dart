@@ -19,13 +19,13 @@ class FoodyGoNavigationBar extends StatelessWidget {
           },
           icon: Image.asset(
             imagePath,
-            width: 36,
-            height: 36,
+            width: 28,
+            height: 28,
           ),
         ),
         Text(
           name,
-          style: TextStyle(fontSize: 13, color: Colors.black),
+          style: TextStyle(fontSize: 12, color: Colors.black),
         ),
       ],
     );
@@ -34,8 +34,8 @@ class FoodyGoNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 120,
-      padding: const EdgeInsets.symmetric(vertical: 20),
+      height: 100,
+      padding: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: const BorderRadius.only(

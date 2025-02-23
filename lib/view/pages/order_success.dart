@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:foodygo/view/components/bottom_navigation.dart';
 import 'package:go_router/go_router.dart';
 
 class OrderSuccessPage extends StatelessWidget {
