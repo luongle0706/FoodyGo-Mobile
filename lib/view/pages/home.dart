@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodygo/view/components/header.dart';
-import 'package:foodygo/view/components/product/product_preview.dart';
+import 'package:foodygo/view/components/restaurant/restaurant_preview.dart';
 import 'package:foodygo/view/theme.dart';
 
 class HomePage extends StatelessWidget {
@@ -9,90 +9,78 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Danh sách sản phẩm mẫu
-    final List<Map<String, String>> products = [
+    final List<Map<String, String>> restaurants = [
       {
         'imageUrl':
             'https://img-global.cpcdn.com/recipes/49876fe80303b991/640x640sq70/photo.webp',
         'restaurantName': 'Cơm tấm Ngô Quyền',
-        'productName': 'Cơm sườn trứng',
-        'price': '25.000đ'
+        'address': '123 phố ẩm thực, đường Đông Hòa',
       },
       {
         'imageUrl':
             'https://img-global.cpcdn.com/recipes/49876fe80303b991/640x640sq70/photo.webp',
         'restaurantName': 'Cơm tấm Ngô Quyền',
-        'productName': 'Cơm sườn trứng',
-        'price': '25.000đ'
+        'address': '123 phố ẩm thực, đường Đông Hòa',
       },
       {
         'imageUrl':
             'https://img-global.cpcdn.com/recipes/49876fe80303b991/640x640sq70/photo.webp',
         'restaurantName': 'Cơm tấm Ngô Quyền',
-        'productName': 'Cơm sườn trứng',
-        'price': '25.000đ'
+        'address': '123 phố ẩm thực, đường Đông Hòa',
       },
       {
         'imageUrl':
             'https://img-global.cpcdn.com/recipes/49876fe80303b991/640x640sq70/photo.webp',
         'restaurantName': 'Cơm tấm Ngô Quyền',
-        'productName': 'Cơm sườn trứng',
-        'price': '25.000đ'
+        'address': '123 phố ẩm thực, đường Đông Hòa',
       },
       {
         'imageUrl':
             'https://img-global.cpcdn.com/recipes/49876fe80303b991/640x640sq70/photo.webp',
         'restaurantName': 'Cơm tấm Ngô Quyền',
-        'productName': 'Cơm sườn trứng',
-        'price': '25.000đ'
+        'address': '123 phố ẩm thực, đường Đông Hòa',
       },
       {
         'imageUrl':
             'https://img-global.cpcdn.com/recipes/49876fe80303b991/640x640sq70/photo.webp',
         'restaurantName': 'Cơm tấm Ngô Quyền',
-        'productName': 'Cơm sườn trứng',
-        'price': '25.000đ'
+        'address': '123 phố ẩm thực, đường Đông Hòa',
       },
       {
         'imageUrl':
             'https://img-global.cpcdn.com/recipes/49876fe80303b991/640x640sq70/photo.webp',
         'restaurantName': 'Cơm tấm Ngô Quyền',
-        'productName': 'Cơm sườn trứng',
-        'price': '25.000đ'
+        'address': '123 phố ẩm thực, đường Đông Hòa',
       },
       {
         'imageUrl':
             'https://img-global.cpcdn.com/recipes/49876fe80303b991/640x640sq70/photo.webp',
         'restaurantName': 'Cơm tấm Ngô Quyền',
-        'productName': 'Cơm sườn trứng',
-        'price': '25.000đ'
+        'address': '123 phố ẩm thực, đường Đông Hòa',
       },
       {
         'imageUrl':
             'https://img-global.cpcdn.com/recipes/49876fe80303b991/640x640sq70/photo.webp',
         'restaurantName': 'Cơm tấm Ngô Quyền',
-        'productName': 'Cơm sườn trứng',
-        'price': '25.000đ'
+        'address': '123 phố ẩm thực, đường Đông Hòa',
       },
       {
         'imageUrl':
             'https://img-global.cpcdn.com/recipes/49876fe80303b991/640x640sq70/photo.webp',
         'restaurantName': 'Cơm tấm Ngô Quyền',
-        'productName': 'Cơm sườn trứng',
-        'price': '25.000đ'
+        'address': '123 phố ẩm thực, đường Đông Hòa',
       },
       {
         'imageUrl':
             'https://img-global.cpcdn.com/recipes/49876fe80303b991/640x640sq70/photo.webp',
         'restaurantName': 'Cơm tấm Ngô Quyền',
-        'productName': 'Cơm sườn trứng',
-        'price': '25.000đ'
+        'address': '123 phố ẩm thực, đường Đông Hòa',
       },
       {
         'imageUrl':
             'https://img-global.cpcdn.com/recipes/49876fe80303b991/640x640sq70/photo.webp',
         'restaurantName': 'Cơm tấm Ngô Quyền',
-        'productName': 'Cơm sườn trứng',
-        'price': '25.000đ'
+        'address': '123 phố ẩm thực, đường Đông Hòa',
       },
     ];
 
@@ -107,7 +95,7 @@ class HomePage extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Text(
-                "Đồ ăn phổ biến",
+                "Quán ăn phổ biến",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
           ),
@@ -123,16 +111,15 @@ class HomePage extends StatelessWidget {
                     crossAxisCount: crossAxisCount,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 0.75,
+                    childAspectRatio: 1,
                   ),
-                  itemCount: products.length,
+                  itemCount: restaurants.length,
                   itemBuilder: (context, index) {
-                    final product = products[index];
-                    return ProductPreview(
-                      imageUrl: product['imageUrl']!,
-                      restaurantName: product['restaurantName']!,
-                      productName: product['productName']!,
-                      price: product['price']!,
+                    final restaurant = restaurants[index];
+                    return RestaurantPreview(
+                      imageUrl: restaurant['imageUrl']!,
+                      restaurantName: restaurant['restaurantName']!,
+                      address: restaurant['address']!,
                     );
                   },
                 );

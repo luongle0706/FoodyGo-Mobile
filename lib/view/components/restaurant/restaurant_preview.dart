@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
-class ProductPreview extends StatelessWidget {
+class RestaurantPreview extends StatelessWidget {
   final String imageUrl;
   final String restaurantName;
-  final String productName;
-  final String price;
+  final String address;
 
-  const ProductPreview({
-    Key? key,
+  const RestaurantPreview({
     required this.imageUrl,
     required this.restaurantName,
-    required this.productName,
-    required this.price,
-  }) : super(key: key);
+    required this.address,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -59,22 +55,13 @@ class ProductPreview extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             Text(
-              productName,
+              address,
               style: const TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
               ),
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              price,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
-              ),
             ),
           ],
         ),

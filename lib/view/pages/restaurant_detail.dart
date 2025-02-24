@@ -17,6 +17,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   // Mock restaurant and menu data
   final Map<String, dynamic> restaurantInfo = {
     "name": "Cơm tấm Ngô Quyền",
+    "image": "https://img-global.cpcdn.com/recipes/49876fe80303b991/640x640sq70/photo.webp",
     "description":
         "Tiệm này bán cơm sườn, ba rọi, xiên nướng, gà nướng, bì, chả. Cơm thêm, canh thêm miễn phí. Mại dô, mại dô!",
     "phone": "0123 456 789",
@@ -69,9 +70,15 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                    child: Text("Ảnh đại diện quán",
-                        style: TextStyle(fontSize: 16))),
+                ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                restaurantInfo['image'],
+                height: 100,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
                 SizedBox(height: 8),
                 Text(
                   restaurantInfo['name'],
