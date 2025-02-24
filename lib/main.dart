@@ -20,6 +20,7 @@ import 'package:foodygo/view/pages/register.dart';
 import 'package:foodygo/view/pages/register_info.dart';
 import 'package:foodygo/view/pages/otp.dart';
 import 'package:foodygo/view/pages/register_success.dart';
+import 'package:foodygo/view/pages/restaurant_detail.dart';
 import 'package:foodygo/view/pages/topup_page.dart';
 import 'package:foodygo/view/pages/transaction_detail_detail.dart';
 import 'package:foodygo/view/pages/transfer_points_page.dart';
@@ -34,7 +35,7 @@ void main() async {
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-  ).then((value) => print('Firebase here, HELLO'));
+  );
 
   await NotificationService.instance.initialize();
 
@@ -157,24 +158,6 @@ class Main extends StatelessWidget {
                       return MaterialPage(child: ViewCartPage());
                     })
               ]),
-          // GoRoute(
-          //     name: 'home',
-          //     path: '/',
-          //     pageBuilder: (context, state) {
-          //       return MaterialPage(child: HomePage());
-          //     }),
-          // GoRoute(
-          //     name: 'splash_screen',
-          //     path: '/splash',
-          //     pageBuilder: (context, state) {
-          //       return MaterialPage(child: SplashScreen());
-          //     }),
-          // GoRoute(
-          //     name: 'welcome_screen',
-          //     path: '/welcome',
-          //     pageBuilder: (context, state) {
-          //       return MaterialPage(child: WelcomeScreen());
-          //     }),
           GoRoute(
               name: 'detail_order',
               path: '/protected/detail-order',
@@ -186,6 +169,14 @@ class Main extends StatelessWidget {
               path: '/protected/order-history',
               pageBuilder: (context, state) {
                 return MaterialPage(child: OrderHistory());
+              }),
+          GoRoute(
+              name: 'protected_restaurant_detail',
+              path: '/protected/restaurant-detail/:id',
+              pageBuilder: (context, state) {
+                final restaurantId = int.parse(state.pathParameters['id']!);
+                return MaterialPage(
+                    child: RestaurantDetailPage(restaurantId: restaurantId));
               }),
           GoRoute(
               name: 'confirm_order',
