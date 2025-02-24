@@ -1,6 +1,25 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+final Map<String, AndroidNotificationChannel> _channels = {
+  'delivery': AndroidNotificationChannel(
+      'delivery_channel', 'Delivery Notifications',
+      description: 'Notifications for delivery updates',
+      importance: Importance.high),
+  'chat': AndroidNotificationChannel(
+    'chat_channel',
+    'Chat Messages',
+    description: 'Notifications for new chat messages',
+    importance: Importance.max, // Max for chat messages
+  ),
+  'general': AndroidNotificationChannel(
+    'general_channel',
+    'General Notifications',
+    description: 'Other general notifications',
+    importance: Importance.defaultImportance, // Normal notifications
+  ),
+};
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await NotificationService.instance.setupFlutterNotifications();
@@ -42,14 +61,19 @@ class NotificationService {
       return;
     }
 
-    const channel = AndroidNotificationChannel(
-        'high_importance_channel', 'High Importance Notifications',
-        importance: Importance.max);
+    final androidImplementation =
+        _localNotifications.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
 
-    await _localNotifications
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
+    if (androidImplementation != null) {
+      for (var channel in _channels.values) {
+        await androidImplementation.deleteNotificationChannel(channel.id);
+      }
+
+      for (var channel in _channels.values) {
+        await androidImplementation.createNotificationChannel(channel);
+      }
+    }
 
     const initializationSettingsAndroid =
         AndroidInitializationSettings("@mipmap/ic_launcher");
@@ -71,17 +95,27 @@ class NotificationService {
     AndroidNotification? android = message.notification?.android;
 
     if (notification != null && android != null) {
+      String type = message.data['type'] ?? 'general';
+      AndroidNotificationChannel channel =
+          _channels[type] ?? _channels['general']!;
+
+      // Generate a unique ID for each notification
+      int notificationId =
+          DateTime.now().millisecondsSinceEpoch.remainder(100000);
+
       await _localNotifications.show(
-          notification.hashCode,
+          notificationId,
           notification.title,
           notification.body,
           NotificationDetails(
-              android: AndroidNotificationDetails(
-                  'high_importance_channel', 'High Importance Notifications',
-                  channelDescription:
-                      'This channel is used for important notifications.',
+              android: AndroidNotificationDetails(channel.id, channel.name,
+                  channelDescription: channel.description,
                   importance: Importance.max,
                   priority: Priority.max,
+                  fullScreenIntent: true,
+                  playSound: true,
+                  sound: RawResourceAndroidNotificationSound(
+                      'notification_sound.mp3'.split('.').first),
                   icon: '@mipmap/ic_launcher')));
     }
   }
