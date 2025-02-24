@@ -1,9 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/service/notification_service.dart';
-import 'package:foodygo/utils/injection.dart';
+import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/pages/add_to_cart.dart';
 import 'package:foodygo/view/pages/confirm_order.dart';
 import 'package:foodygo/view/pages/detail_order.dart';
@@ -38,8 +37,6 @@ void main() async {
   );
 
   await NotificationService.instance.initialize();
-
-  setupInjection();
   runApp(Main());
 }
 
@@ -47,7 +44,7 @@ class Main extends StatelessWidget {
   const Main({super.key});
 
   Future<bool> isAuthenticated() async {
-    String? savedUser = await locator<FlutterSecureStorage>().read(key: 'user');
+    String? savedUser = await SecureStorage.instance.get(key: 'user');
     return savedUser != null;
   }
 

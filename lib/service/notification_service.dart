@@ -1,5 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:foodygo/firebase_options.dart';
+import 'package:foodygo/utils/app_logger.dart';
+import 'package:foodygo/utils/secure_storage.dart';
 
 final Map<String, AndroidNotificationChannel> _channels = {
   'delivery': AndroidNotificationChannel(
@@ -22,8 +26,17 @@ final Map<String, AndroidNotificationChannel> _channels = {
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await NotificationService.instance.setupFlutterNotifications();
   await NotificationService.instance.showNotification(message);
+}
+
+@pragma('vm:entry-point')
+void notificationResponseBackgroundHandler(NotificationResponse response) {
+  // Handle the notification response.
+  // For example, log the response or navigate to a specific screen.
 }
 
 class NotificationService {
@@ -34,13 +47,17 @@ class NotificationService {
   final _localNotifications = FlutterLocalNotificationsPlugin();
   bool _isFlutterLocalNotificationsInitialized = false;
 
+  final logger = AppLogger.instance;
+  final storage = SecureStorage.instance;
+
   Future<void> initialize() async {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     await _requestPermission();
     await _setupMessageHandlers();
 
     final token = await _messaging.getToken();
-    print('FCM Token: $token');
+    logger.info("FCM Token: $token");
+    storage.put(key: 'fcm_token', value: token!);
   }
 
   Future<void> _requestPermission() async {
@@ -52,8 +69,7 @@ class NotificationService {
         announcement: false,
         carPlay: false,
         criticalAlert: false);
-
-    print("Permission status: ${settings.authorizationStatus}");
+    logger.info("Permission status: ${settings.authorizationStatus}");
   }
 
   Future<void> setupFlutterNotifications() async {
@@ -85,19 +101,21 @@ class NotificationService {
         InitializationSettings(android: initializationSettingsAndroid);
 
     await _localNotifications.initialize(initializationSettings,
-        onDidReceiveBackgroundNotificationResponse: (details) {});
+        onDidReceiveBackgroundNotificationResponse:
+            notificationResponseBackgroundHandler);
 
     _isFlutterLocalNotificationsInitialized = true;
   }
 
   Future<void> showNotification(RemoteMessage message) async {
-    RemoteNotification? notification = message.notification;
-    AndroidNotification? android = message.notification?.android;
+    String? title = message.notification?.title ?? message.data['title'];
+    String? body = message.notification?.body ?? message.data['body'];
+    // RemoteNotification? notification = message.notification;
+    // AndroidNotification? android = message.notification?.android;
 
-    if (notification != null && android != null) {
-      String type = message.data['type'] ?? 'general';
+    if (title != null && body != null) {
       AndroidNotificationChannel channel =
-          _channels[type] ?? _channels['general']!;
+          _channels[message.data['type'] ?? 'chat']!;
 
       // Generate a unique ID for each notification
       int notificationId =
@@ -105,8 +123,8 @@ class NotificationService {
 
       await _localNotifications.show(
           notificationId,
-          notification.title,
-          notification.body,
+          title,
+          body,
           NotificationDetails(
               android: AndroidNotificationDetails(channel.id, channel.name,
                   channelDescription: channel.description,

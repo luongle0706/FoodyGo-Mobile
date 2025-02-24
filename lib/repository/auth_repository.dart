@@ -1,9 +1,15 @@
 import 'package:foodygo/dto/login_dto.dart';
+import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/constants.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AuthRepository {
+  AuthRepository._();
+  static final AuthRepository instance = AuthRepository._();
+
+  final logger = AppLogger.instance;
+
   Future<LoginResponseDTO> login(LoginRequestDTO request) async {
     final response = await http.post(
       Uri.parse('$globalURL/api/v1/authentications/login'),
@@ -11,27 +17,26 @@ class AuthRepository {
       body: json.encode(request.toJson()),
     );
 
-    print("HELLO");
-
-    if (response.statusCode == 200 || response.statusCode == 400) {
+    if (response.statusCode == 200) {
       final Map<String, dynamic> jsonResponse = json.decode(response.body);
-      final Map<String, dynamic> data = jsonResponse['data'];
+      logger.info(jsonResponse.toString());
       return LoginResponseDTO(
-          code: data['code'],
-          message: data['message'],
-          token: data['token'],
-          refreshToken: data['refreshToken'],
-          fullName: data['fullName'],
-          email: data['email']);
+          code: jsonResponse['code'],
+          message: jsonResponse['message'],
+          token: jsonResponse['token'],
+          refreshToken: jsonResponse['refreshToken'],
+          fullName: jsonResponse['fullName'],
+          email: jsonResponse['email']);
     } else {
       throw Exception('Failed to load data!');
     }
   }
 
-  Future<LoginResponseDTO> loginByGoogle(String googleIdToken) async {
+  Future<LoginResponseDTO> loginByGoogle(
+      String googleIdToken, String fcmToken) async {
     final url =
-        '$globalURL/api/v1/authentications/firebase?googleIdToken=$googleIdToken';
-    print('Sending request to: $url');
+        '$globalURL/api/v1/authentications/firebase?googleIdToken=$googleIdToken&fcmToken=$fcmToken';
+    logger.info('Sending request to: $url');
 
     try {
       final response = await http.post(
@@ -39,9 +44,8 @@ class AuthRepository {
         headers: {'Content-Type': 'application/json'},
       );
 
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-      print(response.toString());
+      logger.info('Response Status Code: ${response.statusCode}');
+      logger.info('Response Body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 400) {
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
@@ -59,19 +63,8 @@ class AuthRepository {
             'Failed to load data! Status Code: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error occurred: $e');
+      logger.error('Error occurred: $e');
       rethrow;
     }
   }
-
-  // void test(String idToken) async {
-  //   final response = await http.get(Uri.parse(
-  //       '$globalURL/api/v1/authentications/firebase-decode-token?authorizationHeader=$idToken'));
-
-  //   if (response.statusCode == 200) {
-  //     print('Success');
-  //   } else {
-  //     throw Exception('Failed to load data!');
-  //   }
-  // }
 }
