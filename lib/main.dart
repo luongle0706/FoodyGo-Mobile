@@ -20,6 +20,7 @@ import 'package:foodygo/view/pages/register_info.dart';
 import 'package:foodygo/view/pages/otp.dart';
 import 'package:foodygo/view/pages/register_success.dart';
 import 'package:foodygo/view/pages/restaurant_detail.dart';
+import 'package:foodygo/view/pages/restaurant_menu.dart';
 import 'package:foodygo/view/pages/topup_page.dart';
 import 'package:foodygo/view/pages/transaction_detail_detail.dart';
 import 'package:foodygo/view/pages/transfer_points_page.dart';
@@ -166,6 +167,12 @@ class Main extends StatelessWidget {
               path: '/protected/order-history',
               pageBuilder: (context, state) {
                 return MaterialPage(child: OrderHistory());
+              }),
+          GoRoute(
+              name: 'restaurant_menu',
+              path: '/protected/restaurant_menu',
+              pageBuilder: (context, state) {
+                return MaterialPage(child: RestaurantMenu());
               }),
           GoRoute(
               name: 'protected_restaurant_detail',
