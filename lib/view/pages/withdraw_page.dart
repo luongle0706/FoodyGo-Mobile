@@ -4,7 +4,6 @@ class WithdrawPage extends StatefulWidget {
   const WithdrawPage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _WithdrawPageState createState() => _WithdrawPageState();
 }
 
@@ -15,72 +14,119 @@ class _WithdrawPageState extends State<WithdrawPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[300], // Background color
       appBar: AppBar(
-        title: Text('Rút tiền'),
+        backgroundColor: Colors.grey[400], // App bar color
+        title: const Text(
+          'Rút tiền',
+          style: TextStyle(
+              color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
+        elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Nhập số tiền cần rút',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
+            const Text(
+              'Nhập số tiền cần rút',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
             Container(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.black, width: 1),
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextField(
-                    controller: _amountController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      suffixText: 'đ',
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        _amount = double.tryParse(value) ?? 0;
-                      });
-                    },
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _amountController,
+                          keyboardType: TextInputType.number,
+                          style: const TextStyle(fontSize: 16),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            isDense: true,
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              _amount = double.tryParse(value) ?? 0;
+                            });
+                          },
+                        ),
+                      ),
+                      const Text(
+                        'đ',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 10),
-                  Text(
-                      'Tổng xu sẽ trừ: ${(_amount / 1000).toStringAsFixed(0)} FoodyXu',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  Text('(1.000đ = 1 FoodyXu)',
-                      style: TextStyle(color: Colors.grey)),
+                  const Divider(thickness: 1, color: Colors.black),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Tổng xu sẽ trừ',
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '${(_amount / 1000).toStringAsFixed(0)} FoodyXu',
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    '(1.000đ = 1 FoodyXu)',
+                    style: TextStyle(fontSize: 12, color: Colors.black54),
+                  ),
                 ],
               ),
             ),
-            Spacer(),
+            const Spacer(),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 14),
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  side: const BorderSide(color: Colors.black, width: 1),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8)),
+                  backgroundColor: Colors.white,
                 ),
                 onPressed: () {
                   if (_amount == 0) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Vui lòng nhập số tiền hợp lệ!')),
+                      const SnackBar(
+                          content: Text('Vui lòng nhập số tiền hợp lệ!')),
                     );
                   } else {
-                    // Xử lý rút tiền về ngân hàng
+                    // Handle withdrawal action
                   }
                 },
-                child: Text('Thực hiện rút tiền về ví',
-                    style: TextStyle(fontSize: 16)),
+                child: const Text(
+                  'Thực hiện rút tiền về ví',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
               ),
             ),
           ],

@@ -1,89 +1,91 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/service/auth_service.dart';
 import 'package:foodygo/utils/app_logger.dart';
-import 'package:foodygo/utils/secure_storage.dart';
-import 'package:foodygo/view/theme.dart';
+import 'package:go_router/go_router.dart';
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+class UserProfileScreen extends StatelessWidget {
+  UserProfileScreen({super.key});
 
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends State<ProfilePage> {
-  Future<SavedUser>? _userFuture;
   final authService = AuthService.instance;
   final logger = AppLogger.instance;
 
   @override
-  void initState() {
-    super.initState();
-    _loadUser();
-  }
-
-  void _loadUser() {
-    setState(() {
-      _userFuture = _fetchUser();
-    });
-  }
-
-  Future<SavedUser> _fetchUser() async {
-    String? savedUser = await SecureStorage.instance.get(key: 'user');
-    if (savedUser == null) {
-      throw Exception('User not found!');
-    }
-    Map<String, dynamic> userMap = json.decode(savedUser);
-    return SavedUser(
-        email: userMap['email'],
-        token: userMap['token'],
-        fullName: userMap['fullName']);
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text('Profile'),
-      ),
-      body: FutureBuilder(
-          future: _userFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              logger.error(snapshot.error.toString());
-              return Column(
+      body: Column(
+        children: [
+          GestureDetector(
+            onTap: () {
+              GoRouter.of(context).push("/protected/user/detail");
+            },
+            child: Padding(
+              padding:
+                  EdgeInsets.only(top: 50, left: 16, right: 16, bottom: 20),
+              child: Row(
                 children: [
-                  OutlinedButton(
-                    onPressed: () => authService.signOut(context),
-                    child: Text("Sign out"),
+                  CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.grey.shade300,
+                    child: Icon(Icons.person, color: Colors.black54),
                   ),
-                  Center(child: Text('Error!')),
-                ],
-              );
-            }
-            final user = snapshot.data!;
-            return SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Email: ${user.email}'),
-                  Text('Full Name: ${user.fullName}'),
-                  Text('Token: ${user.token}'),
-                  OutlinedButton(
-                    onPressed: () => authService.signOut(context),
-                    child: Text("Sign out"),
-                  ),
+                  SizedBox(width: 16),
+                  Text("Anh Nguyen",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ],
               ),
-            );
-          }),
+            ),
+          ),
+          Divider(),
+          _buildListTile("Foody Xu"),
+          _buildListTile("Địa chỉ"),
+          _buildListTile("Chính sách quy định"),
+          _buildListTile("Về FoodyGo"),
+          SizedBox(height: 20),
+          _buildLogoutButton(context),
+          Spacer(),
+          Text("Phiên bản 0.1", style: TextStyle(color: Colors.black54)),
+          SizedBox(height: 4),
+          Text("FoodyGo Corporation", style: TextStyle(color: Colors.black54)),
+          SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildListTile(String title) {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(title, style: TextStyle(fontSize: 16)),
+              Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
+            ],
+          ),
+        ),
+        Divider(),
+      ],
+    );
+  }
+
+  Widget _buildLogoutButton(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: ElevatedButton(
+        onPressed: () => authService.signOut(context),
+        style: ElevatedButton.styleFrom(
+          minimumSize: Size(double.infinity, 48),
+          backgroundColor: Colors.grey,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        child: Text("Đăng Xuất",
+            style: TextStyle(fontSize: 16, color: Colors.black)),
+      ),
     );
   }
 }

@@ -14,6 +14,7 @@ import 'package:foodygo/view/pages/login.dart';
 import 'package:foodygo/view/pages/order_history.dart';
 import 'package:foodygo/view/pages/order_success.dart';
 import 'package:foodygo/view/pages/profile.dart';
+import 'package:foodygo/view/pages/profile_detail_page.dart';
 import 'package:foodygo/view/pages/protected_routes.dart';
 import 'package:foodygo/view/pages/register.dart';
 import 'package:foodygo/view/pages/register_info.dart';
@@ -139,7 +140,14 @@ class Main extends StatelessWidget {
                   name: 'protected_user',
                   path: '/protected/user',
                   pageBuilder: (context, state) {
-                    return MaterialPage(child: ProfilePage());
+                    return MaterialPage(child: UserProfileScreen());
+                  },
+                ),
+                GoRoute(
+                  name: 'protected_user_detail',
+                  path: '/protected/user/detail',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: ProfileDetailPage());
                   },
                 ),
                 GoRoute(
@@ -154,7 +162,7 @@ class Main extends StatelessWidget {
                     path: '/protected/view-cart',
                     pageBuilder: (context, state) {
                       return MaterialPage(child: ViewCartPage());
-                    })
+                    }),
               ]),
           GoRoute(
               name: 'detail_order',
