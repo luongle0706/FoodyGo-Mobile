@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/service/auth_service.dart';
-import 'package:foodygo/utils/injection.dart';
+import 'package:foodygo/utils/app_logger.dart';
+import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/theme.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -16,6 +16,8 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   Future<SavedUser>? _userFuture;
+  final authService = AuthService.instance;
+  final logger = AppLogger.instance;
 
   @override
   void initState() {
@@ -30,7 +32,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<SavedUser> _fetchUser() async {
-    String? savedUser = await locator<FlutterSecureStorage>().read(key: 'user');
+    String? savedUser = await SecureStorage.instance.get(key: 'user');
     if (savedUser == null) {
       throw Exception('User not found!');
     }
@@ -55,11 +57,11 @@ class _ProfilePageState extends State<ProfilePage> {
               return Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError) {
-              print(snapshot.error);
+              logger.error(snapshot.error.toString());
               return Column(
                 children: [
                   OutlinedButton(
-                    onPressed: () => locator<AuthService>().signOut(context),
+                    onPressed: () => authService.signOut(context),
                     child: Text("Sign out"),
                   ),
                   Center(child: Text('Error!')),
@@ -75,7 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Text('Full Name: ${user.fullName}'),
                   Text('Token: ${user.token}'),
                   OutlinedButton(
-                    onPressed: () => locator<AuthService>().signOut(context),
+                    onPressed: () => authService.signOut(context),
                     child: Text("Sign out"),
                   ),
                 ],
