@@ -1,10 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/restaurant_dto.dart';
 import 'package:foodygo/view/components/header.dart';
 import 'package:foodygo/view/components/restaurant/restaurant_preview.dart';
 import 'package:foodygo/view/theme.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+
+
+  @override
+  void initState() {
+    super.initState();
+    //_loadRestaurants();
+  }
+
+  // Future<RestaurantDto> _loadRestaurants() async {
+  //   String? savedUser = 
+  //   return null;
+  // }
+
+  
 
   @override
   Widget build(BuildContext context) {

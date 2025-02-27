@@ -5,6 +5,7 @@ import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/service/notification_service.dart';
 import 'package:foodygo/utils/injection.dart';
 import 'package:foodygo/view/pages/add_to_cart.dart';
+import 'package:foodygo/view/pages/add_topping_section.dart';
 import 'package:foodygo/view/pages/confirm_order.dart';
 import 'package:foodygo/view/pages/detail_order.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
@@ -152,11 +153,12 @@ class Main extends StatelessWidget {
                   },
                 ),
                 GoRoute(
-                    name: 'protected_view_cart',
-                    path: '/protected/view-cart',
-                    pageBuilder: (context, state) {
-                      return MaterialPage(child: ViewCartPage());
-                    })
+                  name: 'protected_view_cart',
+                  path: '/protected/view-cart',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: ViewCartPage());
+                  },
+                ),
               ]),
           GoRoute(
               name: 'detail_order',
@@ -178,6 +180,13 @@ class Main extends StatelessWidget {
                 return MaterialPage(
                     child: RestaurantDetailPage(restaurantId: restaurantId));
               }),
+          GoRoute(
+            name: 'protected_add_topping_section',
+            path: '/protected/add-topping-section',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: AddToppingSection());
+            },
+          ),
           GoRoute(
               name: 'confirm_order',
               path: '/confirm-order',
