@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodygo/service/auth_service.dart';
-import 'package:foodygo/utils/injection.dart';
-import 'package:foodygo/view/components/button.dart';
+import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/view/components/image_tile.dart';
 import 'package:foodygo/view/components/input_field_w_icon.dart';
 import 'package:foodygo/view/theme.dart';
@@ -12,6 +11,8 @@ class LoginPage extends StatelessWidget {
 
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
+  final authService = AuthService.instance;
+  final logger = AppLogger.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -72,12 +73,29 @@ class LoginPage extends StatelessWidget {
 
               SizedBox(height: 25),
 
-              // Sign in button
-              MyButton(
-                onTap: () => locator.get<AuthService>().signIn(
-                    usernameController.text, passwordController.text, context),
-                text: 'Đăng nhập',
-                color: AppColors.primary,
+              GestureDetector(
+                onTap: () async {
+                  authService.signIn(usernameController.text,
+                      passwordController.text, context);
+                },
+                child: Container(
+                  padding: EdgeInsets.all(15),
+                  margin: EdgeInsets.symmetric(horizontal: 25),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Đăng nhập',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
               ),
 
               SizedBox(height: 50),
@@ -128,8 +146,7 @@ class LoginPage extends StatelessWidget {
                   ImageTile(
                     imagePath: 'assets/images/google.png',
                     text: 'Google',
-                    onTap: () =>
-                        locator.get<AuthService>().signInWithGoogle(context),
+                    onTap: () => authService.signInWithGoogle(context),
                   ),
                 ],
               ),

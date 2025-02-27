@@ -1,9 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/service/notification_service.dart';
-import 'package:foodygo/utils/injection.dart';
+import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/pages/add_to_cart.dart';
 import 'package:foodygo/view/pages/add_topping_section.dart';
 import 'package:foodygo/view/pages/confirm_order.dart';
@@ -16,12 +15,14 @@ import 'package:foodygo/view/pages/login.dart';
 import 'package:foodygo/view/pages/order_history.dart';
 import 'package:foodygo/view/pages/order_success.dart';
 import 'package:foodygo/view/pages/profile.dart';
+import 'package:foodygo/view/pages/profile_detail_page.dart';
 import 'package:foodygo/view/pages/protected_routes.dart';
 import 'package:foodygo/view/pages/register.dart';
 import 'package:foodygo/view/pages/register_info.dart';
 import 'package:foodygo/view/pages/otp.dart';
 import 'package:foodygo/view/pages/register_success.dart';
 import 'package:foodygo/view/pages/restaurant_detail.dart';
+import 'package:foodygo/view/pages/restaurant_menu.dart';
 import 'package:foodygo/view/pages/topup_page.dart';
 import 'package:foodygo/view/pages/transaction_detail_detail.dart';
 import 'package:foodygo/view/pages/transfer_points_page.dart';
@@ -39,8 +40,6 @@ void main() async {
   );
 
   await NotificationService.instance.initialize();
-
-  setupInjection();
   runApp(Main());
 }
 
@@ -48,7 +47,7 @@ class Main extends StatelessWidget {
   const Main({super.key});
 
   Future<bool> isAuthenticated() async {
-    String? savedUser = await locator<FlutterSecureStorage>().read(key: 'user');
+    String? savedUser = await SecureStorage.instance.get(key: 'user');
     return savedUser != null;
   }
 
@@ -142,7 +141,14 @@ class Main extends StatelessWidget {
                   name: 'protected_user',
                   path: '/protected/user',
                   pageBuilder: (context, state) {
-                    return MaterialPage(child: ProfilePage());
+                    return MaterialPage(child: UserProfileScreen());
+                  },
+                ),
+                GoRoute(
+                  name: 'protected_user_detail',
+                  path: '/protected/user/detail',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: ProfileDetailPage());
                   },
                 ),
                 GoRoute(
@@ -171,6 +177,12 @@ class Main extends StatelessWidget {
               path: '/protected/order-history',
               pageBuilder: (context, state) {
                 return MaterialPage(child: OrderHistory());
+              }),
+          GoRoute(
+              name: 'restaurant_menu',
+              path: '/protected/restaurant_menu',
+              pageBuilder: (context, state) {
+                return MaterialPage(child: RestaurantMenu());
               }),
           GoRoute(
               name: 'protected_restaurant_detail',

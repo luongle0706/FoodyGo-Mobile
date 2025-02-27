@@ -1,17 +1,23 @@
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foodygo/dto/login_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/repository/auth_repository.dart';
-import 'package:foodygo/utils/injection.dart';
+import 'package:foodygo/utils/app_logger.dart';
+import 'package:foodygo/utils/secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
+  AuthService._();
+  static final AuthService instance = AuthService._();
+
   final _auth = FirebaseAuth.instance;
+  final logger = AppLogger.instance;
+  final storage = SecureStorage.instance;
+  final authRepository = AuthRepository.instance;
 
   void signInWithGoogle(BuildContext context) async {
     UserCredential result;
@@ -28,13 +34,15 @@ class AuthService {
       result = await _auth.signInWithCredential(cred);
       String? idToken = await result.user?.getIdToken();
 
-      print("ID TOKEN: ");
-      print(idToken);
+      logger.info("ID TOKEN: $idToken");
+
+      String? fcmToken = await storage.get(key: 'fcm_token');
+      logger.info('Fetched fcm_token: $fcmToken');
 
       LoginResponseDTO loginResponseDTO =
-          await locator<AuthRepository>().loginByGoogle(idToken!);
+          await authRepository.loginByGoogle(idToken!, fcmToken!);
 
-      print(loginResponseDTO.token);
+      logger.info("Backend token: ${loginResponseDTO.token}");
 
       if (loginResponseDTO.token.isNotEmpty) {
         SavedUser user = SavedUser(
@@ -42,8 +50,7 @@ class AuthService {
             email: loginResponseDTO.email,
             fullName: loginResponseDTO.fullName);
 
-        await locator<FlutterSecureStorage>()
-            .write(key: 'user', value: json.encode(user.toJson()));
+        storage.put(key: 'user', value: json.encode(user.toJson()));
 
         if (context.mounted) {
           GoRouter.of(context).go('/protected/home');
@@ -63,7 +70,9 @@ class AuthService {
 
   void signIn(String email, String password, BuildContext context) async {
     try {
-      LoginResponseDTO loginResponseDTO = await locator<AuthRepository>()
+      logger.info("Email: $email");
+      logger.info("Password: $password");
+      LoginResponseDTO loginResponseDTO = await authRepository
           .login(LoginRequestDTO(email: email, password: password));
 
       if (loginResponseDTO.token.isNotEmpty) {
@@ -71,22 +80,25 @@ class AuthService {
             token: loginResponseDTO.token,
             email: email,
             fullName: loginResponseDTO.fullName);
-        await locator<FlutterSecureStorage>()
-            .write(key: 'user', value: json.encode(user.toJson()));
+
+        storage.put(key: 'user', value: json.encode(user.toJson()));
 
         if (context.mounted) {
           GoRouter.of(context).go('/protected/home');
         }
       } else {
+        logger.error('login failed');
         if (context.mounted) {
           _showErrorDialog(context, "Login failed. Please try again.");
         }
       }
     } catch (e) {
-      if (context.mounted) {
-        _showErrorDialog(
-            context, "Login failed. Please check your credentials.");
-      }
+      print(e);
+      // logger.error(e.toString());
+      // if (context.mounted) {
+      //   _showErrorDialog(
+      //       context, "Login failed. Please check your credentials.");
+      // }
     }
   }
 
@@ -111,7 +123,7 @@ class AuthService {
   }
 
   void signOut(BuildContext context) async {
-    locator<FlutterSecureStorage>().delete(key: 'user');
+    storage.delete(key: 'user');
     if (context.mounted) {
       GoRouter.of(context).go('/login');
     }

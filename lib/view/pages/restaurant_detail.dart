@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/restaurant_dto.dart';
+import 'package:foodygo/repository/restaurant_repository.dart';
+import 'package:foodygo/utils/secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
 class RestaurantDetailPage extends StatefulWidget {
@@ -11,13 +16,38 @@ class RestaurantDetailPage extends StatefulWidget {
 }
 
 class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
+  final SecureStorage storage = SecureStorage.instance;
+  final RestaurantRepository repository = RestaurantRepository.instance;
+  Future<RestaurantDto>? _restaurant;
+
   int cartTotal = 59000; // Sample cart total
   int cartItemCount = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRestaurant();
+  }
+
+  void _loadRestaurant() {
+    setState(() {
+      _restaurant = fetchRestaurant();
+    });
+  }
+
+  Future<RestaurantDto> fetchRestaurant() async {
+    String? savedUser = await storage.get(key: 'user');
+    Map<String, dynamic> userMap = json.decode(savedUser!);
+    String? accessToken = userMap['token'];
+
+    return repository.loadRestaurantById(accessToken!, widget.restaurantId);
+  }
 
   // Mock restaurant and menu data
   final Map<String, dynamic> restaurantInfo = {
     "name": "Cơm tấm Ngô Quyền",
-    "image": "https://img-global.cpcdn.com/recipes/49876fe80303b991/640x640sq70/photo.webp",
+    "image":
+        "https://img-global.cpcdn.com/recipes/49876fe80303b991/640x640sq70/photo.webp",
     "description":
         "Tiệm này bán cơm sườn, ba rọi, xiên nướng, gà nướng, bì, chả. Cơm thêm, canh thêm miễn phí. Mại dô, mại dô!",
     "phone": "0123 456 789",
@@ -54,7 +84,6 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
           icon: Icon(Icons.arrow_back),
           onPressed: () => GoRouter.of(context).pop(),
         ),
-        title: Text(restaurantInfo['name']),
         actions: [
           IconButton(
             icon: Icon(Icons.search),
@@ -65,46 +94,57 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
       body: Column(
         children: [
           // Restaurant Info
-          Container(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                restaurantInfo['image'],
-                height: 100,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ),
-                SizedBox(height: 8),
-                Text(
-                  restaurantInfo['name'],
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-                Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(restaurantInfo['description']),
-                      SizedBox(height: 8),
-                      Text("📞 ${restaurantInfo['phone']}"),
-                      Text("✉️ ${restaurantInfo['email']}"),
-                      Text("📍 ${restaurantInfo['address']}"),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+          FutureBuilder(
+              future: _restaurant,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final res = snapshot.data!;
+                  return Container(
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            res.image,
+                            height: 100,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Container(
+                          padding: EdgeInsets.all(12),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                res.name,
+                                style: TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(height: 8),
+                              Text("📞 ${res.phone}"),
+                              Text("✉️ ${res.email}"),
+                              Text("📍 ${res.address}"),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return Center(
+                  child: Text("Đang lấy dữ liệu"),
+                );
+              }),
+
           Divider(),
           // Menu List
           Expanded(
