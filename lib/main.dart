@@ -24,6 +24,8 @@ import 'package:foodygo/view/pages/register.dart';
 import 'package:foodygo/view/pages/register_info.dart';
 import 'package:foodygo/view/pages/otp.dart';
 import 'package:foodygo/view/pages/register_success.dart';
+import 'package:foodygo/view/pages/restaurant/food_link_page.dart';
+import 'package:foodygo/view/pages/restaurant/topping_selection_page.dart';
 import 'package:foodygo/view/pages/restaurant_detail.dart';
 import 'package:foodygo/view/pages/restaurant_foodygo_page.dart';
 import 'package:foodygo/view/pages/restaurant_home_page.dart';
@@ -241,6 +243,20 @@ class Main extends StatelessWidget {
             path: '/protected/add-topping-section',
             pageBuilder: (context, state) {
               return MaterialPage(child: AddToppingSection());
+            },
+          ),
+          GoRoute(
+            name: 'protected_topping_selection',
+            path: '/protected/topping-selection',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: ToppingSelectionPage());
+            },
+          ),
+          GoRoute(
+            name: 'food_link',
+            path: '/protected/food-link',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: FoodLinkPage());
             },
           ),
           GoRoute(
