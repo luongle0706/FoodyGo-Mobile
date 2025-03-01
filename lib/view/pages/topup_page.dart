@@ -9,7 +9,7 @@ class TopupPage extends StatefulWidget {
 }
 
 class _TopupPageState extends State<TopupPage> {
-  double _points = 30;
+  double _points = 100;
   String _selectedPaymentMethod = '';
 
   @override
@@ -49,9 +49,9 @@ class _TopupPageState extends State<TopupPage> {
                   ),
                   Slider(
                     value: _points,
-                    min: 10,
-                    max: 100,
-                    divisions: 9,
+                    min: 0,
+                    max: 1000,
+                    divisions: 1000,
                     label: _points.toInt().toString(),
                     onChanged: (value) {
                       setState(() {

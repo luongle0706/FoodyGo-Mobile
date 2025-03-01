@@ -49,7 +49,8 @@ class AuthService {
             token: loginResponseDTO.token,
             email: loginResponseDTO.email,
             fullName: loginResponseDTO.fullName,
-            role: loginResponseDTO.role);
+            role: loginResponseDTO.role,
+            userId: loginResponseDTO.userId);
 
         storage.put(key: 'user', value: json.encode(user.toJson()));
 
@@ -79,7 +80,8 @@ class AuthService {
             token: loginResponseDTO.token,
             email: email,
             fullName: loginResponseDTO.fullName,
-            role: loginResponseDTO.role);
+            role: loginResponseDTO.role,
+            userId: loginResponseDTO.userId);
 
         storage.put(key: 'user', value: json.encode(user.toJson()));
 

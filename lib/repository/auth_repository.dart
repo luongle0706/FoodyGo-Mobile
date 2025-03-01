@@ -27,7 +27,8 @@ class AuthRepository {
           refreshToken: jsonResponse['refreshToken'],
           fullName: jsonResponse['fullName'],
           email: jsonResponse['email'],
-          role: jsonResponse['role']);
+          role: jsonResponse['role'],
+          userId: jsonResponse['userId']);
     } else {
       throw Exception('Failed to load data!');
     }
@@ -59,7 +60,8 @@ class AuthRepository {
             refreshToken: data['refreshToken'],
             fullName: data['fullName'],
             email: data['email'],
-            role: data['role']);
+            role: data['role'],
+            userId: data['userId']);
       } else {
         throw Exception(
             'Failed to load data! Status Code: ${response.statusCode}');

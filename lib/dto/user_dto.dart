@@ -3,15 +3,23 @@ class SavedUser {
   String token;
   String fullName;
   String role;
+  int userId;
 
   SavedUser(
       {required this.email,
       required this.token,
       required this.fullName,
-      required this.role});
+      required this.role,
+      required this.userId});
 
   toJson() {
-    return {'email': email, 'token': token, 'fullName': fullName, 'role': role};
+    return {
+      'email': email,
+      'token': token,
+      'fullName': fullName,
+      'role': role,
+      'userId': userId
+    };
   }
 
   factory SavedUser.fromJson(Map<String, dynamic> json) {
@@ -20,6 +28,7 @@ class SavedUser {
       email: json['email'],
       fullName: json['fullName'],
       role: json['role'],
+      userId: json['userId'],
     );
   }
 }
