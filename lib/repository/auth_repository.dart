@@ -26,7 +26,8 @@ class AuthRepository {
           token: jsonResponse['token'],
           refreshToken: jsonResponse['refreshToken'],
           fullName: jsonResponse['fullName'],
-          email: jsonResponse['email']);
+          email: jsonResponse['email'],
+          role: jsonResponse['role']);
     } else {
       throw Exception('Failed to load data!');
     }
@@ -47,7 +48,7 @@ class AuthRepository {
       logger.info('Response Status Code: ${response.statusCode}');
       logger.info('Response Body: ${response.body}');
 
-      if (response.statusCode == 200 || response.statusCode == 400) {
+      if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
         final Map<String, dynamic> data = jsonResponse['data'];
 
@@ -57,7 +58,8 @@ class AuthRepository {
             token: data['token'],
             refreshToken: data['refreshToken'],
             fullName: data['fullName'],
-            email: data['email']);
+            email: data['email'],
+            role: data['role']);
       } else {
         throw Exception(
             'Failed to load data! Status Code: ${response.statusCode}');

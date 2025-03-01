@@ -22,7 +22,10 @@ import 'package:foodygo/view/pages/register_info.dart';
 import 'package:foodygo/view/pages/otp.dart';
 import 'package:foodygo/view/pages/register_success.dart';
 import 'package:foodygo/view/pages/restaurant_detail.dart';
+import 'package:foodygo/view/pages/restaurant_foodygo_page.dart';
+import 'package:foodygo/view/pages/restaurant_home_page.dart';
 import 'package:foodygo/view/pages/restaurant_menu.dart';
+import 'package:foodygo/view/pages/staff_home_page.dart';
 import 'package:foodygo/view/pages/topup_page.dart';
 import 'package:foodygo/view/pages/transaction_detail_detail.dart';
 import 'package:foodygo/view/pages/transfer_points_page.dart';
@@ -64,6 +67,27 @@ class Main extends StatelessWidget {
                   path: '/protected/home',
                   pageBuilder: (context, state) {
                     return MaterialPage(child: HomePage());
+                  },
+                ),
+                GoRoute(
+                  name: 'protected_restaurant_home',
+                  path: '/protected/restaurant-home',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: RestaurantHomePage());
+                  },
+                ),
+                GoRoute(
+                  name: 'protected_staff_home',
+                  path: '/protected/staff-home',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: StaffHomePage());
+                  },
+                ),
+                GoRoute(
+                  name: 'protected_restaurant_foodygo',
+                  path: '/protected/restaurant-foodygo',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: RestaurantFoodygoPage());
                   },
                 ),
                 GoRoute(
