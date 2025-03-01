@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/service/notification_service.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:foodygo/view/components/hub/hub_home_wrapper.dart';
 import 'package:foodygo/view/pages/add_to_cart.dart';
 import 'package:foodygo/view/pages/add_topping_section.dart';
 import 'package:foodygo/view/pages/confirm_order.dart';
@@ -11,6 +12,8 @@ import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/food_detail.dart';
 import 'package:foodygo/view/pages/foodyxu_history_page.dart';
 import 'package:foodygo/view/pages/home.dart';
+import 'package:foodygo/view/pages/hub/staff_arrived_page.dart';
+import 'package:foodygo/view/pages/hub/staff_home_history_page.dart';
 import 'package:foodygo/view/pages/login.dart';
 import 'package:foodygo/view/pages/order_history.dart';
 import 'package:foodygo/view/pages/order_success.dart';
@@ -25,7 +28,7 @@ import 'package:foodygo/view/pages/restaurant_detail.dart';
 import 'package:foodygo/view/pages/restaurant_foodygo_page.dart';
 import 'package:foodygo/view/pages/restaurant_home_page.dart';
 import 'package:foodygo/view/pages/restaurant_menu.dart';
-import 'package:foodygo/view/pages/staff_home_page.dart';
+import 'package:foodygo/view/pages/hub/staff_home_page.dart';
 import 'package:foodygo/view/pages/topup_page.dart';
 import 'package:foodygo/view/pages/transaction_detail_detail.dart';
 import 'package:foodygo/view/pages/transfer_points_page.dart';
@@ -80,7 +83,24 @@ class Main extends StatelessWidget {
                   name: 'protected_staff_home',
                   path: '/protected/staff-home',
                   pageBuilder: (context, state) {
-                    return MaterialPage(child: StaffHomePage());
+                    return MaterialPage(
+                        child: HubHomeWrapper(child: StaffHomePage()));
+                  },
+                ),
+                GoRoute(
+                  name: 'protected_staff_home_arrived',
+                  path: '/protected/staff-home-arrived',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(
+                        child: HubHomeWrapper(child: StaffArrivedPage()));
+                  },
+                ),
+                GoRoute(
+                  name: 'protected_staff_home_history',
+                  path: '/protected/staff-home-history',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(
+                        child: HubHomeWrapper(child: StaffHomeHistoryPage()));
                   },
                 ),
                 GoRoute(
