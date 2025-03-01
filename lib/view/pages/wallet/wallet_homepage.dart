@@ -76,38 +76,42 @@ class _WalletHomepageState extends State<WalletHomepage> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                  color: Colors.grey[200],
-                  child: Row(
-                    children: [
-                      const CircleAvatar(
-                        radius: 24,
-                        backgroundColor: Colors.grey,
-                        child: Icon(Icons.person, color: Colors.white),
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Chào ${user?.fullName ?? 'User'}!',
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '💰 ${wallet?.balance != null && wallet!.balance > 0 ? '${wallet!.balance.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} FoodyXu' : 'Đang tải...'}',
-                            style: const TextStyle(
-                                fontSize: 14, color: Colors.black54),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      const Icon(Icons.arrow_forward_ios,
-                          size: 16, color: Colors.black54),
-                    ],
+                GestureDetector(
+                  onTap: () => GoRouter.of(context)
+                      .push('/protected/wallet/transaction-history'),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 16),
+                    color: Colors.grey[200],
+                    child: Row(
+                      children: [
+                        const CircleAvatar(
+                          radius: 24,
+                          backgroundColor: Colors.grey,
+                          child: Icon(Icons.person, color: Colors.white),
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Chào ${user?.fullName ?? 'User'}!',
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '💰 ${wallet?.balance != null && wallet!.balance > 0 ? '${wallet!.balance.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} FoodyXu' : 'Đang tải...'}',
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.black54),
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        const Icon(Icons.arrow_forward_ios,
+                            size: 16, color: Colors.black54),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
@@ -142,7 +146,7 @@ class _WalletHomepageState extends State<WalletHomepage> {
                         context,
                         icon: Icons.history,
                         title: 'Lịch sử thanh toán',
-                        subtitle: 'Xem lại lịch sử thanh toán các đơn hàng',
+                        subtitle: 'Xem lại lịch sử thanh toán của ví',
                         route: '/protected/wallet/transaction-history',
                       ),
                     ],
@@ -161,7 +165,7 @@ class _WalletHomepageState extends State<WalletHomepage> {
     required String route,
   }) {
     return GestureDetector(
-      onTap: () => context.go(route),
+      onTap: () => GoRouter.of(context).push(route),
       child: Container(
         padding: const EdgeInsets.all(16),
         margin: const EdgeInsets.only(bottom: 12),

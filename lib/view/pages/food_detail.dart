@@ -23,17 +23,16 @@ class FoodDetailPage extends StatelessWidget {
               ),
               // Back button
               Positioned(
-                top: 40, 
+                top: 40,
                 left: 10,
                 child: GestureDetector(
                   onTap: () {
-                    context.pop(); 
+                    context.pop();
                   },
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.black
-                          .withOpacity(0.5),
+                      color: Colors.black.withOpacity(0.5),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -84,7 +83,10 @@ class FoodDetailPage extends StatelessWidget {
                   const Spacer(),
 
                   // Add to cart
-                  MyButton(onTap: () {}, text: 'Thêm vào giỏ hàng', color: AppColors.primary)
+                  MyButton(
+                      onTap: () {},
+                      text: 'Thêm vào giỏ hàng',
+                      color: AppColors.primary)
                 ],
               ),
             ),

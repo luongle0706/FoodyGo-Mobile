@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class TransactionDetailScreen extends StatelessWidget {
   final String transactionTitle;
@@ -24,9 +25,7 @@ class TransactionDetailScreen extends StatelessWidget {
         title: Text("Chi tiết giao dịch"),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => GoRouter.of(context).pop(),
         ),
       ),
       body: Padding(

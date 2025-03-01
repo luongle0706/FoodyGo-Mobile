@@ -119,9 +119,7 @@ class AuthService {
           content: Text(message),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => GoRouter.of(context).pop(),
               child: Text("OK"),
             ),
           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AddToCartPage extends StatelessWidget {
   const AddToCartPage({super.key});
@@ -44,7 +45,7 @@ class AddToCartPage extends StatelessWidget {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               IconButton(
                 icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => GoRouter.of(context).pop(),
               ),
             ],
           ),

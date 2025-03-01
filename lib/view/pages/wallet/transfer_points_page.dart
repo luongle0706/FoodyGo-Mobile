@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-class TopupPage extends StatefulWidget {
-  const TopupPage({super.key});
+class TransferPointsPage extends StatefulWidget {
+  const TransferPointsPage({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _TopupPageState createState() => _TopupPageState();
+  _TransferPointsPageState createState() => _TransferPointsPageState();
 }
 
-class _TopupPageState extends State<TopupPage> {
-  double _points = 100;
-  String _selectedPaymentMethod = '';
+class _TransferPointsPageState extends State<TransferPointsPage> {
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
+  double _points = 0;
+  final double _balance = 100; // Giả sử số dư hiện tại là 100 FoodyXu
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mua điểm'),
+        title: Text('Chuyển điểm'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => GoRouter.of(context).pop(),
         ),
       ),
       body: Padding(
@@ -27,7 +30,20 @@ class _TopupPageState extends State<TopupPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Nhập số FoodyXu cần mua',
+            Text('CHỌN NGƯỜI NHẬN',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            SizedBox(height: 10),
+            TextField(
+              controller: _phoneController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Số điện thoại người nhận',
+                suffixIcon: Icon(Icons.contacts),
+              ),
+              keyboardType: TextInputType.phone,
+            ),
+            SizedBox(height: 20),
+            Text('SỐ UTOP CẦN CHUYỂN',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
             Container(
@@ -38,20 +54,26 @@ class _TopupPageState extends State<TopupPage> {
               ),
               child: Column(
                 children: [
+                  Text('Số dư: $_balance FoodyXu',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(_points.toInt().toString(),
+                      Text('$_points FoodyXu',
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold)),
-                      Text('FoodyXu', style: TextStyle(fontSize: 16)),
+                      Text('${(_points * 1000).toInt()} đ',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
                     ],
                   ),
                   Slider(
                     value: _points,
                     min: 0,
-                    max: 1000,
-                    divisions: 1000,
+                    max: _balance,
+                    divisions: _balance.toInt(),
                     label: _points.toInt().toString(),
                     onChanged: (value) {
                       setState(() {
@@ -59,49 +81,24 @@ class _TopupPageState extends State<TopupPage> {
                       });
                     },
                   ),
-                  Text('Tổng tiền: ${(1000 * _points).toInt()} đ',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text('Số FoodyXu cần chuyển không được vượt quá số hiện có.',
+                      style: TextStyle(color: Colors.grey)),
                   Text('(1.000đ = 1 FoodyXu)',
                       style: TextStyle(color: Colors.grey)),
                 ],
               ),
             ),
             SizedBox(height: 20),
-            Text('PHƯƠNG THỨC THANH TOÁN',
+            Text('Lời nhắn',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
-            RadioListTile(
-              title: Row(
-                children: [
-                  Image.asset('assets/images/vnpay_logo.png', height: 24),
-                  SizedBox(width: 10),
-                  Text('VNPAY'),
-                ],
+            TextField(
+              controller: _messageController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Nhập lời nhắn',
               ),
-              value: 'VNPAY',
-              groupValue: _selectedPaymentMethod,
-              onChanged: (value) {
-                setState(() {
-                  _selectedPaymentMethod = value.toString();
-                });
-              },
-            ),
-            RadioListTile(
-              title: Row(
-                children: [
-                  Image.asset('assets/images/momo_logo.png', height: 24),
-                  SizedBox(width: 10),
-                  Text('Momo'),
-                ],
-              ),
-              value: 'Momo',
-              groupValue: _selectedPaymentMethod,
-              onChanged: (value) {
-                setState(() {
-                  _selectedPaymentMethod = value.toString();
-                });
-              },
+              maxLines: 3,
             ),
             Spacer(),
             SizedBox(
@@ -113,18 +110,15 @@ class _TopupPageState extends State<TopupPage> {
                       borderRadius: BorderRadius.circular(8)),
                 ),
                 onPressed: () {
-                  if (_selectedPaymentMethod.isEmpty) {
+                  if (_phoneController.text.isEmpty || _points == 0) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content:
-                              Text('Vui lòng chọn phương thức thanh toán!')),
+                      SnackBar(content: Text('Vui lòng nhập đủ thông tin!')),
                     );
                   } else {
-                    // Xử lý mua điểm
+                    // Xử lý chuyển điểm
                   }
                 },
-                child:
-                    Text('Thực hiện mua điểm', style: TextStyle(fontSize: 16)),
+                child: Text('Chuyển điểm', style: TextStyle(fontSize: 16)),
               ),
             ),
           ],

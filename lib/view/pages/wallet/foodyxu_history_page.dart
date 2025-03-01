@@ -26,9 +26,7 @@ class FoodyXuHistoryPage extends StatelessWidget {
         title: Text("Lịch sử điểm FoodyXu"),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => GoRouter.of(context).pop(),
         ),
       ),
       body: ListView.builder(
@@ -37,7 +35,7 @@ class FoodyXuHistoryPage extends StatelessWidget {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              context.go('/protected/wallet/transaction-detail');
+              GoRouter.of(context).push("/protected/wallet/transaction-detail");
             },
             child: TransactionCard(transaction: transactions[index]),
           );

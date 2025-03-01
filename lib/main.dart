@@ -10,7 +10,7 @@ import 'package:foodygo/view/pages/confirm_order.dart';
 import 'package:foodygo/view/pages/detail_order.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/food_detail.dart';
-import 'package:foodygo/view/pages/foodyxu_history_page.dart';
+import 'package:foodygo/view/pages/wallet/foodyxu_history_page.dart';
 import 'package:foodygo/view/pages/home.dart';
 import 'package:foodygo/view/pages/hub/staff_arrived_page.dart';
 import 'package:foodygo/view/pages/hub/staff_home_history_page.dart';
@@ -29,12 +29,12 @@ import 'package:foodygo/view/pages/restaurant_foodygo_page.dart';
 import 'package:foodygo/view/pages/restaurant_home_page.dart';
 import 'package:foodygo/view/pages/restaurant_menu.dart';
 import 'package:foodygo/view/pages/hub/staff_home_page.dart';
-import 'package:foodygo/view/pages/topup_page.dart';
-import 'package:foodygo/view/pages/transaction_detail_detail.dart';
-import 'package:foodygo/view/pages/transfer_points_page.dart';
+import 'package:foodygo/view/pages/wallet/topup_page.dart';
+import 'package:foodygo/view/pages/wallet/transaction_detail_detail.dart';
+import 'package:foodygo/view/pages/wallet/transfer_points_page.dart';
 import 'package:foodygo/view/pages/view_cart.dart';
-import 'package:foodygo/view/pages/wallet_homepage.dart';
-import 'package:foodygo/view/pages/withdraw_page.dart';
+import 'package:foodygo/view/pages/wallet/wallet_homepage.dart';
+import 'package:foodygo/view/pages/wallet/withdraw_page.dart';
 import 'package:go_router/go_router.dart';
 
 void main() async {
