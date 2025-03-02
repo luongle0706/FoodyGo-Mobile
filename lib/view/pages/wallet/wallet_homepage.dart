@@ -51,11 +51,17 @@ class _WalletHomepageState extends State<WalletHomepage> {
     logger.info('Fetching wallet balance...');
     WalletDto? walletBalance =
         await walletRepository.loadWalletBalance(token!, user!.userId);
-    setState(() {
-      logger.info('Wallet balance: ${walletBalance.balance}');
-      wallet = walletBalance;
-      isLoading = false;
-    });
+    if (walletBalance != null) {
+      setState(() {
+        logger.info('Wallet balance: ${walletBalance.balance}');
+        wallet = walletBalance;
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override

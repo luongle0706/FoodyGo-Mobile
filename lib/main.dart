@@ -29,7 +29,6 @@ import 'package:foodygo/view/pages/register_success.dart';
 import 'package:foodygo/view/pages/restaurant/food_link_page.dart';
 import 'package:foodygo/view/pages/restaurant/topping_selection_page.dart';
 import 'package:foodygo/view/pages/restaurant_detail.dart';
-import 'package:foodygo/view/pages/restaurant_foodygo_page.dart';
 import 'package:foodygo/view/pages/restaurant_home_page.dart';
 import 'package:foodygo/view/pages/restaurant_menu.dart';
 import 'package:foodygo/view/pages/hub/staff_home_page.dart';
@@ -62,7 +61,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/order-list-restaurant',
+        initialLocation: '/protected/home',
         routes: [
           ShellRoute(
               builder: (context, state, child) {
@@ -108,12 +107,24 @@ class Main extends StatelessWidget {
                   },
                 ),
                 GoRoute(
-                  name: 'protected_restaurant_foodygo',
-                  path: '/protected/restaurant-foodygo',
-                  pageBuilder: (context, state) {
-                    return MaterialPage(child: RestaurantFoodygoPage());
-                  },
-                ),
+                    name: 'order_list_restaurant',
+                    path: '/protected/restaurant-foodygo', //S-022
+                    pageBuilder: (context, state) {
+                      return MaterialPage(child: OrderListRestaurantPage());
+                    }),
+                GoRoute(
+                    name: 'order_list_customer',
+                    path: 'protected/order-list-customer',
+                    pageBuilder: (context, state) {
+                      return MaterialPage(child: OrderListCustomerPage());
+                    }),
+                GoRoute(
+                    name: 'confirm_order',
+                    path: '/protected/confirm-order',
+                    pageBuilder: (context, state) {
+                      return MaterialPage(
+                          child: ConfirmedOrderRestaurantScreen());
+                    }),
                 GoRoute(
                   name: 'protected_order',
                   path: '/protected/order',
@@ -122,7 +133,7 @@ class Main extends StatelessWidget {
                   },
                 ),
                 GoRoute(
-                  name: 'protected_wallet',
+                  name: 'protected_wallet', //S-027
                   path: '/protected/wallet',
                   pageBuilder: (context, state) {
                     return MaterialPage(child: WalletHomepage());
@@ -158,21 +169,21 @@ class Main extends StatelessWidget {
                   },
                 ),
                 GoRoute(
-                  name: 'protected_wallet_topup',
+                  name: 'protected_wallet_topup', //S-035
                   path: '/protected/wallet/topup',
                   pageBuilder: (context, state) {
                     return MaterialPage(child: TopupPage());
                   },
                 ),
                 GoRoute(
-                  name: 'protected_wallet_transfer',
+                  name: 'protected_wallet_transfer', //S-037
                   path: '/protected/wallet/transfer',
                   pageBuilder: (context, state) {
                     return MaterialPage(child: TransferPointsPage());
                   },
                 ),
                 GoRoute(
-                  name: 'protected_wallet_withdraw',
+                  name: 'protected_wallet_withdraw', //S-36
                   path: '/protected/wallet/withdraw',
                   pageBuilder: (context, state) {
                     return MaterialPage(child: WithdrawPage());
@@ -214,18 +225,6 @@ class Main extends StatelessWidget {
                   },
                 ),
               ]),
-          GoRoute(
-              name: 'order_list_restaurant',
-              path: '/order-list-restaurant',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: OrderListRestaurantPage());
-              }),
-          GoRoute(
-              name: 'order_list_customer',
-              path: '/order-list-customer',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: OrderListCustomerPage());
-              }),
           GoRoute(
               name: 'detail_order',
               path: '/protected/detail-order',
@@ -273,12 +272,6 @@ class Main extends StatelessWidget {
               return MaterialPage(child: FoodLinkPage());
             },
           ),
-          GoRoute(
-              name: 'confirm_order',
-              path: '/confirm-order',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: ConfirmedOrderRestaurantScreen());
-              }),
           GoRoute(
               name: 'login', //S-001
               path: '/login',
