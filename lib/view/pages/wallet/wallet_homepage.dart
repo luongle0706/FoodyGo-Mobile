@@ -36,7 +36,8 @@ class _WalletHomepageState extends State<WalletHomepage> {
     SavedUser? savedUser =
         data != null ? SavedUser.fromJson(json.decode(data)) : null;
     if (savedUser != null) {
-      WalletDto? walletBalance = await walletRepository.loadWalletBalance(user);
+      WalletDto? walletBalance =
+          await walletRepository.loadWalletBalance(savedUser);
       if (walletBalance != null) {
         setState(() {
           wallet = walletBalance;
