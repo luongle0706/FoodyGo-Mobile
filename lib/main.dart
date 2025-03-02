@@ -6,7 +6,7 @@ import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/hub/hub_home_wrapper.dart';
 import 'package:foodygo/view/pages/add_to_cart.dart';
 import 'package:foodygo/view/pages/add_topping_section.dart';
-import 'package:foodygo/view/pages/confirm_order.dart';
+import 'package:foodygo/view/pages/restaurant/confirm_order_restaurant.dart';
 import 'package:foodygo/view/pages/detail_order.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/food_detail.dart';
@@ -15,6 +15,8 @@ import 'package:foodygo/view/pages/home.dart';
 import 'package:foodygo/view/pages/hub/staff_arrived_page.dart';
 import 'package:foodygo/view/pages/hub/staff_home_history_page.dart';
 import 'package:foodygo/view/pages/login.dart';
+import 'package:foodygo/view/pages/order_view_customer.dart';
+import 'package:foodygo/view/pages/restaurant/order_view_restaurant.dart';
 import 'package:foodygo/view/pages/order_history.dart';
 import 'package:foodygo/view/pages/order_success.dart';
 import 'package:foodygo/view/pages/profile.dart';
@@ -60,7 +62,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/protected/home',
+        initialLocation: '/order-list-restaurant',
         routes: [
           ShellRoute(
               builder: (context, state, child) {
@@ -213,6 +215,18 @@ class Main extends StatelessWidget {
                 ),
               ]),
           GoRoute(
+              name: 'order_list_restaurant',
+              path: '/order-list-restaurant',
+              pageBuilder: (context, state) {
+                return MaterialPage(child: OrderListRestaurantPage());
+              }),
+          GoRoute(
+              name: 'order_list_customer',
+              path: '/order-list-customer',
+              pageBuilder: (context, state) {
+                return MaterialPage(child: OrderListCustomerPage());
+              }),
+          GoRoute(
               name: 'detail_order',
               path: '/protected/detail-order',
               pageBuilder: (context, state) {
@@ -220,7 +234,7 @@ class Main extends StatelessWidget {
               }),
           GoRoute(
               name: 'order_history',
-              path: '/protected/order-history',
+              path: '/order-history',
               pageBuilder: (context, state) {
                 return MaterialPage(child: OrderHistory());
               }),
@@ -263,7 +277,7 @@ class Main extends StatelessWidget {
               name: 'confirm_order',
               path: '/confirm-order',
               pageBuilder: (context, state) {
-                return MaterialPage(child: ConfirmOrderPage());
+                return MaterialPage(child: ConfirmedOrderRestaurantScreen());
               }),
           GoRoute(
               name: 'login', //S-001
