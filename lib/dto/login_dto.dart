@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 class LoginRequestDTO {
   String email;
   String password;
@@ -21,6 +23,8 @@ class LoginResponseDTO {
   final String refreshToken;
   final String fullName;
   final String email;
+  final String role;
+  final int userId;
 
   LoginResponseDTO(
       {required this.code,
@@ -28,5 +32,7 @@ class LoginResponseDTO {
       required this.token,
       required this.refreshToken,
       required this.fullName,
-      required this.email});
+      required this.email,
+      required this.role,
+      required this.userId});
 }

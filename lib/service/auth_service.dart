@@ -48,7 +48,9 @@ class AuthService {
         SavedUser user = SavedUser(
             token: loginResponseDTO.token,
             email: loginResponseDTO.email,
-            fullName: loginResponseDTO.fullName);
+            fullName: loginResponseDTO.fullName,
+            role: loginResponseDTO.role,
+            userId: loginResponseDTO.userId);
 
         storage.put(key: 'user', value: json.encode(user.toJson()));
 
@@ -70,8 +72,6 @@ class AuthService {
 
   void signIn(String email, String password, BuildContext context) async {
     try {
-      logger.info("Email: $email");
-      logger.info("Password: $password");
       LoginResponseDTO loginResponseDTO = await authRepository
           .login(LoginRequestDTO(email: email, password: password));
 
@@ -79,12 +79,20 @@ class AuthService {
         SavedUser user = SavedUser(
             token: loginResponseDTO.token,
             email: email,
-            fullName: loginResponseDTO.fullName);
+            fullName: loginResponseDTO.fullName,
+            role: loginResponseDTO.role,
+            userId: loginResponseDTO.userId);
 
         storage.put(key: 'user', value: json.encode(user.toJson()));
 
         if (context.mounted) {
-          GoRouter.of(context).go('/protected/home');
+          if (user.role == 'ROLE_USER') {
+            GoRouter.of(context).go('/protected/home');
+          } else if (user.role == 'ROLE_SELLER') {
+            GoRouter.of(context).go('/protected/restaurant-home');
+          } else {
+            GoRouter.of(context).go('/protected/staff-home');
+          }
         }
       } else {
         logger.error('login failed');
@@ -93,7 +101,7 @@ class AuthService {
         }
       }
     } catch (e) {
-      print(e);
+      logger.error(e.toString());
       // logger.error(e.toString());
       // if (context.mounted) {
       //   _showErrorDialog(
@@ -111,9 +119,7 @@ class AuthService {
           content: Text(message),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => GoRouter.of(context).pop(),
               child: Text("OK"),
             ),
           ],

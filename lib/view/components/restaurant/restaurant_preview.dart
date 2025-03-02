@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class RestaurantPreview extends StatelessWidget {
+  final int id;
   final String imageUrl;
   final String restaurantName;
   final String address;
 
   const RestaurantPreview({
+    required this.id,
     required this.imageUrl,
     required this.restaurantName,
     required this.address,
@@ -16,7 +18,7 @@ class RestaurantPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        GoRouter.of(context).push('/protected/restaurant-detail/1');
+        GoRouter.of(context).push('/protected/restaurant-detail/$id');
       },
       child: Container(
         width: 150,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class DetailOrder extends StatelessWidget {
   final int status = 3;
@@ -19,9 +20,7 @@ class DetailOrder extends StatelessWidget {
         elevation: 1,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context); // back privious page
-          },
+          onPressed: () => GoRouter.of(context).pop(),
         ),
       ),
       body: SingleChildScrollView(
