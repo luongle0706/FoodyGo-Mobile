@@ -231,7 +231,7 @@ class Main extends StatelessWidget {
                 return MaterialPage(child: RestaurantMenu());
               }),
           GoRoute(
-              name: 'protected_restaurant_detail',
+              name: 'protected_restaurant_detail', // S-007
               path: '/protected/restaurant-detail/:id',
               pageBuilder: (context, state) {
                 final restaurantId = int.parse(state.pathParameters['id']!);
@@ -246,14 +246,14 @@ class Main extends StatelessWidget {
             },
           ),
           GoRoute(
-            name: 'protected_topping_selection',
+            name: 'protected_topping_selection', // S-043
             path: '/protected/topping-selection',
             pageBuilder: (context, state) {
               return MaterialPage(child: ToppingSelectionPage());
             },
           ),
           GoRoute(
-            name: 'food_link',
+            name: 'food_link', // S-034
             path: '/protected/food-link',
             pageBuilder: (context, state) {
               return MaterialPage(child: FoodLinkPage());
