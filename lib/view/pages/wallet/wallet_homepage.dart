@@ -33,36 +33,47 @@ class _WalletHomepageState extends State<WalletHomepage> {
 
   Future<void> loadUser() async {
     String? data = await storage.get(key: 'user');
-    if (data != null) {
-      setState(() {
-        user = SavedUser.fromJson(json.decode(data));
-        token = user?.token;
-      });
-      logger.info('User loaded: ${user?.fullName}');
-      fetchWalletBalance();
+    SavedUser? savedUser =
+        data != null ? SavedUser.fromJson(json.decode(data)) : null;
+    if (savedUser != null) {
+      WalletDto? walletBalance = await walletRepository.loadWalletBalance(user);
+      if (walletBalance != null) {
+        setState(() {
+          wallet = walletBalance;
+          user = savedUser;
+          token = user?.token;
+          isLoading = false;
+        });
+      } else {
+        logger.info("Failed to load wallet balance!");
+        setState(() {
+          isLoading = false;
+        });
+      }
     } else {
+      logger.info("Failed to load user!");
       setState(() {
         isLoading = false;
       });
     }
   }
 
-  Future<void> fetchWalletBalance() async {
-    logger.info('Fetching wallet balance...');
-    WalletDto? walletBalance =
-        await walletRepository.loadWalletBalance(token!, user!.userId);
-    if (walletBalance != null) {
-      setState(() {
-        logger.info('Wallet balance: ${walletBalance.balance}');
-        wallet = walletBalance;
-        isLoading = false;
-      });
-    } else {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
+  // Future<void> fetchWalletBalance() async {
+  //   logger.info('Fetching wallet balance...');
+  //   WalletDto? walletBalance =
+  //       await walletRepository.loadWalletBalance(token!, user!.userId);
+  //   if (walletBalance != null) {
+  //     setState(() {
+  //       logger.info('Wallet balance: ${walletBalance.balance}');
+  //       wallet = walletBalance;
+  //       isLoading = false;
+  //     });
+  //   } else {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
