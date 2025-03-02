@@ -68,21 +68,21 @@ class Main extends StatelessWidget {
               },
               routes: [
                 GoRoute(
-                  name: 'protected_home',
+                  name: 'protected_home', // S-006
                   path: '/protected/home',
                   pageBuilder: (context, state) {
                     return MaterialPage(child: HomePage());
                   },
                 ),
                 GoRoute(
-                  name: 'protected_restaurant_home',
+                  name: 'protected_restaurant_home', // S-033
                   path: '/protected/restaurant-home',
                   pageBuilder: (context, state) {
                     return MaterialPage(child: RestaurantHomePage());
                   },
                 ),
                 GoRoute(
-                  name: 'protected_staff_home',
+                  name: 'protected_staff_home', // S-040
                   path: '/protected/staff-home',
                   pageBuilder: (context, state) {
                     return MaterialPage(
@@ -90,7 +90,7 @@ class Main extends StatelessWidget {
                   },
                 ),
                 GoRoute(
-                  name: 'protected_staff_home_arrived',
+                  name: 'protected_staff_home_arrived', //S-041
                   path: '/protected/staff-home-arrived',
                   pageBuilder: (context, state) {
                     return MaterialPage(
@@ -98,7 +98,7 @@ class Main extends StatelessWidget {
                   },
                 ),
                 GoRoute(
-                  name: 'protected_staff_home_history',
+                  name: 'protected_staff_home_history', //S-042
                   path: '/protected/staff-home-history',
                   pageBuilder: (context, state) {
                     return MaterialPage(
@@ -266,7 +266,7 @@ class Main extends StatelessWidget {
                 return MaterialPage(child: ConfirmOrderPage());
               }),
           GoRoute(
-              name: 'login',
+              name: 'login', //S-001
               path: '/login',
               pageBuilder: (context, state) {
                 return MaterialPage(child: LoginPage());
