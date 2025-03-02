@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:foodygo/view/pages/restaurant/custome_appbar_order_restaurant_list.dart';
 
 class ConfirmedOrderRestaurantScreen extends StatelessWidget {
+  const ConfirmedOrderRestaurantScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: "Cơm tấm Ngô Quyền"),
+      appBar: CustomFootageRestaurantOrderAppBar(title: "Cơm tấm Ngô Quyền"),
       body: Column(
         children: [
           Padding(

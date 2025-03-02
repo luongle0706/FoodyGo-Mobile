@@ -5,7 +5,7 @@ class CustomFootageRestaurantOrderAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   final String title;
 
-  CustomFootageRestaurantOrderAppBar({required this.title});
+  const CustomFootageRestaurantOrderAppBar({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {

@@ -3,13 +3,16 @@ import 'package:foodygo/view/pages/restaurant/custome_appbar_order_restaurant_li
 import 'package:go_router/go_router.dart';
 
 class OrderListRestaurantPage extends StatefulWidget {
+  const OrderListRestaurantPage({super.key});
+
   @override
-  _OrderListRestaurantPageState createState() =>
+  State<OrderListRestaurantPage> createState() =>
       _OrderListRestaurantPageState();
 }
 
 class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
   int selectedTab = 0;
+
   int selectedSubTab = 0;
 
   @override
@@ -85,31 +88,31 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
   }
 
   /// 🔹 Nút chọn tab chính
-  Widget _tabButton(String text,
-      {bool isSelected = false, VoidCallback? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? Colors.black : Colors.grey,
-            ),
-          ),
-          if (isSelected)
-            Container(
-              margin: EdgeInsets.only(top: 5),
-              height: 3,
-              width: 40,
-              color: Colors.black,
-            ),
-        ],
-      ),
-    );
-  }
+  // Widget _tabButton(String text,
+  //     {bool isSelected = false, VoidCallback? onTap}) {
+  //   return GestureDetector(
+  //     onTap: onTap,
+  //     child: Column(
+  //       children: [
+  //         Text(
+  //           text,
+  //           style: TextStyle(
+  //             fontSize: 16,
+  //             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+  //             color: isSelected ? Colors.black : Colors.grey,
+  //           ),
+  //         ),
+  //         if (isSelected)
+  //           Container(
+  //             margin: EdgeInsets.only(top: 5),
+  //             height: 3,
+  //             width: 40,
+  //             color: Colors.black,
+  //           ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   /// 🔹 Nút chọn tab con
   Widget _tabSelector(String text, int index) {
