@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class ViewOrderPage extends StatefulWidget {
-  const ViewOrderPage({super.key});
+class OrderListCustomerPage extends StatefulWidget {
+  const OrderListCustomerPage({super.key});
 
   @override
-  _ViewOrderPageState createState() => _ViewOrderPageState();
+  _OrderListCustomerPageState createState() => _OrderListCustomerPageState();
 }
 
-class _ViewOrderPageState extends State<ViewOrderPage> {
+class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
   int selectedTab = 0; // 0 for "Đang đến", 1 for "Lịch sử"
 
   @override

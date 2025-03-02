@@ -11,7 +11,8 @@ import 'package:foodygo/view/pages/food_detail.dart';
 import 'package:foodygo/view/pages/foodyxu_history_page.dart';
 import 'package:foodygo/view/pages/home.dart';
 import 'package:foodygo/view/pages/login.dart';
-import 'package:foodygo/view/pages/order-view.dart';
+import 'package:foodygo/view/pages/order_view_customer.dart';
+import 'package:foodygo/view/pages/order_view_restaurant.dart';
 import 'package:foodygo/view/pages/order_history.dart';
 import 'package:foodygo/view/pages/order_success.dart';
 import 'package:foodygo/view/pages/profile.dart';
@@ -51,7 +52,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/view-order',
+        initialLocation: '/order-list-restaurant',
         routes: [
           ShellRoute(
               builder: (context, state, child) {
@@ -158,10 +159,16 @@ class Main extends StatelessWidget {
                     })
               ]),
           GoRoute(
-              name: 'view-order',
-              path: '/view-order',
+              name: 'order_list_restaurant',
+              path: '/order-list-restaurant',
               pageBuilder: (context, state) {
-                return MaterialPage(child: ViewOrderPage());
+                return MaterialPage(child: OrderListRestaurantPage());
+              }),
+          GoRoute(
+              name: 'order_list_customer',
+              path: '/order-list-customer',
+              pageBuilder: (context, state) {
+                return MaterialPage(child: OrderListCustomerPage());
               }),
           GoRoute(
               name: 'detail_order',
@@ -171,7 +178,7 @@ class Main extends StatelessWidget {
               }),
           GoRoute(
               name: 'order_history',
-              path: '/protected/order-history',
+              path: '/order-history',
               pageBuilder: (context, state) {
                 return MaterialPage(child: OrderHistory());
               }),
