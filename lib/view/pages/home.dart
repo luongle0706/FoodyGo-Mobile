@@ -85,10 +85,7 @@ class _HomePageState extends State<HomePage> {
                           itemBuilder: (context, index) {
                             final restaurant = res[index];
                             return RestaurantPreview(
-                              id: restaurant.id,
-                              imageUrl: restaurant.image,
-                              restaurantName: restaurant.name,
-                              address: restaurant.address,
+                              restaurantDto: restaurant,
                             );
                           },
                         );

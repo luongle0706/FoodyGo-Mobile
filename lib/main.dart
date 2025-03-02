@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/restaurant_dto.dart';
 import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/service/notification_service.dart';
 import 'package:foodygo/utils/secure_storage.dart';
@@ -231,13 +232,16 @@ class Main extends StatelessWidget {
                 return MaterialPage(child: RestaurantMenu());
               }),
           GoRoute(
-              name: 'protected_restaurant_detail',
-              path: '/protected/restaurant-detail/:id',
-              pageBuilder: (context, state) {
-                final restaurantId = int.parse(state.pathParameters['id']!);
-                return MaterialPage(
-                    child: RestaurantDetailPage(restaurantId: restaurantId));
-              }),
+            name: 'protected_restaurant_detail',
+            path: '/protected/restaurant-detail',
+            pageBuilder: (context, state) {
+              final restaurantDto = state.extra
+                  as RestaurantDto; // Retrieve the restaurant entity
+              return MaterialPage(
+                child: RestaurantDetailPage(restaurantDto: restaurantDto),
+              );
+            },
+          ),
           GoRoute(
             name: 'protected_add_topping_section',
             path: '/protected/add-topping-section',

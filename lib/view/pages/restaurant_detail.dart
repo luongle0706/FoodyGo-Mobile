@@ -1,24 +1,31 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/product_dto.dart';
 import 'package:foodygo/dto/restaurant_dto.dart';
-import 'package:foodygo/repository/restaurant_repository.dart';
+import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/repository/product_repository.dart';
+import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class RestaurantDetailPage extends StatefulWidget {
-  final int restaurantId;
+  final RestaurantDto restaurantDto;
 
-  const RestaurantDetailPage({super.key, required this.restaurantId});
+  const RestaurantDetailPage({super.key, required this.restaurantDto});
 
   @override
   State<RestaurantDetailPage> createState() => _RestaurantDetailPageState();
 }
 
 class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
-  final SecureStorage storage = SecureStorage.instance;
-  final RestaurantRepository repository = RestaurantRepository.instance;
-  Future<RestaurantDto>? _restaurant;
+  final storage = SecureStorage.instance;
+  SavedUser? user;
+  final ProductRepository repository = ProductRepository.instance;
+  AppLogger logger = AppLogger.instance;
+  List<ProductDto>? products;
+  bool isLoading = true;
 
   int cartTotal = 59000; // Sample cart total
   int cartItemCount = 1;
@@ -26,60 +33,48 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   @override
   void initState() {
     super.initState();
-    _loadRestaurant();
+    loadUser();
   }
 
-  void _loadRestaurant() {
-    setState(() {
-      _restaurant = fetchRestaurant();
-    });
-  }
+  Future<void> loadUser() async {
+    String? data = await storage.get(key: 'user');
+    SavedUser? savedUser =
+        data != null ? SavedUser.fromJson(json.decode(data)) : null;
 
-  Future<RestaurantDto> fetchRestaurant() async {
-    String? savedUser = await storage.get(key: 'user');
-    Map<String, dynamic> userMap = json.decode(savedUser!);
-    String? accessToken = userMap['token'];
-
-    return repository.loadRestaurantById(accessToken!, widget.restaurantId);
-  }
-
-  // Mock restaurant and menu data
-  final Map<String, dynamic> restaurantInfo = {
-    "name": "Cơm tấm Ngô Quyền",
-    "image":
-        "https://img-global.cpcdn.com/recipes/49876fe80303b991/640x640sq70/photo.webp",
-    "description":
-        "Tiệm này bán cơm sườn, ba rọi, xiên nướng, gà nướng, bì, chả. Cơm thêm, canh thêm miễn phí. Mại dô, mại dô!",
-    "phone": "0123 456 789",
-    "email": "ngoquyenfood@gmail.com",
-    "address": "123 phố ẩm thực khu B"
-  };
-
-  final List<Map<String, dynamic>> menuItems = [
-    {
-      "name": "Cơm tấm sườn, bì, chả, trứng",
-      "description": "Cơm tấm siêu cấp ngon",
-      "prep_time": "15 phút",
-      "price": 25000
-    },
-    {
-      "name": "Cơm tấm sườn, bì, chả, trứng",
-      "description": "Cơm tấm siêu cấp ngon",
-      "prep_time": "15 phút",
-      "price": 25000
-    },
-    {
-      "name": "Cơm tấm sườn, bì, chả, trứng",
-      "description": "Cơm tấm siêu cấp ngon",
-      "prep_time": "15 phút",
-      "price": 25000
+    if (savedUser != null) {
+      List<ProductDto>? fetchProducts = await repository
+          .getProductsByRestaurantId(widget.restaurantDto.id, savedUser.token);
+      if (fetchProducts != null) {
+        setState(() {
+          products = fetchProducts;
+          user = savedUser;
+          isLoading = false;
+        });
+      }
+    } else {
+      setState(() {
+        isLoading = true;
+      });
     }
-  ];
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return SizedBox(
+        height: 100,
+        child: Center(
+          child: Row(
+            children: [
+              CircularProgressIndicator(),
+            ],
+          ), // Show loading indicator
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.primary,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => GoRouter.of(context).pop(),
@@ -94,64 +89,62 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
       body: Column(
         children: [
           // Restaurant Info
-          FutureBuilder(
-              future: _restaurant,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final res = snapshot.data!;
-                  return Container(
-                    padding: EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            res.image,
-                            height: 100,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Container(
-                          padding: EdgeInsets.all(12),
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                res.name,
-                                style: TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 8),
-                              Text("📞 ${res.phone}"),
-                              Text("✉️ ${res.email}"),
-                              Text("📍 ${res.address}"),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-                return Center(
-                  child: Text("Đang lấy dữ liệu"),
-                );
-              }),
+          Container(
+            color: AppColors.background,
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    widget.restaurantDto.image,
+                    height: 100,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Container(
+                  padding: EdgeInsets.all(12),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 2,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.restaurantDto.name,
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 8),
+                      Text("📞 ${widget.restaurantDto.phone}"),
+                      Text("✉️ ${widget.restaurantDto.email}"),
+                      Text("📍 ${widget.restaurantDto.address}"),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
 
           Divider(),
           // Menu List
           Expanded(
             child: ListView.builder(
-              itemCount: menuItems.length,
+              itemCount: products?.length,
               itemBuilder: (context, index) {
-                final item = menuItems[index];
+                final item = products?[index];
                 return Container(
                   margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   padding: EdgeInsets.all(12),
@@ -174,13 +167,14 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(item['name'],
+                            Text(item!.name,
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold)),
-                            Text(item['description']),
-                            Text("⏳ ${item['prep_time']}"),
+                            Text(item!.description),
+                            Text(
+                                "⏳ Thời gian chuẩn bị: ${item!.prepareTime.round()} phút"),
                             SizedBox(height: 4),
-                            Text("${item['price']}đ",
+                            Text("Giá: ${item.price.toStringAsFixed(3)}đ",
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold)),
                           ],
