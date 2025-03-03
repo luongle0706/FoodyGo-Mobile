@@ -10,6 +10,8 @@ import 'package:foodygo/view/pages/confirm_order.dart';
 import 'package:foodygo/view/pages/detail_order.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/food_detail.dart';
+import 'package:foodygo/view/pages/notification_page.dart';
+import 'package:foodygo/view/pages/restaurant_home.dart';
 import 'package:foodygo/view/pages/wallet/foodyxu_history_page.dart';
 import 'package:foodygo/view/pages/home.dart';
 import 'package:foodygo/view/pages/hub/staff_arrived_page.dart';
@@ -229,6 +231,12 @@ class Main extends StatelessWidget {
               path: '/protected/restaurant_menu',
               pageBuilder: (context, state) {
                 return MaterialPage(child: RestaurantMenu());
+              }),
+          GoRoute(
+              name: 'restaurant_home',
+              path: '/protected/restaurant_home',
+              pageBuilder: (context, state) {
+                return MaterialPage(child: RestaurantHome());
               }),
           GoRoute(
               name: 'protected_restaurant_detail',
