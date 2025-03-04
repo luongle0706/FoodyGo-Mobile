@@ -1,13 +1,72 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/service/auth_service.dart';
 import 'package:foodygo/utils/app_logger.dart';
+import 'package:foodygo/utils/secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
-class UserProfileScreen extends StatelessWidget {
-  UserProfileScreen({super.key});
+class UserProfileScreen extends StatefulWidget {
+  const UserProfileScreen({super.key});
 
+  @override
+  State<UserProfileScreen> createState() => _UserProfileScreenState();
+}
+
+class _UserProfileScreenState extends State<UserProfileScreen> {
+  SavedUser? user;
+  bool isLoading = true;
   final authService = AuthService.instance;
   final logger = AppLogger.instance;
+  final storage = SecureStorage.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUser();
+  }
+
+  Future<void> loadUser() async {
+    String? data = await storage.get(key: 'user');
+    if (data != null) {
+      logger.info('Data $data');
+      setState(() {
+        user = SavedUser.fromJson(json.decode(data));
+        isLoading = false;
+      });
+    } else {
+      isLoading = false;
+    }
+  }
+
+  Widget _buildWallet(BuildContext context) {
+    if (user != null && !isLoading) {
+      if (user?.role == 'ROLE_STAFF') {
+        return Container();
+      }
+      return GestureDetector(
+        onTap: () => GoRouter.of(context).push("/protected/wallet"),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('FoodyXu', style: TextStyle(fontSize: 16)),
+                  Icon(Icons.arrow_forward_ios,
+                      size: 16, color: Colors.black54),
+                ],
+              ),
+            ),
+            Divider(),
+          ],
+        ),
+      );
+    }
+    return Container();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +96,7 @@ class UserProfileScreen extends StatelessWidget {
             ),
           ),
           Divider(),
-          _buildListTile("Foody Xu"),
+          _buildWallet(context),
           _buildListTile("Địa chỉ"),
           _buildListTile("Chính sách quy định"),
           _buildListTile("Về FoodyGo"),
