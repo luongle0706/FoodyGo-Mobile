@@ -6,6 +6,7 @@ import 'package:foodygo/service/notification_service.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/hub/hub_home_wrapper.dart';
 import 'package:foodygo/view/pages/add_to_cart.dart';
+import 'package:foodygo/view/pages/notification_page.dart';
 import 'package:foodygo/view/pages/restaurant/add_topping_item.dart';
 import 'package:foodygo/view/pages/restaurant/add_topping_section.dart';
 import 'package:foodygo/view/pages/restaurant/confirm_order_restaurant.dart';
@@ -14,6 +15,7 @@ import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/food_detail.dart';
 import 'package:foodygo/view/pages/restaurant/open_hours_setting.dart';
 import 'package:foodygo/view/pages/restaurant/topping_section_setting.dart';
+import 'package:foodygo/view/pages/restaurant_home.dart';
 import 'package:foodygo/view/pages/wallet/foodyxu_history_page.dart';
 import 'package:foodygo/view/pages/home.dart';
 import 'package:foodygo/view/pages/hub/staff_arrived_page.dart';
@@ -83,9 +85,15 @@ class Main extends StatelessWidget {
                   name: 'protected_restaurant_home', // S-033
                   path: '/protected/restaurant-home',
                   pageBuilder: (context, state) {
-                    return MaterialPage(child: RestaurantHomePage());
+                    return MaterialPage(child: RestaurantHome());
                   },
                 ),
+                GoRoute(
+                    name: 'notifications', // S-032
+                    path: '/protected/notifications',
+                    pageBuilder: (context, state) {
+                      return MaterialPage(child: NotificationPage());
+                    }),
                 GoRoute(
                   name: 'protected_staff_home', // S-040
                   path: '/protected/staff-home',
@@ -230,19 +238,19 @@ class Main extends StatelessWidget {
                 ),
               ]),
           GoRoute(
-              name: 'detail_order',
+              name: 'detail_order', // S-014
               path: '/protected/detail-order',
               pageBuilder: (context, state) {
                 return MaterialPage(child: DetailOrder());
               }),
           GoRoute(
-              name: 'order_history',
+              name: 'order_history', // S-015
               path: '/order-history',
               pageBuilder: (context, state) {
                 return MaterialPage(child: OrderHistory());
               }),
           GoRoute(
-              name: 'restaurant_menu',
+              name: 'restaurant_menu', // S-016
               path: '/protected/restaurant_menu',
               pageBuilder: (context, state) {
                 return MaterialPage(child: RestaurantMenu());
