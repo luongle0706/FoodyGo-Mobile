@@ -1,18 +1,55 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/service/auth_service.dart';
 import 'package:foodygo/utils/app_logger.dart';
+import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/image_tile.dart';
 import 'package:foodygo/view/components/input_field_w_icon.dart';
 import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final authService = AuthService.instance;
   final logger = AppLogger.instance;
+  final storage = SecureStorage.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAPI();
+  }
+
+  Future<void> fetchAPI() async {
+    String? data = await storage.get(key: 'user');
+    SavedUser? _user =
+        data != null ? SavedUser.fromJson(json.decode(data)) : null;
+    if (_user != null) {
+      if (_user.role == 'ROLE_SELLER') {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          GoRouter.of(context).go('/protected/restaurant-home');
+        });
+      } else if (_user.role == 'ROLE_USER') {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          GoRouter.of(context).go('/protected/home');
+        });
+      } else if (_user.role == 'ROLE_STAFF') {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          GoRouter.of(context).go('/protected/staff-home');
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -21,10 +21,10 @@ class RestaurantDetailPage extends StatefulWidget {
 
 class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   final storage = SecureStorage.instance;
-  SavedUser? user;
   final ProductRepository repository = ProductRepository.instance;
   AppLogger logger = AppLogger.instance;
   List<ProductDto>? products;
+  SavedUser? user;
   bool isLoading = true;
 
   int cartTotal = 59000; // Sample cart total
@@ -50,8 +50,14 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
           user = savedUser;
           isLoading = false;
         });
+      } else {
+        logger.info('Failed to load restaurant details');
+        setState(() {
+          user = savedUser;
+        });
       }
     } else {
+      logger.info('Failed to load user');
       setState(() {
         isLoading = true;
       });
@@ -170,9 +176,9 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                             Text(item!.name,
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold)),
-                            Text(item!.description),
+                            Text(item.description),
                             Text(
-                                "⏳ Thời gian chuẩn bị: ${item!.prepareTime.round()} phút"),
+                                "⏳ Thời gian chuẩn bị: ${item.prepareTime.round()} phút"),
                             SizedBox(height: 4),
                             Text("Giá: ${item.price.toStringAsFixed(3)}đ",
                                 style: TextStyle(

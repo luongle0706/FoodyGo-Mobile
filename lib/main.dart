@@ -35,7 +35,6 @@ import 'package:foodygo/view/pages/register_success.dart';
 import 'package:foodygo/view/pages/restaurant/food_link_page.dart';
 import 'package:foodygo/view/pages/restaurant/topping_selection_page.dart';
 import 'package:foodygo/view/pages/restaurant_detail.dart';
-import 'package:foodygo/view/pages/restaurant_home_page.dart';
 import 'package:foodygo/view/pages/restaurant_menu.dart';
 import 'package:foodygo/view/pages/hub/staff_home_page.dart';
 import 'package:foodygo/view/pages/wallet/topup_page.dart';
@@ -67,7 +66,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/protected/open-hours-setting',
+        initialLocation: '/login',
         routes: [
           ShellRoute(
               builder: (context, state, child) {
@@ -259,8 +258,7 @@ class Main extends StatelessWidget {
             name: 'protected_restaurant_detail', // S-007
             path: '/protected/restaurant-detail',
             pageBuilder: (context, state) {
-              final restaurantDto = state.extra
-                  as RestaurantDto; 
+              final restaurantDto = state.extra as RestaurantDto;
               return MaterialPage(
                 child: RestaurantDetailPage(restaurantDto: restaurantDto),
               );
@@ -268,28 +266,28 @@ class Main extends StatelessWidget {
           ),
           GoRoute(
             name: 'protected_open_hours_seting', // S-038
-            path: '/protected/open-hours-setting', 
+            path: '/protected/open-hours-setting',
             pageBuilder: (context, state) {
               return MaterialPage(child: OpenHoursSetting());
             },
           ),
           GoRoute(
             name: 'protected_add_topping_section', // S-019
-            path: '/protected/add-topping-section', 
+            path: '/protected/add-topping-section',
             pageBuilder: (context, state) {
               return MaterialPage(child: AddToppingSection());
             },
           ),
           GoRoute(
             name: 'protected_topping_section_setting', // S-020
-            path: '/protected/topping-section-setting', 
+            path: '/protected/topping-section-setting',
             pageBuilder: (context, state) {
               return MaterialPage(child: ToppingSectionSetting());
             },
           ),
           GoRoute(
             name: 'protected_add_topping_item', // S-021
-            path: '/protected/add-topping-item', 
+            path: '/protected/add-topping-item',
             pageBuilder: (context, state) {
               return MaterialPage(child: AddToppingItem());
             },
