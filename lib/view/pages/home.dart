@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:foodygo/dto/restaurant_dto.dart';
+import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/restaurant_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
@@ -17,34 +17,54 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Future<List<RestaurantDto>>? _restaurants;
-
-  final SecureStorage storage = SecureStorage.instance;
-  final RestaurantRepository repository = RestaurantRepository.instance;
-  final AppLogger logger = AppLogger.instance;
+  List<dynamic>? _restaurants;
+  bool _isLoading = true;
+  final SecureStorage _storage = SecureStorage.instance;
+  final RestaurantRepository _repository = RestaurantRepository.instance;
+  final AppLogger _logger = AppLogger.instance;
 
   @override
   void initState() {
     super.initState();
-    _loadRestaurants();
+    _init();
   }
 
-  void _loadRestaurants() {
-    setState(() {
-      _restaurants = fetchRestaurant();
-    });
-  }
-
-  Future<List<RestaurantDto>> fetchRestaurant() async {
-    String? savedUser = await storage.get(key: 'user');
-    Map<String, dynamic> userMap = json.decode(savedUser!);
-    String? accessToken = userMap['token'];
-
-    return repository.loadRestaurants(accessToken!);
+  void _init() async {
+    String? userData = await _storage.get(key: 'user');
+    SavedUser? user =
+        userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
+    if (user != null) {
+      Map<String, dynamic> restaurants =
+          await _repository.loadRestaurants(user.token);
+      if (restaurants['data'] != null) {
+        List<dynamic> data = restaurants['data'];
+        setState(() {
+          _restaurants = data;
+          _isLoading = false;
+        });
+      } else {
+        _logger.info("Failed to load restaurants!");
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.background,
@@ -61,42 +81,30 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           const SizedBox(height: 10),
-          FutureBuilder(
-              future: _restaurants,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final res = snapshot.data!;
-                  return Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        int crossAxisCount =
-                            (constraints.maxWidth ~/ 180).clamp(2, 4);
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                int crossAxisCount = (constraints.maxWidth ~/ 180).clamp(2, 4);
 
-                        return GridView.builder(
-                          padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: crossAxisCount,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 1,
-                          ),
-                          itemCount: res.length,
-                          itemBuilder: (context, index) {
-                            final restaurant = res[index];
-                            return RestaurantPreview(
-                              restaurantDto: restaurant,
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  );
-                }
-                return Center(
-                  child: Text("Đang lấy dữ liệu"),
+                return GridView.builder(
+                  padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 1,
+                  ),
+                  itemCount: _restaurants?.length,
+                  itemBuilder: (context, index) {
+                    Map<String, dynamic> restaurant = _restaurants?[index];
+                    return RestaurantPreview(
+                      restaurant: restaurant,
+                    );
+                  },
                 );
-              })
+              },
+            ),
+          )
         ],
       ),
     );

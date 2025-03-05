@@ -9,7 +9,7 @@ class RestaurantRepository {
   static final RestaurantRepository instance = RestaurantRepository._();
   final AppLogger logger = AppLogger.instance;
 
-  Future<List<RestaurantDto>> loadRestaurants(String accessToken) async {
+  Future<Map<String, dynamic>> loadRestaurants(String accessToken) async {
     logger.info("Access token hehe $accessToken");
     final response = await http.get(
       Uri.parse('$globalURL/api/v1/restaurants'),
@@ -19,20 +19,9 @@ class RestaurantRepository {
       },
     );
 
-    if (response.statusCode == 200 || response.statusCode == 400) {
-      final jsonResponse = json.decode(response.body);
-      List<dynamic> list = jsonResponse['data'];
-      logger.info('${list}');
-      return list
-          .map((item) => RestaurantDto(
-              id: item['id'],
-              name: item['name'],
-              phone: item['phone'],
-              email: item['email'],
-              address: item['address'],
-              image: item['image'],
-              available: item['available']))
-          .toList();
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      return jsonResponse;
     } else {
       throw Exception('Failed to load data!');
     }
@@ -52,13 +41,13 @@ class RestaurantRepository {
       dynamic data = jsonResponse['data'];
       logger.info('${data}');
       return RestaurantDto(
-              id: data['id'],
-              name: data['name'],
-              phone: data['phone'],
-              email: data['email'],
-              address: data['address'],
-              image: data['image'],
-              available: data['available']);
+          id: data['id'],
+          name: data['name'],
+          phone: data['phone'],
+          email: data['email'],
+          address: data['address'],
+          image: data['image'],
+          available: data['available']);
     } else {
       throw Exception('Failed to load data!');
     }
