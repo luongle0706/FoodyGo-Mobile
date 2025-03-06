@@ -68,7 +68,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/protected/product-detail-restaurant',
+        initialLocation: '/login',
         routes: [
           ShellRoute(
               builder: (context, state, child) {

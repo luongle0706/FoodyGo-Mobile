@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:foodygo/dto/product_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/repository/cart_repository.dart';
 import 'package:foodygo/repository/product_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
@@ -19,15 +20,17 @@ class RestaurantDetailPage extends StatefulWidget {
 }
 
 class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
-  final storage = SecureStorage.instance;
-  final ProductRepository repository = ProductRepository.instance;
-  AppLogger logger = AppLogger.instance;
-  List<ProductDto>? products;
-  SavedUser? user;
-  bool isLoading = true;
-
-  int cartTotal = 59000; // Sample cart total
-  int cartItemCount = 1;
+  final _storage = SecureStorage.instance;
+  final AppLogger logger = AppLogger.instance;
+  final ProductRepository _productRepository = ProductRepository.instance;
+  final CartRepository _cartRepository = CartRepository.instance;
+  final AppLogger _logger = AppLogger.instance;
+  SavedUser? _user;
+  List<ProductDto>? _products;
+  List<dynamic>? _cartItems;
+  bool _isLoading = true;
+  int _cartTotal = 0;
+  int _cartItemCount = 0;
 
   @override
   void initState() {
@@ -36,37 +39,91 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   }
 
   Future<void> loadUser() async {
-    String? data = await storage.get(key: 'user');
-    SavedUser? savedUser =
-        data != null ? SavedUser.fromJson(json.decode(data)) : null;
+    String? userData = await _storage.get(key: 'user');
+    SavedUser? user =
+        userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
 
-    if (savedUser != null) {
-      List<ProductDto>? fetchProducts =
-          await repository.getProductsByRestaurantId(
-              widget.restaurantDto['id'], savedUser.token);
-      if (fetchProducts != null) {
+    if (user != null) {
+      setState(() {
+        _user = user;
+      });
+      bool fetchedProducts = await fetchProducts(user);
+      bool fetchedCartItems = await fetchItemsInCart(user: user);
+
+      if (fetchedProducts && fetchedCartItems) {
         setState(() {
-          products = fetchProducts;
-          user = savedUser;
-          isLoading = false;
+          _isLoading = false;
         });
       } else {
-        logger.info('Failed to load restaurant details');
         setState(() {
-          user = savedUser;
+          _isLoading = true;
         });
       }
     } else {
-      logger.info('Failed to load user');
+      _logger.info('Failed to load user');
       setState(() {
-        isLoading = true;
+        _isLoading = true;
       });
+    }
+  }
+
+  Future<bool> fetchProducts(SavedUser user) async {
+    List<ProductDto>? fetchProducts = await _productRepository
+        .getProductsByRestaurantId(widget.restaurantDto['id'], user.token);
+    if (fetchProducts != null) {
+      setState(() {
+        _products = fetchProducts;
+      });
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<void> addToCart({required ProductDto product}) async {
+    bool result = await _cartRepository.addToCart(
+        accessToken: _user?.token,
+        userId: _user?.userId,
+        restaurantId: widget.restaurantDto['id'],
+        productId: product.id,
+        productName: product.name,
+        price: product.price,
+        quantity: 1);
+    if (result) {
+      logger.info('success');
+      fetchItemsInCart(user: _user!);
+    } else {
+      logger.info('failed');
+    }
+  }
+
+  Future<bool> fetchItemsInCart({required SavedUser user}) async {
+    List<dynamic>? data = await _cartRepository.getCartByRestaurant(
+        accessToken: _user?.token,
+        userId: _user?.userId,
+        restaurantId: widget.restaurantDto['id']);
+    if (data != null) {
+      int total = data
+          .map((item) => (item['price'] as num).toInt())
+          .reduce((a, b) => a + b);
+      int totalQuantity = data
+          .map((item) => (item['quantity'] as num).toInt())
+          .reduce((a, b) => a + b);
+      logger.info('Total price: $total');
+      setState(() {
+        _cartItems = data;
+        _cartItemCount = totalQuantity;
+        _cartTotal = total;
+      });
+      return true;
+    } else {
+      return false;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (_isLoading) {
       return SizedBox(
         height: 100,
         child: Center(
@@ -148,9 +205,9 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
           // Menu List
           Expanded(
             child: ListView.builder(
-              itemCount: products?.length,
+              itemCount: _products?.length,
               itemBuilder: (context, index) {
-                final item = products?[index];
+                final item = _products?[index];
                 return Container(
                   margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   padding: EdgeInsets.all(12),
@@ -185,7 +242,12 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                     fontSize: 16, fontWeight: FontWeight.bold)),
                           ],
                         ),
-                      )
+                      ),
+                      TextButton(
+                          onPressed: () => addToCart(product: item),
+                          child: Text('+')),
+                      Text(
+                          '(Đã có ${_cartItems?.firstWhere((i) => i['productId'] == item.id)['quantity']})')
                     ],
                   ),
                 );
@@ -204,15 +266,38 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
+            Stack(
+              clipBehavior: Clip.none,
               children: [
                 Icon(Icons.shopping_cart, size: 24),
-                SizedBox(width: 8),
-                Text("Tổng cộng: $cartTotalđ",
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                if (_cartItemCount > 0) // Only show if there are items
+                  Positioned(
+                    right: -10,
+                    top: -20,
+                    child: Container(
+                      padding: EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: BoxConstraints(
+                        minWidth: 20,
+                        minHeight: 20,
+                      ),
+                      child: Text(
+                        '$_cartItemCount',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
               ],
             ),
+            Text('Giỏ hàng: $_cartTotal'),
             ElevatedButton(
               onPressed: () {
                 // Handle checkout
