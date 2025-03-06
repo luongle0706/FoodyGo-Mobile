@@ -18,6 +18,7 @@ class CustomFootageRestaurantOrderAppBar extends StatelessWidget
           child: Column(
             children: [
               AppBar(
+                automaticallyImplyLeading: false,
                 backgroundColor: Colors.transparent, // Để AppBar trong suốt
                 elevation: 0,
                 title: Row(
@@ -47,9 +48,11 @@ class CustomFootageRestaurantOrderAppBar extends StatelessWidget
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    _buildTabButton(context, "Đơn", "/order-list-restaurant"),
+                    _buildTabButton(
+                        context, "Đơn", "/protected/restaurant-foodygo"),
                     SizedBox(width: 10),
-                    _buildTabButton(context, "Thực đơn", "/order-history"),
+                    _buildTabButton(
+                        context, "Thực đơn", "/protected/restaurant_menu"),
                     SizedBox(width: 10),
                     _buildTabButton(context, "Báo cáo", "/report"),
                   ],
@@ -65,7 +68,7 @@ class CustomFootageRestaurantOrderAppBar extends StatelessWidget
   Widget _buildTabButton(BuildContext context, String text, String route) {
     return GestureDetector(
       onTap: () {
-        GoRouter.of(context).go(route);
+        GoRouter.of(context).push(route);
       },
       child: Container(
         width: 100,
