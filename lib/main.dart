@@ -7,6 +7,7 @@ import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/hub/hub_home_wrapper.dart';
 import 'package:foodygo/view/pages/add_to_cart.dart';
 import 'package:foodygo/view/pages/notification_page.dart';
+import 'package:foodygo/view/pages/restaurant/add_edit_category.dart';
 import 'package:foodygo/view/pages/restaurant/add_topping_item.dart';
 import 'package:foodygo/view/pages/restaurant/add_topping_section.dart';
 import 'package:foodygo/view/pages/restaurant/confirm_order_restaurant.dart';
@@ -14,6 +15,8 @@ import 'package:foodygo/view/pages/detail_order.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/food_detail.dart';
 import 'package:foodygo/view/pages/restaurant/open_hours_setting.dart';
+import 'package:foodygo/view/pages/restaurant/order_detail_restaurant.dart';
+import 'package:foodygo/view/pages/restaurant/product_detail_restaurant.dart';
 import 'package:foodygo/view/pages/restaurant/topping_section_setting.dart';
 import 'package:foodygo/view/pages/restaurant_home.dart';
 import 'package:foodygo/view/pages/wallet/foodyxu_history_page.dart';
@@ -66,7 +69,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/login',
+        initialLocation: '/protected/product-detail-restaurant',
         routes: [
           ShellRoute(
               builder: (context, state, child) {
@@ -293,10 +296,31 @@ class Main extends StatelessWidget {
             },
           ),
           GoRoute(
+            name: 'protected_order_detail_restaurant', // S-026
+            path: '/protected/order-detail-restaurant',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: OrderDetailRestaurant());
+            },
+          ),
+          GoRoute(
+            name: 'protected_add_edit_category', // S-039
+            path: '/protected/add-edit-category',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: AddEditCategory());
+            },
+          ),
+          GoRoute(
             name: 'protected_topping_selection', // S-043
             path: '/protected/topping-selection',
             pageBuilder: (context, state) {
               return MaterialPage(child: ToppingSelectionPage());
+            },
+          ),
+          GoRoute(
+            name: 'protected_product_detail_restaurant', // S-045
+            path: '/protected/product-detail-restaurant',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: ProductDetailRestaurant());
             },
           ),
           GoRoute(

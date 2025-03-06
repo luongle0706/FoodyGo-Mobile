@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:foodygo/view/theme.dart';
 
-class AddToppingItem extends StatefulWidget {
-  const AddToppingItem({super.key});
+class AddEditCategory extends StatefulWidget {
+  const AddEditCategory({super.key});
 
   @override
-  _AddToppingItemState createState() => _AddToppingItemState();
+  _AddEditCategoryState createState() => _AddEditCategoryState();
 }
 
-class _AddToppingItemState extends State<AddToppingItem> {
+class _AddEditCategoryState extends State<AddEditCategory> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
 
@@ -21,7 +21,7 @@ class _AddToppingItemState extends State<AddToppingItem> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          "Thêm topping",
+          "Thêm/Sửa danh mục",
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: AppColors.primary,
@@ -37,7 +37,7 @@ class _AddToppingItemState extends State<AddToppingItem> {
               controller: nameController,
               decoration: InputDecoration(
                 labelText: "Tên*",
-                hintText: "VD: Tương ớt",
+                hintText: "VD: Cơm",
                 border: const OutlineInputBorder(),
                 suffixIcon: const Icon(Icons.edit),
               ),
@@ -49,9 +49,9 @@ class _AddToppingItemState extends State<AddToppingItem> {
               controller: priceController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                labelText: "Giá*",
+                labelText: "Mô tả",
                 border: const OutlineInputBorder(),
-                suffixText: "đ",
+                suffixText: "VD: Món chính với cơm",
               ),
             ),
             const Spacer(),

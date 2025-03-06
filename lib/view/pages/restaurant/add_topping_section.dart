@@ -99,7 +99,7 @@ class AddToppingSection extends StatelessWidget {
                 ),
                 child: const Text(
                   "Lưu",
-                  style: TextStyle(fontSize: 18, color: Colors.white),
+                  style: TextStyle(fontSize: 20, color: Colors.white),
                 ),
               ),
             ),
