@@ -247,7 +247,9 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                           onPressed: () => addToCart(product: item),
                           child: Text('+')),
                       Text(
-                          '(Đã có ${_cartItems?.firstWhere((i) => i['productId'] == item.id)['quantity']})')
+                          '(Đã có ${_cartItems?.firstWhere((i) => i['productId'] == item.id, orElse: () => {
+                                'quantity': 0
+                              })['quantity']})')
                     ],
                   ),
                 );
