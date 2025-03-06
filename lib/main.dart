@@ -252,6 +252,12 @@ class Main extends StatelessWidget {
                     return MaterialPage(child: ViewCartPage());
                   },
                 ),
+                GoRoute(
+                    name: 'restaurant_menu', // S-016
+                    path: '/protected/restaurant_menu',
+                    pageBuilder: (context, state) {
+                      return MaterialPage(child: RestaurantMenu());
+                    })
               ]),
           GoRoute(
               name: 'detail_order', // S-014
@@ -264,12 +270,6 @@ class Main extends StatelessWidget {
               path: '/order-history',
               pageBuilder: (context, state) {
                 return MaterialPage(child: OrderHistory());
-              }),
-          GoRoute(
-              name: 'restaurant_menu', // S-016
-              path: '/protected/restaurant_menu',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: RestaurantMenu());
               }),
           GoRoute(
             name: 'protected_restaurant_detail', // S-007
