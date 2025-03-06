@@ -42,7 +42,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
     String? userData = await _storage.get(key: 'user');
     SavedUser? user =
         userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
-
+    logger.info('hello');
     if (user != null) {
       setState(() {
         _user = user;
@@ -62,7 +62,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
     } else {
       _logger.info('Failed to load user');
       setState(() {
-        _isLoading = true;
+        _isLoading = false;
       });
     }
   }
@@ -103,12 +103,17 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
         userId: _user?.userId,
         restaurantId: widget.restaurantDto['id']);
     if (data != null) {
-      int total = data
-          .map((item) => (item['price'] as num).toInt())
-          .reduce((a, b) => a + b);
-      int totalQuantity = data
-          .map((item) => (item['quantity'] as num).toInt())
-          .reduce((a, b) => a + b);
+      int total = data.isNotEmpty
+          ? data
+              .map((item) => ((item['price'] as num).toInt() *
+                  (item['quantity'] as num).toInt()))
+              .reduce((a, b) => a + b)
+          : 0;
+      int totalQuantity = data.isNotEmpty
+          ? data
+              .map((item) => (item['quantity'] as num).toInt())
+              .reduce((a, b) => a + b)
+          : 0;
       logger.info('Total price: $total');
       setState(() {
         _cartItems = data;
