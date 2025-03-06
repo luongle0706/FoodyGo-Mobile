@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:foodygo/dto/restaurant_dto.dart';
 import 'package:go_router/go_router.dart';
 
 class RestaurantPreview extends StatelessWidget {
-  final RestaurantDto restaurantDto;
+  final Map<String, dynamic> restaurant;
 
-  const RestaurantPreview({
-    required this.restaurantDto
-  });
+  const RestaurantPreview({super.key, required this.restaurant});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        GoRouter.of(context).push('/protected/restaurant-detail',
-         extra: restaurantDto);
+        GoRouter.of(context)
+            .push('/protected/restaurant-detail', extra: restaurant);
       },
       child: Container(
         width: 150,
@@ -36,7 +33,7 @@ class RestaurantPreview extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.network(
-                restaurantDto.image,
+                restaurant['image'],
                 height: 100,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -44,7 +41,7 @@ class RestaurantPreview extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              restaurantDto.name,
+              restaurant['name'],
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -53,7 +50,7 @@ class RestaurantPreview extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             Text(
-              restaurantDto.address,
+              restaurant['address'],
               style: const TextStyle(
                 fontSize: 12,
                 color: Colors.grey,

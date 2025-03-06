@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:foodygo/dto/product_dto.dart';
-import 'package:foodygo/dto/restaurant_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/product_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
@@ -11,7 +10,7 @@ import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class RestaurantDetailPage extends StatefulWidget {
-  final RestaurantDto restaurantDto;
+  final Map<String, dynamic> restaurantDto;
 
   const RestaurantDetailPage({super.key, required this.restaurantDto});
 
@@ -42,8 +41,9 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
         data != null ? SavedUser.fromJson(json.decode(data)) : null;
 
     if (savedUser != null) {
-      List<ProductDto>? fetchProducts = await repository
-          .getProductsByRestaurantId(widget.restaurantDto.id, savedUser.token);
+      List<ProductDto>? fetchProducts =
+          await repository.getProductsByRestaurantId(
+              widget.restaurantDto['id'], savedUser.token);
       if (fetchProducts != null) {
         setState(() {
           products = fetchProducts;
@@ -104,7 +104,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
-                    widget.restaurantDto.image,
+                    widget.restaurantDto['image'],
                     height: 100,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -129,14 +129,14 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.restaurantDto.name,
+                        widget.restaurantDto['name'],
                         style: TextStyle(
                             fontSize: 24, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 8),
-                      Text("📞 ${widget.restaurantDto.phone}"),
-                      Text("✉️ ${widget.restaurantDto.email}"),
-                      Text("📍 ${widget.restaurantDto.address}"),
+                      Text("📞 ${widget.restaurantDto['phone']}"),
+                      Text("✉️ ${widget.restaurantDto['email']}"),
+                      Text("📍 ${widget.restaurantDto['address']}"),
                     ],
                   ),
                 ),
@@ -208,7 +208,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
               children: [
                 Icon(Icons.shopping_cart, size: 24),
                 SizedBox(width: 8),
-                Text("Tổng cộng: ${cartTotal}đ",
+                Text("Tổng cộng: $cartTotalđ",
                     style:
                         TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ],
