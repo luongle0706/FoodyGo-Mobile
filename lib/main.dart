@@ -39,6 +39,7 @@ import 'package:foodygo/view/pages/restaurant/topping_selection_page.dart';
 import 'package:foodygo/view/pages/restaurant_detail.dart';
 import 'package:foodygo/view/pages/restaurant_menu.dart';
 import 'package:foodygo/view/pages/hub/staff_home_page.dart';
+import 'package:foodygo/view/pages/wallet/payment_history_page.dart';
 import 'package:foodygo/view/pages/wallet/topup_page.dart';
 import 'package:foodygo/view/pages/wallet/transaction_detail_detail.dart';
 import 'package:foodygo/view/pages/wallet/transfer_points_page.dart';
@@ -160,18 +161,32 @@ class Main extends StatelessWidget {
                   },
                 ),
                 GoRoute(
+                  name: 'protected_wallet_payment_history',
+                  path: '/protected/wallet/payment-history',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: PaymentHistoryPage());
+                  },
+                ),
+                GoRoute(
                   name: 'protected_wallet_transaction_detail',
                   path: '/protected/wallet/transaction-detail',
                   pageBuilder: (context, state) {
+                    // Extract transaction details from the extra data
+                    final extra = state.extra as Map<String, dynamic>? ?? {};
+
                     return MaterialPage(
-                        child: TransactionDetailScreen(
-                      transactionTitle: 'Sample Title',
-                      transactionAmount: '100.0',
-                      transactionStatus: 'Completed',
-                      transactionId: '12345',
-                      transactionDateTime: DateTime.now().toIso8601String(),
-                      currentBalance: '500.0',
-                    ));
+                      child: TransactionDetailScreen(
+                        transactionTitle:
+                            extra['transactionTitle'] ?? 'Giao dịch',
+                        transactionAmount:
+                            extra['transactionAmount'] ?? '0 FoodyXu',
+                        transactionStatus:
+                            extra['transactionStatus'] ?? 'Thành công',
+                        transactionId: extra['transactionId'] ?? '',
+                        transactionDateTime: extra['transactionDateTime'] ?? '',
+                        currentBalance: extra['currentBalance'] ?? '0 FoodyXu',
+                      ),
+                    );
                   },
                 ),
                 GoRoute(

@@ -21,7 +21,6 @@ class _WalletHomepageState extends State<WalletHomepage> {
   String? token;
   final walletRepository = WalletRepository.instance;
   final AppLogger logger = AppLogger.instance;
-
   final storage = SecureStorage.instance;
 
   @override
@@ -32,6 +31,10 @@ class _WalletHomepageState extends State<WalletHomepage> {
   }
 
   Future<void> loadUser() async {
+    setState(() {
+      isLoading = true;
+    });
+
     String? data = await storage.get(key: 'user');
     SavedUser? savedUser =
         data != null ? SavedUser.fromJson(json.decode(data)) : null;
@@ -59,22 +62,15 @@ class _WalletHomepageState extends State<WalletHomepage> {
     }
   }
 
-  // Future<void> fetchWalletBalance() async {
-  //   logger.info('Fetching wallet balance...');
-  //   WalletDto? walletBalance =
-  //       await walletRepository.loadWalletBalance(token!, user!.userId);
-  //   if (walletBalance != null) {
-  //     setState(() {
-  //       logger.info('Wallet balance: ${walletBalance.balance}');
-  //       wallet = walletBalance;
-  //       isLoading = false;
-  //     });
-  //   } else {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //   }
-  // }
+  Future<void> _navigateToRoute(String route) async {
+    final needsRefresh = await GoRouter.of(context).push<bool>(route);
+
+    // If returned value is true, refresh the wallet balance
+    if (needsRefresh == true) {
+      logger.info('Transaction completed, refreshing wallet balance');
+      loadUser();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,8 +91,8 @@ class _WalletHomepageState extends State<WalletHomepage> {
           : Column(
               children: [
                 GestureDetector(
-                  onTap: () => GoRouter.of(context)
-                      .push('/protected/wallet/transaction-history'),
+                  onTap: () =>
+                      _navigateToRoute('/protected/wallet/transaction-history'),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         vertical: 16, horizontal: 16),
@@ -165,7 +161,7 @@ class _WalletHomepageState extends State<WalletHomepage> {
                         icon: Icons.history,
                         title: 'Lịch sử thanh toán',
                         subtitle: 'Xem lại lịch sử thanh toán của ví',
-                        route: '/protected/wallet/transaction-history',
+                        route: '/protected/wallet/payment-history',
                       ),
                     ],
                   ),
@@ -183,7 +179,7 @@ class _WalletHomepageState extends State<WalletHomepage> {
     required String route,
   }) {
     return GestureDetector(
-      onTap: () => GoRouter.of(context).push(route),
+      onTap: () => _navigateToRoute(route),
       child: Container(
         padding: const EdgeInsets.all(16),
         margin: const EdgeInsets.only(bottom: 12),

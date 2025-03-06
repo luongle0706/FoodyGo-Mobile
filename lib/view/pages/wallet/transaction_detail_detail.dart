@@ -83,7 +83,7 @@ class TransactionDetailScreen extends StatelessWidget {
                 children: [
                   _buildDetailRow("Mã giao dịch", transactionId),
                   _buildDetailRow("Thời gian giao dịch", transactionDateTime),
-                  _buildDetailRow("Số dư hiện tại", currentBalance),
+                  _buildDetailRow("Số dư còn lại", currentBalance),
                 ],
               ),
             ),

@@ -1,10 +1,16 @@
+// lib/dto/transaction_item.dart
 import 'package:flutter/material.dart';
 
 class TransactionItem {
   final String title;
   final String amount;
-  final String dateTime;
+  final String date;
   final IconData icon;
 
-  TransactionItem(this.title, this.amount, this.dateTime, this.icon);
+  TransactionItem({
+    required this.title,
+    required this.amount,
+    required this.date,
+    required this.icon,
+  });
 }
