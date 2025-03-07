@@ -45,7 +45,6 @@ import 'package:foodygo/view/pages/wallet/payment_history_page.dart';
 import 'package:foodygo/view/pages/wallet/topup_page.dart';
 import 'package:foodygo/view/pages/wallet/transaction_detail_detail.dart';
 import 'package:foodygo/view/pages/wallet/transfer_points_page.dart';
-import 'package:foodygo/view/pages/view_cart.dart';
 import 'package:foodygo/view/pages/wallet/wallet_homepage.dart';
 import 'package:foodygo/view/pages/wallet/withdraw_page.dart';
 import 'package:go_router/go_router.dart';
@@ -247,13 +246,14 @@ class Main extends StatelessWidget {
                     return MaterialPage(child: AddToCartPage());
                   },
                 ),
-                GoRoute(
-                  name: 'protected_view_cart',
-                  path: '/protected/view-cart',
-                  pageBuilder: (context, state) {
-                    return MaterialPage(child: ViewCartPage());
-                  },
-                ),
+                // Integrated with S=007
+                // GoRoute(
+                //   name: 'protected_view_cart',
+                //   path: '/protected/view-cart',
+                //   pageBuilder: (context, state) {
+                //     return MaterialPage(child: ViewCartPage());
+                //   },
+                // ),
                 GoRoute(
                     name: 'restaurant_menu', // S-016
                     path: '/protected/restaurant_menu',
@@ -365,25 +365,25 @@ class Main extends StatelessWidget {
                 return MaterialPage(child: LoginPage());
               }),
           GoRoute(
-              name: 'register',
+              name: 'register', //S-002
               path: '/register',
               pageBuilder: (context, state) {
                 return MaterialPage(child: RegisterPage());
               }),
           GoRoute(
-              name: 'register info',
+              name: 'register info', //S-003
               path: '/register-info',
               pageBuilder: (context, state) {
                 return MaterialPage(child: RegisterInfo());
               }),
           GoRoute(
-              name: 'otp',
+              name: 'otp', //S-004
               path: '/otp',
               pageBuilder: (context, state) {
                 return MaterialPage(child: OtpPage());
               }),
           GoRoute(
-            name: 'protected_food_detail',
+            name: 'protected_food_detail', //S-008
             path: '/protected/product',
             pageBuilder: (context, state) {
               final map = state.extra as Map<String, dynamic>;
@@ -397,7 +397,7 @@ class Main extends StatelessWidget {
             },
           ),
           GoRoute(
-            name: 'registerSuccess',
+            name: 'registerSuccess', //S-005
             path: '/registerSuccess',
             pageBuilder: (context, state) {
               return MaterialPage(child: RegisterSuccessPage());
