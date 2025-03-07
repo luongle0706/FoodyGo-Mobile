@@ -103,7 +103,6 @@ class AuthRepository {
 
     final response = await http.post(Uri.parse('$globalURL/api/v1/send-otp'),
         headers: {'Content-Type': 'application/json'}, body: json.encode(body));
-    logger.info("response$response");
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonResponse = json.decode(response.body);
       logger.info("jsonResponse$jsonResponse");
@@ -112,6 +111,8 @@ class AuthRepository {
           otp: jsonResponse['data']['otp'],
           existedEmail: jsonResponse['data']['existedEmail'] as bool);
     } else {
+      logger.info("statusCode" + response.statusCode.toString());
+      logger.info("response$response");
       throw Exception('Failed to load data in send OTP!');
     }
   }
