@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:foodygo/dto/OTP_dto.dart';
 import 'package:foodygo/dto/login_dto.dart';
+import 'package:foodygo/dto/register_dto.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/constants.dart';
 import 'package:http/http.dart' as http;
@@ -13,7 +16,10 @@ class AuthRepository {
   Future<LoginResponseDTO> login(LoginRequestDTO request) async {
     final response = await http.post(
       Uri.parse('$globalURL/api/v1/authentications/login'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
       body: json.encode(request.toJson()),
     );
 
@@ -30,7 +36,7 @@ class AuthRepository {
           role: jsonResponse['role'],
           userId: jsonResponse['userId']);
     } else {
-      throw Exception('Failed to load data!');
+      throw Exception('Failed to load data!: ${response.body}');
     }
   }
 
@@ -69,6 +75,45 @@ class AuthRepository {
     } catch (e) {
       logger.error('Error occurred: $e');
       rethrow;
+    }
+  }
+
+  Future<RegisterResponseDTO> register(RegisterRequestDTO request) async {
+    final response = await http.post(
+      Uri.parse('$globalURL/api/v1/authentications/register'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(request.toJson()),
+    );
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+      logger.info(jsonResponse.toString());
+      return RegisterResponseDTO(
+          message: jsonResponse['message'],
+          email: jsonResponse['data']['email'],
+          roleName: jsonResponse['data']['roleName'],
+          userId: jsonResponse['data']['userID'] as int?);
+    } else {
+      throw Exception('Failed to load data in register!');
+    }
+  }
+
+  Future<OTPResponseDTO> sendOTP({required email}) async {
+    Map<String, dynamic> body = {'email': email};
+    logger.info("request body$body");
+
+    final response = await http.post(Uri.parse('$globalURL/api/v1/send-otp'),
+        headers: {'Content-Type': 'application/json'}, body: json.encode(body));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+      logger.info("jsonResponse$jsonResponse");
+      return OTPResponseDTO(
+          message: jsonResponse['message'],
+          otp: jsonResponse['data']['otp'],
+          existedEmail: jsonResponse['data']['existedEmail'] as bool);
+    } else {
+      logger.info("statusCode" + response.statusCode.toString());
+      logger.info("response$response");
+      throw Exception('Failed to load data in send OTP!');
     }
   }
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:foodygo/view/theme.dart';
 
 class ProductDetailRestaurant extends StatefulWidget {
+  const ProductDetailRestaurant({super.key});
+
   @override
   _ProductDetailRestaurantState createState() =>
       _ProductDetailRestaurantState();
@@ -169,32 +171,32 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
       ],
     );
   }
-  void _showDeleteConfirmation(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text("Xác nhận xóa"),
-        content: Text("Bạn có chắc chắn muốn xóa món này không?"),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Đóng hộp thoại
-            },
-            child: Text("Hủy", style: TextStyle(color: Colors.black45)),
-          ),
-          TextButton(
-            onPressed: () {
-              // Xử lý xóa món tại đây
-              Navigator.of(context).pop(); // Đóng hộp thoại sau khi xác nhận
-              print("Món đã bị xóa!");
-            },
-            child: Text("Xóa", style: TextStyle(color: AppColors.primary)),
-          ),
-        ],
-      );
-    },
-  );
-}
 
+  void _showDeleteConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Xác nhận xóa"),
+          content: Text("Bạn có chắc chắn muốn xóa món này không?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Đóng hộp thoại
+              },
+              child: Text("Hủy", style: TextStyle(color: Colors.black45)),
+            ),
+            TextButton(
+              onPressed: () {
+                // Xử lý xóa món tại đây
+                Navigator.of(context).pop(); // Đóng hộp thoại sau khi xác nhận
+                print("Món đã bị xóa!");
+              },
+              child: Text("Xóa", style: TextStyle(color: AppColors.primary)),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

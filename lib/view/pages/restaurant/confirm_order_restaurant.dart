@@ -36,6 +36,8 @@ class ConfirmedOrderRestaurantScreen extends StatelessWidget {
 }
 
 class ConfirmedOrderCard extends StatelessWidget {
+  const ConfirmedOrderCard({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Card(

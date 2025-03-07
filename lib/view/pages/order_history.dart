@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
 
 class OrderHistory extends StatefulWidget {
+  const OrderHistory({super.key});
+
   @override
   _OrderHistoryState createState() => _OrderHistoryState();
 }
@@ -98,7 +100,9 @@ class _OrderHistoryState extends State<OrderHistory> {
         ),
         centerTitle: true,
       ),
-      body: _selectedIndex == 1 ? filter() : Center(child: Text("Không có đơn hàng đang đến")),
+      body: _selectedIndex == 1
+          ? filter()
+          : Center(child: Text("Không có đơn hàng đang đến")),
     );
   }
 
@@ -129,7 +133,6 @@ class _OrderHistoryState extends State<OrderHistory> {
                   });
                 },
               ),
-
               DropdownButton<String>(
                 value: selectedStatus,
                 dropdownColor: Colors.white,
@@ -147,7 +150,6 @@ class _OrderHistoryState extends State<OrderHistory> {
                   });
                 },
               ),
-
               GestureDetector(
                 onTap: () => _selectDateRange(context),
                 child: Row(
@@ -169,7 +171,6 @@ class _OrderHistoryState extends State<OrderHistory> {
   }
 
   Widget buildHistoryList() {
-
     List<Map<String, dynamic>> filteredOrders = orders.where((order) {
       DateTime orderDate;
       if (order["time"].contains("Hôm nay")) {
@@ -180,12 +181,15 @@ class _OrderHistoryState extends State<OrderHistory> {
         orderDate = DateFormat("dd/MM/yyyy HH:mm").parse(order["time"]);
       }
 
-      bool isInDateRange = orderDate.isAfter(startDate.subtract(Duration(days: 1))) &&
-          orderDate.isBefore(endDate.add(Duration(days: 1)));
+      bool isInDateRange =
+          orderDate.isAfter(startDate.subtract(Duration(days: 1))) &&
+              orderDate.isBefore(endDate.add(Duration(days: 1)));
 
-      bool matchesService = selectedService == "Tất cả" || order["service"] == selectedService;
+      bool matchesService =
+          selectedService == "Tất cả" || order["service"] == selectedService;
 
-      bool matchesStatus = selectedStatus == "Tất cả" || order["status"] == selectedStatus;
+      bool matchesStatus =
+          selectedStatus == "Tất cả" || order["status"] == selectedStatus;
 
       return isInDateRange && matchesService && matchesStatus;
     }).toList();
@@ -204,11 +208,13 @@ class _OrderHistoryState extends State<OrderHistory> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Đồ ăn ${order["id"]}", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text("Đồ ăn ${order["id"]}",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(order["time"], style: TextStyle(color: Colors.grey)),
                   ],
                 ),
-                Text("${order["title"]} - ${order["restaurant"]}", style: TextStyle(color: Colors.grey)),
+                Text("${order["title"]} - ${order["restaurant"]}",
+                    style: TextStyle(color: Colors.grey)),
                 SizedBox(height: 10),
                 GestureDetector(
                   onTap: () {
@@ -238,12 +244,17 @@ class _OrderHistoryState extends State<OrderHistory> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Text(order["price"], style: TextStyle(fontWeight: FontWeight.bold)),
+                                    Text(order["price"],
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
-                                        Text(order["quantity"], style: TextStyle(color: Colors.grey)),
-                                        Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                                        Text(order["quantity"],
+                                            style:
+                                                TextStyle(color: Colors.grey)),
+                                        Icon(Icons.arrow_forward_ios,
+                                            size: 14, color: Colors.grey),
                                       ],
                                     ),
                                   ],
@@ -255,7 +266,8 @@ class _OrderHistoryState extends State<OrderHistory> {
                         SizedBox(height: 10),
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 5),
-                          child: Text(order["name"], style: TextStyle(color: Colors.black)),
+                          child: Text(order["name"],
+                              style: TextStyle(color: Colors.black)),
                         ),
                       ],
                     ),
@@ -265,12 +277,14 @@ class _OrderHistoryState extends State<OrderHistory> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(order["status"], style: TextStyle(color: Colors.green)),
+                    Text(order["status"],
+                        style: TextStyle(color: Colors.green)),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => WelcomeScreen()),
+                          MaterialPageRoute(
+                              builder: (context) => WelcomeScreen()),
                         );
                       },
                       child: Text("Đặt lại"),

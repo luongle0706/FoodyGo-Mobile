@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/OTP_dto.dart';
+import 'package:foodygo/dto/register_dto.dart';
+import 'package:foodygo/repository/auth_repository.dart';
+import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/view/components/register/checkbox.dart';
 import 'package:foodygo/view/components/register/input_text.dart';
 import 'package:foodygo/view/components/register/register_button.dart';
@@ -12,15 +16,97 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final fullNameController = TextEditingController();
-
   final emailController = TextEditingController();
-
-  final mobileController = TextEditingController();
-
   final passwordController = TextEditingController();
+  final logger = AppLogger.instance;
 
-  bool? acceptedTerms = false;
+  bool acceptedTerms = false;
+  bool isLoading = false;
+
+  void sendOTP() async {
+    if (!acceptedTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Bạn cần đồng ý với Điều khoản & Dịch vụ.")),
+      );
+      return;
+    }
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Vui lòng nhập đầy đủ thông tin.")),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      OTPResponseDTO otpResponseDTO =
+          await AuthRepository.instance.sendOTP(email: emailController.text);
+      if (otpResponseDTO.existedEmail) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text(
+                  "Ẹmail của bạn đã được đăng ký. Vui lòng nhập email mới")),
+        );
+        return;
+      }
+      if (mounted) {
+        GoRouter.of(context).push('/otp',
+            extra: {'otp': otpResponseDTO.otp, 'email': emailController.text});
+      }
+    } catch (e) {
+      logger.info("Registration error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Đăng ký thất bại. Vui lòng thử lại!")),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
+  }
+
+  void registerUser() async {
+    if (!acceptedTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Bạn cần đồng ý với Điều khoản & Dịch vụ.")),
+      );
+      return;
+    }
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Vui lòng nhập đầy đủ thông tin.")),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      RegisterRequestDTO requestDTO = RegisterRequestDTO(
+          email: emailController.text, password: passwordController.text);
+
+      RegisterResponseDTO responseDTO =
+          await AuthRepository.instance.register(requestDTO);
+
+      logger.info("API register from page register: ${responseDTO.toString()}");
+
+      if (mounted) {
+        GoRouter.of(context).push('/register-info');
+      }
+    } catch (e) {
+      logger.info("Registration error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Đăng ký thất bại. Vui lòng thử lại!")),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +114,13 @@ class _RegisterPageState extends State<RegisterPage> {
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       body: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Hãy bắt đầu nào!',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
             ),
@@ -42,88 +128,80 @@ class _RegisterPageState extends State<RegisterPage> {
               'Nhập thông tin của bạn để tạo tài khoản',
               style: TextStyle(color: Colors.grey.shade500, fontSize: 20),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             RegisterInput(
-                controller: emailController,
-                hintText: "Địa chỉ email",
-                icon: SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
-                    child: Image.asset(
-                      'assets/icons/emailIcon.png',
-                    ),
-                  ),
-                )),
-            SizedBox(height: 30),
+              controller: emailController,
+              hintText: "Địa chỉ email",
+              icon: SizedBox(
+                width: 50,
+                height: 50,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  child: Image.asset('assets/icons/emailIcon.png'),
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
             RegisterInput(
-                controller: passwordController,
-                hintText: "Mật khẩu",
-                icon: SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
-                    child: Image.asset(
-                      'assets/icons/passwordIcon.png',
-                    ),
-                  ),
-                )),
-            SizedBox(height: 10),
+              controller: passwordController,
+              hintText: "Mật khẩu",
+              icon: SizedBox(
+                width: 50,
+                height: 50,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  child: Image.asset('assets/icons/passwordIcon.png'),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 CheckboxIcon(
-                  value: acceptedTerms ?? false,
+                  value: acceptedTerms,
                   checkbox: Checkbox(
                     value: acceptedTerms,
                     activeColor: Colors.black,
                     onChanged: (value) {
                       setState(() {
-                        acceptedTerms = value;
+                        acceptedTerms = value ?? false;
                       });
                     },
                   ),
                 ),
-                Text("Tôi đồng ý với Điều khoản & Dịch vụ", style: TextStyle(
-                  fontSize: 16
-                ),)
+                const Text("Tôi đồng ý với Điều khoản & Dịch vụ",
+                    style: TextStyle(fontSize: 16)),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             RegisterButton(
-              text: "Tiếp tục",
-              onTap: () {GoRouter.of(context).push('/register-info');},
+              text: isLoading ? "Đang xử lý..." : "Tiếp tục",
+              onTap: isLoading ? () {} : sendOTP,
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Bạn đã có tài khoản?"),
+                const Text("Bạn đã có tài khoản?"),
                 TextButton(
                   style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero, // Remove default padding
-                    minimumSize:
-                        Size(0, 0), // Ensure it doesn't reserve extra space
-                    tapTargetSize:
-                        MaterialTapTargetSize.shrinkWrap, // Reduce tap area
+                    padding: EdgeInsets.zero,
+                    minimumSize: const Size(0, 0),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   onPressed: () {
                     GoRouter.of(context).go('/login');
                   },
-                  child: Text(
+                  child: const Text(
                     " Đăng nhập",
                     style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        color: Colors.black, fontWeight: FontWeight.bold),
                   ),
-                )
+                ),
               ],
-            )
+            ),
           ],
         ),
       ),

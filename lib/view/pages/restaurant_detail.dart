@@ -129,16 +129,33 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return SizedBox(
-        height: 100,
-        child: Center(
-          child: Row(
-            children: [
-              CircularProgressIndicator(),
+      return Scaffold(
+          appBar: AppBar(
+            backgroundColor: AppColors.primary,
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              ),
+              onPressed: () => GoRouter.of(context).pop(),
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
+                onPressed: () {},
+              )
             ],
-          ), // Show loading indicator
-        ),
-      );
+          ),
+          body: SizedBox(
+            height: 100,
+            child: Center(
+              child: CircularProgressIndicator(),
+              // Show loading indicator
+            ),
+          ));
     }
     return Scaffold(
       appBar: AppBar(
@@ -228,8 +245,10 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                     ),
                     child: GestureDetector(
                       onTap: () {
-                        GoRouter.of(context)
-                            .push('/protected/product', extra: item.id);
+                        GoRouter.of(context).push('/protected/product', extra: {
+                          'restaurantId': widget.restaurantDto['id'],
+                          'productId': item.id
+                        });
                       },
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
