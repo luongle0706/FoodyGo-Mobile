@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/constants.dart';
 import 'package:http/http.dart' as http;
 
 class CartRepository {
   CartRepository._();
   static final CartRepository instance = CartRepository._();
+  final AppLogger _logger = AppLogger.instance;
 
   Future<List<dynamic>?> getCartByRestaurant(
       {required accessToken, required userId, required restaurantId}) async {
@@ -22,6 +24,22 @@ class CartRepository {
       return data;
     }
     return null;
+  }
+
+  Future<bool> removeFromCart(
+      {required accessToken, required userId, required productId}) async {
+    final response = await http.delete(
+      Uri.parse('$globalURL/api/v1/carts/users/$userId/products/$productId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      },
+    );
+    if (response.statusCode == 200) {
+      return true;
+    }
+    _logger.error(json.decode(response.body).toString());
+    return false;
   }
 
   Future<bool> addToCart(

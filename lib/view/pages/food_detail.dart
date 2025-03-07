@@ -10,6 +10,7 @@ import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/button.dart';
 import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class FoodDetailPage extends StatefulWidget {
   final int restaurantId;
@@ -29,10 +30,9 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
   final CartRepository _cartRepository = CartRepository.instance;
   SavedUser? _user;
   ProductDto? _product;
-  List<dynamic>? _cartItems;
   bool _isLoading = true;
-  int _cartTotal = 0;
   int _cartItemCount = 0;
+  int _cartTotal = 0;
 
   @override
   void initState() {
@@ -49,8 +49,9 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
         _user = user;
       });
       bool fetchedProduct = await fetchProduct(user);
+      bool fetchedItemsInCart = await fetchItemsInCart(user: user);
 
-      if (fetchedProduct) {
+      if (fetchedProduct && fetchedItemsInCart) {
         setState(() {
           _isLoading = false;
         });
@@ -88,18 +89,18 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
     if (data != null) {
       int total = data.isNotEmpty
           ? data
+              .where((item) => item['productId'] == widget.productId)
               .map((item) => ((item['price'] as num).toInt() *
                   (item['quantity'] as num).toInt()))
-              .reduce((a, b) => a + b)
+              .fold(0, (a, b) => a + b)
           : 0;
       int totalQuantity = data.isNotEmpty
           ? data
+              .where((item) => item['productId'] == widget.productId)
               .map((item) => (item['quantity'] as num).toInt())
-              .reduce((a, b) => a + b)
+              .fold(0, (a, b) => a + b)
           : 0;
-      _logger.info('Total price: $total');
       setState(() {
-        _cartItems = data;
         _cartItemCount = totalQuantity;
         _cartTotal = total;
       });
@@ -119,16 +120,26 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
         price: product.price,
         quantity: 1);
     if (result) {
-      _logger.info('success');
       fetchItemsInCart(user: _user!);
     } else {
       _logger.info('failed');
     }
   }
 
+  Future<void> removeFromCart({required ProductDto product}) async {
+    bool result = await _cartRepository.removeFromCart(
+        productId: product.id,
+        userId: _user?.userId,
+        accessToken: _user?.token);
+    if (result) {
+      fetchItemsInCart(user: _user!);
+    } else {
+      _logger.info('Failed to delete item from cart');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
     if (_isLoading) {
       return SizedBox(
         height: 100,
@@ -214,11 +225,89 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
 
                   const Spacer(),
 
-                  // Add to cart
-                  MyButton(
-                      onTap: () => addToCart(product: _product!),
-                      text: 'Thêm vào giỏ hàng',
-                      color: AppColors.primary)
+                  _cartItemCount > 0
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Price section
+                            Row(
+                              children: [
+                                Text(
+                                  '${NumberFormat("#,###", "vi_VN").format(_cartTotal)}đ',
+                                  style: const TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            // Quantity control
+                            Row(
+                              children: [
+                                // Remove button
+                                InkWell(
+                                  onTap: _cartItemCount > 0
+                                      ? () => removeFromCart(product: _product!)
+                                      : null,
+                                  child: Container(
+                                    width: 32,
+                                    height: 32,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: _cartItemCount > 0
+                                          ? Colors.white
+                                          : Colors.grey.shade300,
+                                      border: Border.all(
+                                        color: _cartItemCount > 0
+                                            ? Colors.red
+                                            : Colors.grey,
+                                        width: 1.5,
+                                      ),
+                                      borderRadius: BorderRadius.circular(
+                                          4), // Square corners
+                                    ),
+                                    child: Icon(Icons.remove,
+                                        color: _cartItemCount > 0
+                                            ? Colors.red
+                                            : Colors.grey,
+                                        size: 20),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                // Quantity text
+                                Text(
+                                  '$_cartItemCount',
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(width: 8),
+                                // Add button
+                                InkWell(
+                                  onTap: () => addToCart(product: _product!),
+                                  child: Container(
+                                    width: 32,
+                                    height: 32,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(
+                                          4), // Square corners
+                                    ),
+                                    child: const Icon(Icons.add,
+                                        color: Colors.white, size: 20),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      : MyButton(
+                          onTap: () => addToCart(product: _product!),
+                          text:
+                              'Thêm vào giỏ hàng - ${NumberFormat("#,###", "vi_VN").format(_product?.price)}đ',
+                          color: AppColors.primary)
                 ],
               ),
             ),

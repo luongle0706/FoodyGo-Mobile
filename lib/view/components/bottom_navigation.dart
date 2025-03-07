@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:foodygo/dto/user_dto.dart';
-import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,14 +14,12 @@ class FoodyGoNavigationBar extends StatefulWidget {
 
 class _FoodyGoNavigationBarState extends State<FoodyGoNavigationBar> {
   final storage = SecureStorage.instance;
-  final logger = AppLogger.instance;
   SavedUser? user;
   bool isLoading = true;
 
   Future<void> loadUser() async {
     String? data = await storage.get(key: 'user');
     if (data != null) {
-      logger.info('Data $data');
       setState(() {
         user = SavedUser.fromJson(json.decode(data));
         isLoading = false;
@@ -102,7 +99,7 @@ class _FoodyGoNavigationBarState extends State<FoodyGoNavigationBar> {
           BoxShadow(
             color: Colors.black12,
             spreadRadius: 1,
-            blurRadius: 3, 
+            blurRadius: 3,
             offset: Offset(0, -2),
           ),
         ],

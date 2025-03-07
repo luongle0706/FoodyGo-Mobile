@@ -10,7 +10,6 @@ class RestaurantRepository {
   final AppLogger logger = AppLogger.instance;
 
   Future<Map<String, dynamic>> loadRestaurants(String accessToken) async {
-    logger.info("Access token hehe $accessToken");
     final response = await http.get(
       Uri.parse('$globalURL/api/v1/restaurants'),
       headers: {
@@ -39,7 +38,6 @@ class RestaurantRepository {
     if (response.statusCode == 200 || response.statusCode == 400) {
       final jsonResponse = json.decode(response.body);
       dynamic data = jsonResponse['data'];
-      logger.info('$data');
       return RestaurantDto(
           id: data['id'],
           name: data['name'],

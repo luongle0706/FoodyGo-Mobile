@@ -9,6 +9,7 @@ import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class RestaurantDetailPage extends StatefulWidget {
   final Map<String, dynamic> restaurantDto;
@@ -21,7 +22,6 @@ class RestaurantDetailPage extends StatefulWidget {
 
 class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   final _storage = SecureStorage.instance;
-  final AppLogger logger = AppLogger.instance;
   final ProductRepository _productRepository = ProductRepository.instance;
   final CartRepository _cartRepository = CartRepository.instance;
   final AppLogger _logger = AppLogger.instance;
@@ -42,7 +42,6 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
     String? userData = await _storage.get(key: 'user');
     SavedUser? user =
         userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
-    logger.info('hello');
     if (user != null) {
       setState(() {
         _user = user;
@@ -90,10 +89,21 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
         price: product.price,
         quantity: 1);
     if (result) {
-      logger.info('success');
       fetchItemsInCart(user: _user!);
     } else {
-      logger.info('failed');
+      _logger.info('failed');
+    }
+  }
+
+  Future<void> removeFromCart({required ProductDto product}) async {
+    bool result = await _cartRepository.removeFromCart(
+        productId: product.id,
+        userId: _user?.userId,
+        accessToken: _user?.token);
+    if (result) {
+      fetchItemsInCart(user: _user!);
+    } else {
+      _logger.info('Failed to delete item from cart');
     }
   }
 
@@ -114,7 +124,6 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
               .map((item) => (item['quantity'] as num).toInt())
               .reduce((a, b) => a + b)
           : 0;
-      logger.info('Total price: $total');
       setState(() {
         _cartItems = data;
         _cartItemCount = totalQuantity;
@@ -275,20 +284,52 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                 Text(
                                     "⏳ Thời gian chuẩn bị: ${item.prepareTime.round()} phút"),
                                 SizedBox(height: 4),
-                                Text("Giá: ${item.price.round()}đ",
+                                Text(
+                                    "Giá: ${NumberFormat("#,###", "vi_VN").format(item.price)}đ",
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),
-                          TextButton(
-                              onPressed: () => addToCart(product: item),
-                              child: Text('+')),
-                          Text(
-                              '(Đã có ${_cartItems?.firstWhere((i) => i['productId'] == item.id, orElse: () => {
-                                    'quantity': 0
-                                  })['quantity']})')
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () => removeFromCart(product: item),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.orange,
+                                  minimumSize: Size(32, 32),
+                                  padding: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4)),
+                                ),
+                                child: Icon(Icons.remove,
+                                    color: Colors.white, size: 18),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                '${_cartItems?.firstWhere((i) => i['productId'] == item.id, orElse: () => {
+                                      'quantity': 0
+                                    })['quantity']}',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(width: 8),
+                              ElevatedButton(
+                                onPressed: () => addToCart(product: item),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.orange,
+                                  minimumSize: Size(32, 32),
+                                  padding: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4)),
+                                ),
+                                child: Icon(Icons.add,
+                                    color: Colors.white, size: 18),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ));
@@ -338,7 +379,11 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                   ),
               ],
             ),
-            Text('Giỏ hàng: $_cartTotal'),
+            Text('Tổng: ${NumberFormat("#,###", "vi_VN").format(_cartTotal)}đ',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black)),
             ElevatedButton(
               onPressed: () {
                 // Handle checkout
