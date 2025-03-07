@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodygo/view/pages/restaurant/custome_appbar_order_restaurant_list.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class RestaurantMenu extends StatefulWidget {
   const RestaurantMenu({super.key});
@@ -122,19 +123,19 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
   }
 }
 
-// Widget riêng cho Tab Thực đơn
 class MenuScreen extends StatefulWidget {
   final List<Map<String, dynamic>> toppingGroups;
   final List<Map<String, dynamic>> categoryMenu;
-
-  MenuScreen({required this.toppingGroups, required this.categoryMenu});
+  const MenuScreen(
+      {super.key, required this.toppingGroups, required this.categoryMenu});
 
   @override
-  _MenuScreenState createState() => _MenuScreenState();
+  State<MenuScreen> createState() => _MenuScreenState();
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  int selectedTab = 0; // 0: Món, 1: Nhóm Topping
+  int selectedTab = 0;
+  // 0: Món, 1: Nhóm Topping
   String searchQuery = "";
 
   @override
@@ -231,14 +232,14 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
               TextButton.icon(
                 onPressed: () {
-                  // Xử lý khi nhấn nút Thêm
+                  GoRouter.of(context).push('/protected/add-dish');
                 },
                 icon: Icon(Icons.add, color: Colors.black),
                 label: Text("Thêm", style: TextStyle(color: Colors.black)),
               ),
               TextButton.icon(
                 onPressed: () {
-                  // Xử lý khi nhấn nút Chỉnh sửa danh mục
+                  GoRouter.of(context).push('/protected/manage-categories');
                 },
                 icon: Icon(Icons.edit, color: Colors.black),
                 label: Text("Chỉnh sửa danh mục",
