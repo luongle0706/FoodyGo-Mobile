@@ -4,7 +4,7 @@ import 'package:foodygo/dto/transaction_item.dart';
 class TransactionCard extends StatelessWidget {
   final TransactionItem transaction;
 
-  const TransactionCard({required this.transaction});
+  const TransactionCard({super.key, required this.transaction});
 
   @override
   Widget build(BuildContext context) {

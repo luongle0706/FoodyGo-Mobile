@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
 
 class RestaurantMenu extends StatefulWidget {
+  const RestaurantMenu({super.key});
+
   @override
   _RestaurantMenuState createState() => _RestaurantMenuState();
 }
@@ -19,22 +21,42 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
       "title": "Cơm",
       "isExpanded": true,
       "items": [
-        {"name": "Cơm tấm sườn que", "price": "25.000đ", "image": "assets/comtam.png", "isAvailable": true},
-        {"name": "Cơm gà xối mỡ", "price": "30.000đ", "image": "assets/comga.png", "isAvailable": false},
+        {
+          "name": "Cơm tấm sườn que",
+          "price": "25.000đ",
+          "image": "assets/comtam.png",
+          "isAvailable": true
+        },
+        {
+          "name": "Cơm gà xối mỡ",
+          "price": "30.000đ",
+          "image": "assets/comga.png",
+          "isAvailable": false
+        },
       ]
     },
     {
       "title": "Phở",
       "isExpanded": true,
       "items": [
-        {"name": "Phở bò", "price": "35.000đ", "image": "assets/phobo.png", "isAvailable": true},
+        {
+          "name": "Phở bò",
+          "price": "35.000đ",
+          "image": "assets/phobo.png",
+          "isAvailable": true
+        },
       ]
     },
     {
       "title": "Bún",
       "isExpanded": true,
       "items": [
-        {"name": "Bún bò Huế", "price": "40.000đ", "image": "assets/bunbo.png", "isAvailable": true},
+        {
+          "name": "Bún bò Huế",
+          "price": "40.000đ",
+          "image": "assets/bunbo.png",
+          "isAvailable": true
+        },
       ]
     },
   ];
@@ -68,7 +90,8 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
                     children: [
                       Icon(
                         Icons.circle,
-                        color: restaurant["isOpen"] ? Colors.green : Colors.grey,
+                        color:
+                            restaurant["isOpen"] ? Colors.green : Colors.grey,
                         size: 12,
                       ),
                       SizedBox(width: 6),
@@ -77,11 +100,12 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: restaurant["isOpen"] ? Colors.green : Colors.grey,
-
+                          color:
+                              restaurant["isOpen"] ? Colors.green : Colors.grey,
                         ),
                       ),
-                      Icon(Icons.arrow_forward_ios, size: 15, color: Colors.grey),
+                      Icon(Icons.arrow_forward_ios,
+                          size: 15, color: Colors.grey),
                     ],
                   ),
                 ],
@@ -106,19 +130,22 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
         children: [
           Expanded(
             child: selectedTab == 1
-                ? MenuScreen(toppingGroups: toppingGroups, categoryMenu: categorizedMenu)
+                ? MenuScreen(
+                    toppingGroups: toppingGroups, categoryMenu: categorizedMenu)
                 : WelcomeScreen(),
           ),
         ],
       ),
-
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Trang chủ"),
-          BottomNavigationBarItem(icon: Icon(Icons.restaurant), label: "FoodyGo"),
-          BottomNavigationBarItem(icon: Icon(Icons.account_balance_wallet), label: "Ví"),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: "Thông báo"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.restaurant), label: "FoodyGo"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.account_balance_wallet), label: "Ví"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.notifications), label: "Thông báo"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Tài khoản"),
         ],
       ),
@@ -183,16 +210,15 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
       ),
     );
   }
-
 }
 
 // Widget riêng cho Tab Thực đơn
 class MenuScreen extends StatefulWidget {
-
   final List<Map<String, dynamic>> toppingGroups;
   final List<Map<String, dynamic>> categoryMenu;
 
-  MenuScreen({required this.toppingGroups, required this.categoryMenu});
+  const MenuScreen(
+      {super.key, required this.toppingGroups, required this.categoryMenu});
 
   @override
   _MenuScreenState createState() => _MenuScreenState();
@@ -204,19 +230,24 @@ class _MenuScreenState extends State<MenuScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<Map<String, dynamic>> filter = widget.categoryMenu
+        .map((category) {
+          List<Map<String, dynamic>> filteredItems =
+              (category["items"] as List<dynamic>)
+                  .cast<Map<String, dynamic>>()
+                  .where((item) => item["name"]
+                      .toLowerCase()
+                      .contains(searchQuery.toLowerCase()))
+                  .toList();
 
-    List<Map<String, dynamic>> filter = widget.categoryMenu.map((category) {
-      List<Map<String, dynamic>> filteredItems = (category["items"] as List<dynamic>)
-          .cast<Map<String, dynamic>>()
-          .where((item) => item["name"].toLowerCase().contains(searchQuery.toLowerCase()))
-          .toList();
-
-      return {
-        "title": category["title"],
-        "isExpanded": category["isExpanded"],
-        "items": filteredItems,
-      };
-    }).where((category) => category["items"].isNotEmpty).toList();
+          return {
+            "title": category["title"],
+            "isExpanded": category["isExpanded"],
+            "items": filteredItems,
+          };
+        })
+        .where((category) => category["items"].isNotEmpty)
+        .toList();
 
     return Column(
       children: [
@@ -231,9 +262,11 @@ class _MenuScreenState extends State<MenuScreen> {
             decoration: InputDecoration(
               hintText: "Nhập tên món ăn",
               prefixIcon: Icon(Icons.search),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               isDense: true,
-              contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              contentPadding:
+                  EdgeInsets.symmetric(vertical: 10, horizontal: 12),
             ),
           ),
         ),
@@ -299,7 +332,8 @@ class _MenuScreenState extends State<MenuScreen> {
                   // Xử lý khi nhấn nút Chỉnh sửa danh mục
                 },
                 icon: Icon(Icons.edit, color: Colors.black),
-                label: Text("Chỉnh sửa danh mục", style: TextStyle(color: Colors.black)),
+                label: Text("Chỉnh sửa danh mục",
+                    style: TextStyle(color: Colors.black)),
               ),
             ],
           ),
@@ -308,7 +342,8 @@ class _MenuScreenState extends State<MenuScreen> {
         // Nội dung dựa theo tab
         Expanded(
           child: ListView.builder(
-            itemCount: selectedTab == 0 ? filter.length : widget.toppingGroups.length,
+            itemCount:
+                selectedTab == 0 ? filter.length : widget.toppingGroups.length,
             itemBuilder: (context, categoryIndex) {
               if (selectedTab == 0) {
                 var category = filter[categoryIndex];
@@ -317,19 +352,28 @@ class _MenuScreenState extends State<MenuScreen> {
                     ListTile(
                       title: Text(
                         category["title"],
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text("${category["items"].where((item) => item["isAvailable"] == true).length}/${category["items"].length}"),
+                          Text(
+                              "${category["items"].where((item) => item["isAvailable"] == true).length}/${category["items"].length}"),
                           IconButton(
-                            icon: Icon(category["isExpanded"] ? Icons.expand_less : Icons.expand_more),
+                            icon: Icon(category["isExpanded"]
+                                ? Icons.expand_less
+                                : Icons.expand_more),
                             onPressed: () {
                               setState(() {
-                                int originalIndex = widget.categoryMenu.indexWhere((cat) => cat["title"] == category["title"]);
+                                int originalIndex = widget.categoryMenu
+                                    .indexWhere((cat) =>
+                                        cat["title"] == category["title"]);
                                 if (originalIndex != -1) {
-                                  widget.categoryMenu[originalIndex]["isExpanded"] = !widget.categoryMenu[originalIndex]["isExpanded"];
+                                  widget.categoryMenu[originalIndex]
+                                          ["isExpanded"] =
+                                      !widget.categoryMenu[originalIndex]
+                                          ["isExpanded"];
                                 }
                               });
                             },

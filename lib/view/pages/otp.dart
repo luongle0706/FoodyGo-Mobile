@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/OTP_dto.dart';
+import 'package:foodygo/repository/auth_repository.dart';
+import 'package:foodygo/utils/app_logger.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pinput/pinput.dart';
 
@@ -12,8 +15,11 @@ class OtpPage extends StatefulWidget {
 class _OtpPageState extends State<OtpPage> {
   final TextEditingController _otpController = TextEditingController();
   bool _isButtonEnabled = false;
-  int _secondRemaining = 90;
+  int _secondRemaining = 10;
   bool _isResendDisabled = true;
+  late String otp;
+  late String email;
+  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -37,7 +43,20 @@ class _OtpPageState extends State<OtpPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      final extra = GoRouterState.of(context).extra as Map<String, dynamic>?;
+      otp = extra?['otp'] ?? "khong co otp";
+      email = extra?['email'] ?? "Không có email";
+      _isInitialized = true;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final logger = AppLogger.instance;
+
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: Padding(
@@ -65,8 +84,8 @@ class _OtpPageState extends State<OtpPage> {
             const SizedBox(height: 5),
             Row(
               children: [
-                const Text(
-                  "youremail@gmail.com",
+                Text(
+                  email,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 10),
@@ -110,9 +129,22 @@ class _OtpPageState extends State<OtpPage> {
                   child: ElevatedButton(
                     onPressed: _isResendDisabled
                         ? null
-                        : () {
+                        : () async {
+                            OTPResponseDTO otpResponseDTO = await AuthRepository
+                                .instance
+                                .sendOTP(email: email);
+                            if (otpResponseDTO.existedEmail) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        "Ẹmail của bạn đã được đăng ký. Vui lòng nhập email mới")),
+                              );
+                              return;
+                            }
+                            otp = otpResponseDTO.otp;
+                            logger.info("OTP after resend: $otp");
                             setState(() {
-                              _secondRemaining = 90;
+                              _secondRemaining = 10;
                               _isResendDisabled = true;
                             });
                             _startTimer();
@@ -130,7 +162,18 @@ class _OtpPageState extends State<OtpPage> {
                 SizedBox(width: 20),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: _isButtonEnabled ? () {} : null,
+                    onPressed: _isButtonEnabled
+                        ? () {
+                            logger.info("xacsnhan otp: $otp");
+                            if (_otpController.text == otp) {
+                              GoRouter.of(context).push('/register-info');
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("OTP không hợp lệ!")),
+                              );
+                            }
+                          }
+                        : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 14),

@@ -32,18 +32,18 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> fetchAPI() async {
     String? data = await storage.get(key: 'user');
-    SavedUser? _user =
+    SavedUser? user =
         data != null ? SavedUser.fromJson(json.decode(data)) : null;
-    if (_user != null) {
-      if (_user.role == 'ROLE_SELLER') {
+    if (user != null) {
+      if (user.role == 'ROLE_SELLER') {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           GoRouter.of(context).go('/protected/restaurant-home');
         });
-      } else if (_user.role == 'ROLE_USER') {
+      } else if (user.role == 'ROLE_USER') {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           GoRouter.of(context).go('/protected/home');
         });
-      } else if (_user.role == 'ROLE_STAFF') {
+      } else if (user.role == 'ROLE_STAFF') {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           GoRouter.of(context).go('/protected/staff-home');
         });

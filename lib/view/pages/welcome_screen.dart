@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class WelcomeScreen extends StatefulWidget {
+  const WelcomeScreen({super.key});
+
   @override
   _WelcomeScreenState createState() => _WelcomeScreenState();
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  PageController _pageController = PageController();
+  final PageController _pageController = PageController();
   int _currentPage = 0;
 
   @override
@@ -26,11 +28,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 bottomRight: Radius.circular(30),
               ),
             ),
-            padding: EdgeInsets.only(bottom: 40, top: 150), // Thêm khoảng cách cho đẹp
+            padding: EdgeInsets.only(
+                bottom: 40, top: 150), // Thêm khoảng cách cho đẹp
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
+                SizedBox(
                   height: 250,
                   child: PageView(
                     controller: _pageController,
@@ -65,7 +68,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       height: _currentPage == index ? 10 : 8,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _currentPage == index ? Colors.green : Colors.grey,
+                        color:
+                            _currentPage == index ? Colors.green : Colors.grey,
                       ),
                     );
                   }),
@@ -130,8 +134,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         onPressed: () {
                           GoRouter.of(context).push('/login');
                         },
-                        child:
-                        Text("Sign In", style: TextStyle(color: Colors.green)),
+                        child: Text("Sign In",
+                            style: TextStyle(color: Colors.green)),
                       ),
                     ),
                   ],

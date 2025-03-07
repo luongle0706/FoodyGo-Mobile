@@ -9,6 +9,8 @@ class Restaurant {
 }
 
 class RestaurantHome extends StatefulWidget {
+  const RestaurantHome({super.key});
+
   @override
   _RestaurantHomeState createState() => _RestaurantHomeState();
 }
@@ -38,7 +40,9 @@ class _RestaurantHomeState extends State<RestaurantHome> {
             ),
             Row(
               children: [
-                Icon(Icons.circle, size: 11, color: restaurant.isOpen ? Colors.green : Colors.grey),
+                Icon(Icons.circle,
+                    size: 11,
+                    color: restaurant.isOpen ? Colors.green : Colors.grey),
                 SizedBox(width: 5),
                 Text(
                   restaurant.isOpen ? "Mở cửa " : "Đóng cửa ",
@@ -68,7 +72,8 @@ class _RestaurantHomeState extends State<RestaurantHome> {
             ),
             itemCount: menuItems.length,
             itemBuilder: (context, index) {
-              return _buildMenuItem(menuItems[index]["icon"], menuItems[index]["title"]);
+              return _buildMenuItem(
+                  menuItems[index]["icon"], menuItems[index]["title"]);
             },
           ),
         ),
@@ -80,8 +85,10 @@ class _RestaurantHomeState extends State<RestaurantHome> {
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Trang chủ"),
           BottomNavigationBarItem(icon: Icon(Icons.fastfood), label: "FoodyGo"),
-          BottomNavigationBarItem(icon: Icon(Icons.account_balance_wallet), label: "Ví"),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: "Thông báo"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.account_balance_wallet), label: "Ví"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.notifications), label: "Thông báo"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Tài khoản"),
         ],
       ),
@@ -103,7 +110,8 @@ class _RestaurantHomeState extends State<RestaurantHome> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
-            BoxShadow(color: Colors.grey.shade400, blurRadius: 3, spreadRadius: 1),
+            BoxShadow(
+                color: Colors.grey.shade400, blurRadius: 3, spreadRadius: 1),
           ],
         ),
         child: Column(
@@ -111,7 +119,8 @@ class _RestaurantHomeState extends State<RestaurantHome> {
           children: [
             Icon(icon, size: 40, color: Colors.black),
             SizedBox(height: 10),
-            Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(title,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           ],
         ),
       ),

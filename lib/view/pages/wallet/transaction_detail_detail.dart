@@ -9,7 +9,8 @@ class TransactionDetailScreen extends StatelessWidget {
   final String transactionDateTime;
   final String currentBalance;
 
-  TransactionDetailScreen({
+  const TransactionDetailScreen({
+    super.key,
     required this.transactionTitle,
     required this.transactionAmount,
     required this.transactionStatus,

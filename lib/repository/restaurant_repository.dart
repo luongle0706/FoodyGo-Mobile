@@ -39,7 +39,7 @@ class RestaurantRepository {
     if (response.statusCode == 200 || response.statusCode == 400) {
       final jsonResponse = json.decode(response.body);
       dynamic data = jsonResponse['data'];
-      logger.info('${data}');
+      logger.info('$data');
       return RestaurantDto(
           id: data['id'],
           name: data['name'],

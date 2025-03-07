@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:foodygo/view/theme.dart';
 
 class OrderDetailRestaurant extends StatelessWidget {
+  const OrderDetailRestaurant({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,8 +105,7 @@ class OrderDetailRestaurant extends StatelessWidget {
                       label: "Thời gian lấy hàng dự kiến",
                       value: "Hôm nay 14:38"),
                   OrderInfoRow(
-                      label: "Ghi chú của khách",
-                      value: "Thêm gói tương ớt"),
+                      label: "Ghi chú của khách", value: "Thêm gói tương ớt"),
                 ],
               ),
             ),
@@ -120,7 +121,7 @@ class OrderItem extends StatelessWidget {
   final String name;
   final String price;
 
-  const OrderItem({required this.name, required this.price});
+  const OrderItem({super.key, required this.name, required this.price});
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +140,7 @@ class OrderInfoRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const OrderInfoRow({required this.label, required this.value});
+  const OrderInfoRow({super.key, required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
