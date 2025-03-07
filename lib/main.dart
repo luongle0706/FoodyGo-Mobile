@@ -6,6 +6,7 @@ import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/hub/hub_home_wrapper.dart';
 import 'package:foodygo/view/pages/add_to_cart.dart';
 import 'package:foodygo/view/pages/notification_page.dart';
+import 'package:foodygo/view/pages/restaurant/add_dish_page.dart';
 import 'package:foodygo/view/pages/restaurant/add_edit_category.dart';
 import 'package:foodygo/view/pages/restaurant/add_topping_item.dart';
 import 'package:foodygo/view/pages/restaurant/add_topping_section.dart';
@@ -13,6 +14,7 @@ import 'package:foodygo/view/pages/restaurant/confirm_order_restaurant.dart';
 import 'package:foodygo/view/pages/detail_order.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/food_detail.dart';
+import 'package:foodygo/view/pages/restaurant/manage_category_list.dart';
 import 'package:foodygo/view/pages/restaurant/open_hours_setting.dart';
 import 'package:foodygo/view/pages/restaurant/order_detail_restaurant.dart';
 import 'package:foodygo/view/pages/restaurant/product_detail_restaurant.dart';
@@ -39,6 +41,7 @@ import 'package:foodygo/view/pages/restaurant/topping_selection_page.dart';
 import 'package:foodygo/view/pages/restaurant_detail.dart';
 import 'package:foodygo/view/pages/restaurant_menu.dart';
 import 'package:foodygo/view/pages/hub/staff_home_page.dart';
+import 'package:foodygo/view/pages/wallet/payment_history_page.dart';
 import 'package:foodygo/view/pages/wallet/topup_page.dart';
 import 'package:foodygo/view/pages/wallet/transaction_detail_detail.dart';
 import 'package:foodygo/view/pages/wallet/transfer_points_page.dart';
@@ -160,18 +163,32 @@ class Main extends StatelessWidget {
                   },
                 ),
                 GoRoute(
+                  name: 'protected_wallet_payment_history',
+                  path: '/protected/wallet/payment-history',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: PaymentHistoryPage());
+                  },
+                ),
+                GoRoute(
                   name: 'protected_wallet_transaction_detail',
                   path: '/protected/wallet/transaction-detail',
                   pageBuilder: (context, state) {
+                    // Extract transaction details from the extra data
+                    final extra = state.extra as Map<String, dynamic>? ?? {};
+
                     return MaterialPage(
-                        child: TransactionDetailScreen(
-                      transactionTitle: 'Sample Title',
-                      transactionAmount: '100.0',
-                      transactionStatus: 'Completed',
-                      transactionId: '12345',
-                      transactionDateTime: DateTime.now().toIso8601String(),
-                      currentBalance: '500.0',
-                    ));
+                      child: TransactionDetailScreen(
+                        transactionTitle:
+                            extra['transactionTitle'] ?? 'Giao dịch',
+                        transactionAmount:
+                            extra['transactionAmount'] ?? '0 FoodyXu',
+                        transactionStatus:
+                            extra['transactionStatus'] ?? 'Thành công',
+                        transactionId: extra['transactionId'] ?? '',
+                        transactionDateTime: extra['transactionDateTime'] ?? '',
+                        currentBalance: extra['currentBalance'] ?? '0 FoodyXu',
+                      ),
+                    );
                   },
                 ),
                 GoRoute(
@@ -237,7 +254,25 @@ class Main extends StatelessWidget {
                     return MaterialPage(child: ViewCartPage());
                   },
                 ),
+                GoRoute(
+                    name: 'restaurant_menu', // S-016
+                    path: '/protected/restaurant_menu',
+                    pageBuilder: (context, state) {
+                      return MaterialPage(child: RestaurantMenu());
+                    }),
+                GoRoute(
+                    name: 'manage_categories', //S-044
+                    path: '/protected/manage-categories',
+                    pageBuilder: (context, state) {
+                      return MaterialPage(child: CategoryPage());
+                    })
               ]),
+          GoRoute(
+              name: 'add_dish_page', // S-017
+              path: '/protected/add-dish',
+              pageBuilder: (context, state) {
+                return MaterialPage(child: AddDishPage());
+              }),
           GoRoute(
               name: 'detail_order', // S-014
               path: '/protected/detail-order',
@@ -249,12 +284,6 @@ class Main extends StatelessWidget {
               path: '/order-history',
               pageBuilder: (context, state) {
                 return MaterialPage(child: OrderHistory());
-              }),
-          GoRoute(
-              name: 'restaurant_menu', // S-016
-              path: '/protected/restaurant_menu',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: RestaurantMenu());
               }),
           GoRoute(
             name: 'protected_restaurant_detail', // S-007
@@ -357,7 +386,10 @@ class Main extends StatelessWidget {
             name: 'protected_food_detail',
             path: '/protected/product',
             pageBuilder: (context, state) {
-              return MaterialPage(child: FoodDetailPage());
+              final map = state.extra as Map<String,dynamic>;
+              final productId = map['productId'] as int;
+              final restaurantId = map['restaurantId'] as int;
+              return MaterialPage(child: FoodDetailPage(restaurantId: restaurantId, productId: productId,));
             },
           ),
           GoRoute(

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:foodygo/view/pages/restaurant/custome_appbar_order_restaurant_list.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class RestaurantMenu extends StatefulWidget {
   const RestaurantMenu({super.key});
 
   @override
-  _RestaurantMenuState createState() => _RestaurantMenuState();
+  State<RestaurantMenu> createState() => _RestaurantMenuState();
 }
 
 class _RestaurantMenuState extends State<RestaurantMenu> {
-  int selectedTab = 1; // Mặc định chọn tab Thực đơn
-
+  int selectedTab = 1;
+  // Mặc định chọn tab Thực đơn
   Map<String, dynamic> restaurant = {
     "name": "Cơm tấm Ngô Quyền",
     "isOpen": true, // true = open, false = close
@@ -70,62 +72,10 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
-      appBar: AppBar(
-        backgroundColor: Colors.grey[600],
-        toolbarHeight: 100,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 4.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    restaurant["name"],
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.circle,
-                        color:
-                            restaurant["isOpen"] ? Colors.green : Colors.grey,
-                        size: 12,
-                      ),
-                      SizedBox(width: 6),
-                      Text(
-                        restaurant["isOpen"] ? "Mở cửa" : "Đóng cửa",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color:
-                              restaurant["isOpen"] ? Colors.green : Colors.grey,
-                        ),
-                      ),
-                      Icon(Icons.arrow_forward_ios,
-                          size: 15, color: Colors.grey),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 12),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.7,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildSmallButton("Đơn", 0),
-                  _buildSmallButton("Thực đơn", 1),
-                  _buildSmallButton("Báo cáo", 2),
-                ],
-              ),
-            ),
-          ],
-        ),
+      appBar: CustomFootageRestaurantOrderAppBar(
+        title: "Cơm tấm Ngô Quyền",
       ),
+      backgroundColor: Colors.grey[300],
       body: Column(
         children: [
           Expanded(
@@ -134,19 +84,6 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
                     toppingGroups: toppingGroups, categoryMenu: categorizedMenu)
                 : WelcomeScreen(),
           ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Trang chủ"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.restaurant), label: "FoodyGo"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.account_balance_wallet), label: "Ví"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.notifications), label: "Thông báo"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Tài khoản"),
         ],
       ),
     );
@@ -184,48 +121,21 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
       ),
     );
   }
-
-  Widget _buildSmallButton(String title, int index) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedTab = index;
-        });
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-        decoration: BoxDecoration(
-          color: selectedTab == index ? Colors.grey[400] : Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.black, width: 1),
-        ),
-        child: Text(
-          title,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-      ),
-    );
-  }
 }
 
-// Widget riêng cho Tab Thực đơn
 class MenuScreen extends StatefulWidget {
   final List<Map<String, dynamic>> toppingGroups;
   final List<Map<String, dynamic>> categoryMenu;
-
   const MenuScreen(
       {super.key, required this.toppingGroups, required this.categoryMenu});
 
   @override
-  _MenuScreenState createState() => _MenuScreenState();
+  State<MenuScreen> createState() => _MenuScreenState();
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  int selectedTab = 0; // 0: Món, 1: Nhóm Topping
+  int selectedTab = 0;
+  // 0: Món, 1: Nhóm Topping
   String searchQuery = "";
 
   @override
@@ -322,14 +232,14 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
               TextButton.icon(
                 onPressed: () {
-                  // Xử lý khi nhấn nút Thêm
+                  GoRouter.of(context).push('/protected/add-dish');
                 },
                 icon: Icon(Icons.add, color: Colors.black),
                 label: Text("Thêm", style: TextStyle(color: Colors.black)),
               ),
               TextButton.icon(
                 onPressed: () {
-                  // Xử lý khi nhấn nút Chỉnh sửa danh mục
+                  GoRouter.of(context).push('/protected/manage-categories');
                 },
                 icon: Icon(Icons.edit, color: Colors.black),
                 label: Text("Chỉnh sửa danh mục",

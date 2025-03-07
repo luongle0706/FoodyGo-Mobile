@@ -70,45 +70,44 @@ class AuthService {
     }
   }
 
-  void signIn(String email, String password, BuildContext context) async {
-    try {
-      LoginResponseDTO loginResponseDTO = await authRepository
-          .login(LoginRequestDTO(email: email, password: password));
+  void signIn(String email, String password, BuildContext context, Function(String) onError) async {
+  try {
+    LoginResponseDTO loginResponseDTO = await authRepository
+        .login(LoginRequestDTO(email: email, password: password));
 
-      if (loginResponseDTO.token.isNotEmpty) {
-        SavedUser user = SavedUser(
-            token: loginResponseDTO.token,
-            email: email,
-            fullName: loginResponseDTO.fullName,
-            role: loginResponseDTO.role,
-            userId: loginResponseDTO.userId);
+    if (loginResponseDTO.token.isNotEmpty) {
+      SavedUser user = SavedUser(
+          token: loginResponseDTO.token,
+          email: email,
+          fullName: loginResponseDTO.fullName,
+          role: loginResponseDTO.role,
+          userId: loginResponseDTO.userId);
 
-        storage.put(key: 'user', value: json.encode(user.toJson()));
+      storage.put(key: 'user', value: json.encode(user.toJson()));
 
-        if (context.mounted) {
-          if (user.role == 'ROLE_USER') {
-            GoRouter.of(context).go('/protected/home');
-          } else if (user.role == 'ROLE_SELLER') {
-            GoRouter.of(context).go('/protected/restaurant-home');
-          } else {
-            GoRouter.of(context).go('/protected/staff-home');
-          }
-        }
-      } else {
-        logger.error('login failed');
-        if (context.mounted) {
-          _showErrorDialog(context, "Login failed. Please try again.");
+      if (context.mounted) {
+        if (user.role == 'ROLE_USER') {
+          GoRouter.of(context).go('/protected/home');
+        } else if (user.role == 'ROLE_SELLER') {
+          GoRouter.of(context).go('/protected/restaurant-home');
+        } else {
+          GoRouter.of(context).go('/protected/staff-home');
         }
       }
-    } catch (e) {
-      logger.error(e.toString());
-      // logger.error(e.toString());
-      // if (context.mounted) {
-      //   _showErrorDialog(
-      //       context, "Login failed. Please check your credentials.");
-      // }
+    } else {
+      logger.error('Login failed');
+      if (context.mounted) {
+        onError("Đăng nhập thất bại. Vui lòng thử lại.");
+      }
+    }
+  } catch (e) {
+    logger.error(e.toString());
+    if (context.mounted) {
+      onError("Đăng nhập thất bại. Vui lòng thử lại.");
     }
   }
+}
+
 
   void _showErrorDialog(BuildContext context, String message) {
     showDialog(

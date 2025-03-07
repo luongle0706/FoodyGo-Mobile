@@ -12,7 +12,7 @@ class RestaurantHome extends StatefulWidget {
   const RestaurantHome({super.key});
 
   @override
-  _RestaurantHomeState createState() => _RestaurantHomeState();
+  State<RestaurantHome> createState() => _RestaurantHomeState();
 }
 
 class _RestaurantHomeState extends State<RestaurantHome> {
@@ -77,20 +77,6 @@ class _RestaurantHomeState extends State<RestaurantHome> {
             },
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Trang chủ"),
-          BottomNavigationBarItem(icon: Icon(Icons.fastfood), label: "FoodyGo"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.account_balance_wallet), label: "Ví"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.notifications), label: "Thông báo"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Tài khoản"),
-        ],
       ),
     );
   }

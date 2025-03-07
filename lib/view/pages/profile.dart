@@ -54,7 +54,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('FoodyXu', style: TextStyle(fontSize: 16)),
+                  Text('Ví Foody', style: TextStyle(fontSize: 16)),
                   Icon(Icons.arrow_forward_ios,
                       size: 16, color: Colors.black54),
                 ],
