@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:foodygo/dto/product_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/repository/cart_repository.dart';
 import 'package:foodygo/repository/product_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
@@ -11,9 +12,11 @@ import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class FoodDetailPage extends StatefulWidget {
+  final int restaurantId;
   final int productId;
 
-  const FoodDetailPage({super.key, required this.productId});
+  const FoodDetailPage(
+      {super.key, required this.restaurantId, required this.productId});
 
   @override
   State<FoodDetailPage> createState() => _FoodDetailPageState();
@@ -23,9 +26,13 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
   final _storage = SecureStorage.instance;
   final AppLogger _logger = AppLogger.instance;
   final ProductRepository _productRepository = ProductRepository.instance;
+  final CartRepository _cartRepository = CartRepository.instance;
   SavedUser? _user;
   ProductDto? _product;
+  List<dynamic>? _cartItems;
   bool _isLoading = true;
+  int _cartTotal = 0;
+  int _cartItemCount = 0;
 
   @override
   void initState() {
@@ -61,8 +68,8 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
   }
 
   Future<bool> fetchProduct(SavedUser user) async {
-    ProductDto? fetchProduct = await _productRepository
-        .getProductById(widget.productId, user.token);
+    ProductDto? fetchProduct =
+        await _productRepository.getProductById(widget.productId, user.token);
     if (fetchProduct != null) {
       setState(() {
         _product = fetchProduct;
@@ -73,8 +80,55 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
     }
   }
 
+  Future<bool> fetchItemsInCart({required SavedUser user}) async {
+    List<dynamic>? data = await _cartRepository.getCartByRestaurant(
+        accessToken: _user?.token,
+        userId: _user?.userId,
+        restaurantId: widget.restaurantId);
+    if (data != null) {
+      int total = data.isNotEmpty
+          ? data
+              .map((item) => ((item['price'] as num).toInt() *
+                  (item['quantity'] as num).toInt()))
+              .reduce((a, b) => a + b)
+          : 0;
+      int totalQuantity = data.isNotEmpty
+          ? data
+              .map((item) => (item['quantity'] as num).toInt())
+              .reduce((a, b) => a + b)
+          : 0;
+      _logger.info('Total price: $total');
+      setState(() {
+        _cartItems = data;
+        _cartItemCount = totalQuantity;
+        _cartTotal = total;
+      });
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<void> addToCart({required ProductDto product}) async {
+    bool result = await _cartRepository.addToCart(
+        accessToken: _user?.token,
+        userId: _user?.userId,
+        restaurantId: widget.restaurantId,
+        productId: product.id,
+        productName: product.name,
+        price: product.price,
+        quantity: 1);
+    if (result) {
+      _logger.info('success');
+      fetchItemsInCart(user: _user!);
+    } else {
+      _logger.info('failed');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+
     if (_isLoading) {
       return SizedBox(
         height: 100,
@@ -162,7 +216,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
 
                   // Add to cart
                   MyButton(
-                      onTap: () {},
+                      onTap: () => addToCart(product: _product!),
                       text: 'Thêm vào giỏ hàng',
                       color: AppColors.primary)
                 ],

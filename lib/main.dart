@@ -386,8 +386,10 @@ class Main extends StatelessWidget {
             name: 'protected_food_detail',
             path: '/protected/product',
             pageBuilder: (context, state) {
-              final productId = state.extra as int;
-              return MaterialPage(child: FoodDetailPage(productId: productId,));
+              final map = state.extra as Map<String,dynamic>;
+              final productId = map['productId'] as int;
+              final restaurantId = map['restaurantId'] as int;
+              return MaterialPage(child: FoodDetailPage(restaurantId: restaurantId, productId: productId,));
             },
           ),
           GoRoute(
