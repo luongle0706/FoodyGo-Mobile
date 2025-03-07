@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:foodygo/dto/OTP_dto.dart';
 import 'package:foodygo/dto/login_dto.dart';
 import 'package:foodygo/dto/register_dto.dart';
