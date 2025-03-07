@@ -24,6 +24,14 @@ class _LoginPageState extends State<LoginPage> {
   final logger = AppLogger.instance;
   final storage = SecureStorage.instance;
 
+  String? _errorMessage;
+
+  void _handleLoginError(String message) {
+    setState(() {
+      _errorMessage = message;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -60,13 +68,29 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 50),
+              SizedBox(height: 30),
 
               // Logo
               Image.asset(
                 "assets/icons/foodygo-logo.png",
                 width: 150,
                 height: 150,
+              ),
+
+              Text(
+                "FoodyGo",
+                style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary),
+              ),
+
+              Text(
+                "Ăn gì chưa người đẹp?",
+                style: TextStyle(
+                    fontSize: 14,
+                    fontStyle: FontStyle.italic,
+                    color: AppColors.primary),
               ),
 
               SizedBox(height: 50),
@@ -91,6 +115,17 @@ class _LoginPageState extends State<LoginPage> {
 
               SizedBox(height: 10),
 
+              if (_errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: Text(
+                    _errorMessage!,
+                    style: TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ),
+
+              SizedBox(height: 10),
+
               // Forgot password?
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
@@ -112,8 +147,15 @@ class _LoginPageState extends State<LoginPage> {
 
               GestureDetector(
                 onTap: () async {
-                  authService.signIn(usernameController.text,
-                      passwordController.text, context);
+                  setState(() {
+                    _errorMessage = null;
+                  });
+                  authService.signIn(
+                    usernameController.text,
+                    passwordController.text,
+                    context,
+                    _handleLoginError,
+                  );
                 },
                 child: Container(
                   padding: EdgeInsets.all(15),

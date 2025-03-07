@@ -3,6 +3,7 @@ class ProductDto {
   final String code;
   final String name;
   final double price;
+  //final String image;
   final String description;
   final double prepareTime;
   final bool available;

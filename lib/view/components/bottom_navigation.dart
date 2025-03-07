@@ -87,11 +87,26 @@ class _FoodyGoNavigationBarState extends State<FoodyGoNavigationBar> {
       height: 100,
       padding: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          )),
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        border: const Border(
+          top: BorderSide(
+            color: Colors.black,
+            width: 0.3,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            spreadRadius: 1,
+            blurRadius: 3, 
+            offset: Offset(0, -2),
+          ),
+        ],
+      ),
       child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.center,

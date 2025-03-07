@@ -144,12 +144,18 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
           onPressed: () => GoRouter.of(context).pop(),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: Icon(
+              Icons.search,
+              color: Colors.white,
+            ),
             onPressed: () {},
           )
         ],
@@ -158,7 +164,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
         children: [
           // Restaurant Info
           Container(
-            color: AppColors.background,
+            color: AppColors.secondary,
             padding: EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,7 +172,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
-                    widget.restaurantDto['image'],
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg/1280px-Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg',
                     height: 100,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -214,50 +220,59 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
               itemBuilder: (context, index) {
                 final item = _products?[index];
                 return Container(
-                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 60,
-                        height: 60,
-                        color: Colors.grey[300],
-                        alignment: Alignment.center,
-                        child: Text("Ảnh đồ ăn"),
+                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey),
+                    ),
+                    child: GestureDetector(
+                      onTap: () {
+                        GoRouter.of(context)
+                            .push('/protected/product', extra: item.id);
+                      },
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg/1280px-Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg',
+                              height: 60,
+                              width: 60,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(item!.name,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold)),
+                                Text(item.description),
+                                Text(
+                                    "⏳ Thời gian chuẩn bị: ${item.prepareTime.round()} phút"),
+                                SizedBox(height: 4),
+                                Text("Giá: ${item.price.round()}đ",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                          TextButton(
+                              onPressed: () => addToCart(product: item),
+                              child: Text('+')),
+                          Text(
+                              '(Đã có ${_cartItems?.firstWhere((i) => i['productId'] == item.id, orElse: () => {
+                                    'quantity': 0
+                                  })['quantity']})')
+                        ],
                       ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(item!.name,
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold)),
-                            Text(item.description),
-                            Text(
-                                "⏳ Thời gian chuẩn bị: ${item.prepareTime.round()} phút"),
-                            SizedBox(height: 4),
-                            Text("Giá: ${item.price.toStringAsFixed(3)}đ",
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                      ),
-                      TextButton(
-                          onPressed: () => addToCart(product: item),
-                          child: Text('+')),
-                      Text(
-                          '(Đã có ${_cartItems?.firstWhere((i) => i['productId'] == item.id, orElse: () => {
-                                'quantity': 0
-                              })['quantity']})')
-                    ],
-                  ),
-                );
+                    ));
               },
             ),
           ),
