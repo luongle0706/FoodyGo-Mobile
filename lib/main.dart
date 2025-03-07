@@ -387,7 +387,10 @@ class Main extends StatelessWidget {
             path: '/protected/product',
             pageBuilder: (context, state) {
               final productId = state.extra as int;
-              return MaterialPage(child: FoodDetailPage(productId: productId,));
+              return MaterialPage(
+                  child: FoodDetailPage(
+                productId: productId,
+              ));
             },
           ),
           GoRoute(
