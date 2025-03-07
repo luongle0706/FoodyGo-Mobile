@@ -6,6 +6,7 @@ import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/hub/hub_home_wrapper.dart';
 import 'package:foodygo/view/pages/add_to_cart.dart';
 import 'package:foodygo/view/pages/notification_page.dart';
+import 'package:foodygo/view/pages/restaurant/add_dish_page.dart';
 import 'package:foodygo/view/pages/restaurant/add_edit_category.dart';
 import 'package:foodygo/view/pages/restaurant/add_topping_item.dart';
 import 'package:foodygo/view/pages/restaurant/add_topping_section.dart';
@@ -13,6 +14,7 @@ import 'package:foodygo/view/pages/restaurant/confirm_order_restaurant.dart';
 import 'package:foodygo/view/pages/detail_order.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/food_detail.dart';
+import 'package:foodygo/view/pages/restaurant/manage_category_list.dart';
 import 'package:foodygo/view/pages/restaurant/open_hours_setting.dart';
 import 'package:foodygo/view/pages/restaurant/order_detail_restaurant.dart';
 import 'package:foodygo/view/pages/restaurant/product_detail_restaurant.dart';
@@ -257,8 +259,20 @@ class Main extends StatelessWidget {
                     path: '/protected/restaurant_menu',
                     pageBuilder: (context, state) {
                       return MaterialPage(child: RestaurantMenu());
+                    }),
+                GoRoute(
+                    name: 'manage_categories', //S-044
+                    path: '/protected/manage-categories',
+                    pageBuilder: (context, state) {
+                      return MaterialPage(child: CategoryPage());
                     })
               ]),
+          GoRoute(
+              name: 'add_dish_page', // S-017
+              path: '/protected/add-dish',
+              pageBuilder: (context, state) {
+                return MaterialPage(child: AddDishPage());
+              }),
           GoRoute(
               name: 'detail_order', // S-014
               path: '/protected/detail-order',
