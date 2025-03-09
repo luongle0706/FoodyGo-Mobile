@@ -33,7 +33,8 @@ class AuthRepository {
           fullName: jsonResponse['fullName'],
           email: jsonResponse['email'],
           role: jsonResponse['role'],
-          userId: jsonResponse['userId']);
+          userId: jsonResponse['userId'],
+          customerId: jsonResponse['customerId']);
     } else {
       throw Exception('Failed to load data!: ${response.body}');
     }
@@ -102,8 +103,6 @@ class AuthRepository {
           otp: jsonResponse['data']['otp'],
           existedEmail: jsonResponse['data']['existedEmail'] as bool);
     } else {
-      logger.info("statusCode" + response.statusCode.toString());
-      logger.info("response$response");
       throw Exception('Failed to load data in send OTP!');
     }
   }

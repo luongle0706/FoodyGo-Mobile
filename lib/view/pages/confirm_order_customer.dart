@@ -1,11 +1,15 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/restaurant_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/cart_repository.dart';
+import 'package:foodygo/repository/order_repository.dart';
+import 'package:foodygo/repository/restaurant_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class ConfirmOrderPage extends StatefulWidget {
   final int restaurantId;
@@ -19,13 +23,24 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
   final _storage = SecureStorage.instance;
   final _logger = AppLogger.instance;
   final _cartRepository = CartRepository.instance;
-  // List<dynamic>? _cartItems;
+  final _restaurantRepository = RestaurantRepository.instance;
+  final _orderRepository = OrderRepository.instance;
+  List<dynamic>? _cartItems;
   SavedUser? _user;
+  RestaurantDto? _restaurant;
   bool _isLoading = true;
+  int _totalPrice = 0;
+  // Need to dynamically change (TODO)
+  final int _shippingFee = 59000;
+  final DateTime _expectedDeliveryTime = DateTime.now().add(Duration(hours: 1));
+  final String _customerPhone = '+84938762971';
+  final String _notes = 'Not implemented';
+  final int _hubId = 1;
 
   @override
   void initState() {
     super.initState();
+    loadUser();
   }
 
   Future<void> loadUser() async {
@@ -37,8 +52,9 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
         _user = user;
       });
       bool fetchedCartItems = await fetchItemsInCart(user: user);
+      bool fetchedRestaurant = await fetchRestaurantById(user: user);
 
-      if (fetchedCartItems) {
+      if (fetchedCartItems && fetchedRestaurant) {
         setState(() {
           _isLoading = false;
         });
@@ -61,42 +77,76 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
         userId: _user?.userId,
         restaurantId: widget.restaurantId);
     if (data != null) {
-      // int total = data.isNotEmpty
-      //     ? data
-      //         .map((item) => ((item['price'] as num).toInt() *
-      //             (item['quantity'] as num).toInt()))
-      //         .reduce((a, b) => a + b)
-      //     : 0;
-      // int totalQuantity = data.isNotEmpty
-      //     ? data
-      //         .map((item) => (item['quantity'] as num).toInt())
-      //         .reduce((a, b) => a + b)
-      //     : 0;
-      // setState(() {
-      //   _cartItems = data;
-      // });
+      int totalPrice = data.fold(
+            0,
+            (sum, item) =>
+                sum! +
+                ((item['price'] as num).toInt() *
+                    (item['quantity'] as num).toInt()),
+          ) ??
+          0;
+      setState(() {
+        _totalPrice = totalPrice;
+        _cartItems = data;
+      });
       return true;
-    } else {
-      return false;
     }
+    return false;
+  }
+
+  Future<bool> fetchRestaurantById({required SavedUser user}) async {
+    RestaurantDto? restaurant = await _restaurantRepository.loadRestaurantById(
+        user.token, widget.restaurantId);
+    if (restaurant != null) {
+      setState(() {
+        _restaurant = restaurant;
+      });
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> placeOrder(BuildContext context) async {
+    int? result = await _orderRepository.pay(
+        accessToken: _user!.token,
+        shippingFee: _shippingFee * 1.0,
+        productFee: _totalPrice * 1.0,
+        time: DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now()),
+        expectedDeliveryTime:
+            DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(_expectedDeliveryTime),
+        customerPhone: _customerPhone,
+        notes: _notes,
+        customerId: _user!.customerId,
+        restaurantId: widget.restaurantId,
+        hubId: _hubId,
+        cartLists: _cartItems!);
+    if (result != null) {
+      _logger.info("Successfully ordered: Order ID=$result");
+      if (context.mounted) {
+        GoRouter.of(context).go('/order-success');
+        return;
+      }
+    }
+    _logger.error('Unable to make order');
   }
 
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-          appBar: AppBar(
-            title: Text("Xác nhận giao hàng"),
-            leading: GestureDetector(
-              onTap: () {
-                GoRouter.of(context).go('/protected/home');
-              },
-              child: Icon(Icons.arrow_back),
-            ),
+        appBar: AppBar(
+          title: Text("Xác nhận giao hàng"),
+          leading: GestureDetector(
+            onTap: () {
+              GoRouter.of(context).go('/protected/home');
+            },
+            child: Icon(Icons.arrow_back),
           ),
-          body: Center(
-            child: CircularProgressIndicator(),
-          ));
+        ),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
     return Scaffold(
@@ -113,7 +163,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
         padding: EdgeInsets.only(top: 0, left: 16, right: 16, bottom: 16),
         child: Column(
           children: [
-            //address section
+            // Address Section
             Divider(),
             Row(
               children: [
@@ -141,76 +191,95 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
             const SizedBox(height: 10),
             Divider(),
             const SizedBox(height: 10),
-            //Restaurant name
+
+            // Restaurant Name
             Row(
               children: [
                 Icon(Icons.local_restaurant),
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    "Xoài Non số dách - Mắm ruốt bao thêm - Nhà hàng Gil Lê",
+                    _restaurant!.name,
                     style: TextStyle(fontWeight: FontWeight.bold),
-                    overflow:
-                        TextOverflow.ellipsis, // Add "..." if text is too long
+                    overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
                 ),
               ],
             ),
             SizedBox(height: 20),
-            // Order Details
-            Row(
-              children: [
-                // Image Placeholder
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  alignment: Alignment.center,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      'https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chorizo-mozarella-gnocchi-bake-cropped-9ab73a3.jpg?resize=768,574',
-                      loadingBuilder: (context, child, progress) {
-                        if (progress == null) {
-                          return child;
-                        } else {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(Icons.error);
-                      },
-                      fit: BoxFit.cover,
-                      width: 60,
-                      height: 60,
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8),
 
-                // Item Name & Price
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("1 x Xoài non mắm ruốt"),
-                    ],
-                  ),
-                ),
-                Text("59.000đ", style: TextStyle(fontWeight: FontWeight.bold)),
-              ],
+            // Order Details
+            Expanded(
+              child: ListView.builder(
+                itemCount: _cartItems?.length ?? 0,
+                itemBuilder: (context, index) {
+                  final item = _cartItems![index];
+
+                  return Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      children: [
+                        // Image Placeholder
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          alignment: Alignment.center,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              'https://via.placeholder.com/60', // Placeholder image
+                              loadingBuilder: (context, child, progress) {
+                                if (progress == null) {
+                                  return child;
+                                } else {
+                                  return Center(
+                                      child: CircularProgressIndicator());
+                                }
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(Icons.error);
+                              },
+                              fit: BoxFit.cover,
+                              width: 60,
+                              height: 60,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+
+                        // Item Name & Price
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  "${item['quantity']} x ${item['productName']}"),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          "${NumberFormat("#,###", "vi_VN").format(item['price'])}đ",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
-            SizedBox(height: 10),
+
             // Price Breakdown
+            Divider(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Tổng giá món"),
-                Text("59.000đ"),
+                Text("${NumberFormat("#,###", "vi_VN").format(_totalPrice)}đ"),
               ],
             ),
             SizedBox(height: 10),
@@ -218,7 +287,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Phí giao hàng"),
-                Text("59.000đ"),
+                Text('$_shippingFee'),
               ],
             ),
             Divider(),
@@ -229,12 +298,14 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
               children: [
                 Text("Tổng thanh toán",
                     style: TextStyle(fontWeight: FontWeight.bold)),
-                Text("59.000đ",
+                Text(
+                    "${NumberFormat("#,###", "vi_VN").format(_totalPrice + _shippingFee)}đ",
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               ],
             ),
             Spacer(),
+
             // Order Button
             SizedBox(
               width: double.infinity,
@@ -246,8 +317,8 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onPressed: () {
-                  GoRouter.of(context).go("/order-success");
+                onPressed: () async {
+                  await placeOrder(context);
                 },
                 child: Text("Đặt Đơn", style: TextStyle(color: Colors.white)),
               ),

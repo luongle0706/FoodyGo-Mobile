@@ -4,13 +4,15 @@ class SavedUser {
   String fullName;
   String role;
   int userId;
+  int customerId;
 
   SavedUser(
       {required this.email,
       required this.token,
       required this.fullName,
       required this.role,
-      required this.userId});
+      required this.userId,
+      required this.customerId});
 
   toJson() {
     return {
@@ -18,17 +20,18 @@ class SavedUser {
       'token': token,
       'fullName': fullName,
       'role': role,
-      'userId': userId
+      'userId': userId,
+      'customerId': customerId
     };
   }
 
   factory SavedUser.fromJson(Map<String, dynamic> json) {
     return SavedUser(
-      token: json['token'],
-      email: json['email'],
-      fullName: json['fullName'],
-      role: json['role'],
-      userId: json['userId'],
-    );
+        token: json['token'],
+        email: json['email'],
+        fullName: json['fullName'],
+        role: json['role'],
+        userId: json['userId'],
+        customerId: json['customerId']);
   }
 }

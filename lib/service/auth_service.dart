@@ -48,7 +48,8 @@ class AuthService {
             email: response['email'],
             fullName: response['fullName'],
             role: response['role'],
-            userId: response['userId']);
+            userId: response['userId'],
+            customerId: response['customerId']);
 
         storage.put(key: 'user', value: json.encode(user.toJson()));
 
@@ -80,7 +81,8 @@ class AuthService {
             email: email,
             fullName: loginResponseDTO.fullName,
             role: loginResponseDTO.role,
-            userId: loginResponseDTO.userId);
+            userId: loginResponseDTO.userId,
+            customerId: loginResponseDTO.customerId);
 
         storage.put(key: 'user', value: json.encode(user.toJson()));
 
