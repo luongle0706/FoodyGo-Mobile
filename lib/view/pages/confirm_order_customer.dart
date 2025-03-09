@@ -1,11 +1,104 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/repository/cart_repository.dart';
+import 'package:foodygo/utils/app_logger.dart';
+import 'package:foodygo/utils/secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
-class ConfirmOrderPage extends StatelessWidget {
-  const ConfirmOrderPage({super.key});
+class ConfirmOrderPage extends StatefulWidget {
+  final int restaurantId;
+  const ConfirmOrderPage({super.key, required this.restaurantId});
+
+  @override
+  State<ConfirmOrderPage> createState() => _ConfirmOrderPageState();
+}
+
+class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
+  final _storage = SecureStorage.instance;
+  final _logger = AppLogger.instance;
+  final _cartRepository = CartRepository.instance;
+  // List<dynamic>? _cartItems;
+  SavedUser? _user;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> loadUser() async {
+    String? userData = await _storage.get(key: 'user');
+    SavedUser? user =
+        userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
+    if (user != null) {
+      setState(() {
+        _user = user;
+      });
+      bool fetchedCartItems = await fetchItemsInCart(user: user);
+
+      if (fetchedCartItems) {
+        setState(() {
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = true;
+        });
+      }
+    } else {
+      _logger.info('Failed to load user');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<bool> fetchItemsInCart({required SavedUser user}) async {
+    List<dynamic>? data = await _cartRepository.getCartByRestaurant(
+        accessToken: _user?.token,
+        userId: _user?.userId,
+        restaurantId: widget.restaurantId);
+    if (data != null) {
+      // int total = data.isNotEmpty
+      //     ? data
+      //         .map((item) => ((item['price'] as num).toInt() *
+      //             (item['quantity'] as num).toInt()))
+      //         .reduce((a, b) => a + b)
+      //     : 0;
+      // int totalQuantity = data.isNotEmpty
+      //     ? data
+      //         .map((item) => (item['quantity'] as num).toInt())
+      //         .reduce((a, b) => a + b)
+      //     : 0;
+      // setState(() {
+      //   _cartItems = data;
+      // });
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+          appBar: AppBar(
+            title: Text("Xác nhận giao hàng"),
+            leading: GestureDetector(
+              onTap: () {
+                GoRouter.of(context).go('/protected/home');
+              },
+              child: Icon(Icons.arrow_back),
+            ),
+          ),
+          body: Center(
+            child: CircularProgressIndicator(),
+          ));
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Xác nhận giao hàng"),
