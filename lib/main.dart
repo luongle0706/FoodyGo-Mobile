@@ -136,9 +136,12 @@ class Main extends StatelessWidget {
                     }),
                 GoRoute(
                     name: 'confirm_order_page',
-                    path: '/protected/confirm-order-cart',
+                    path: '/protected/confirm-order-cart/:restaurantId',
                     pageBuilder: (context, state) {
-                      return MaterialPage(child: ConfirmOrderPage());
+                      final restaurantId =
+                          state.pathParameters['restaurantId'] as int;
+                      return MaterialPage(
+                          child: ConfirmOrderPage(restaurantId: restaurantId));
                     }),
                 GoRoute(
                     name: 'confirm_order', // Dau do trong restaurant

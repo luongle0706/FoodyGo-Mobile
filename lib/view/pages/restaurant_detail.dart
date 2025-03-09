@@ -451,7 +451,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                     ElevatedButton(
                                       onPressed: () {
                                         GoRouter.of(context).go(
-                                            '/protected/confirm-order-cart');
+                                            '/protected/confirm-order-cart/${widget.restaurantDto['id']}');
                                       },
                                       style: ElevatedButton.styleFrom(
                                         padding: EdgeInsets.symmetric(
@@ -512,7 +512,8 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
             ),
             ElevatedButton(
               onPressed: () {
-                GoRouter.of(context).go('/protected/confirm-order-cart');
+                GoRouter.of(context).go(
+                    '/protected/confirm-order-cart/${widget.restaurantDto['id']}');
               },
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
