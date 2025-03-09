@@ -39,18 +39,16 @@ class AuthService {
       String? fcmToken = await storage.get(key: 'fcm_token');
       logger.info('Fetched fcm_token: $fcmToken');
 
-      LoginResponseDTO loginResponseDTO =
+      Map<String, dynamic> response =
           await authRepository.loginByGoogle(idToken!, fcmToken!);
 
-      logger.info("Backend token: ${loginResponseDTO.token}");
-
-      if (loginResponseDTO.token.isNotEmpty) {
+      if (response['token'] != null) {
         SavedUser user = SavedUser(
-            token: loginResponseDTO.token,
-            email: loginResponseDTO.email,
-            fullName: loginResponseDTO.fullName,
-            role: loginResponseDTO.role,
-            userId: loginResponseDTO.userId);
+            token: response['token'],
+            email: response['email'],
+            fullName: response['fullName'],
+            role: response['role'],
+            userId: response['userId']);
 
         storage.put(key: 'user', value: json.encode(user.toJson()));
 
@@ -70,44 +68,44 @@ class AuthService {
     }
   }
 
-  void signIn(String email, String password, BuildContext context, Function(String) onError) async {
-  try {
-    LoginResponseDTO loginResponseDTO = await authRepository
-        .login(LoginRequestDTO(email: email, password: password));
+  void signIn(String email, String password, BuildContext context,
+      Function(String) onError) async {
+    try {
+      LoginResponseDTO loginResponseDTO = await authRepository
+          .login(LoginRequestDTO(email: email, password: password));
 
-    if (loginResponseDTO.token.isNotEmpty) {
-      SavedUser user = SavedUser(
-          token: loginResponseDTO.token,
-          email: email,
-          fullName: loginResponseDTO.fullName,
-          role: loginResponseDTO.role,
-          userId: loginResponseDTO.userId);
+      if (loginResponseDTO.token.isNotEmpty) {
+        SavedUser user = SavedUser(
+            token: loginResponseDTO.token,
+            email: email,
+            fullName: loginResponseDTO.fullName,
+            role: loginResponseDTO.role,
+            userId: loginResponseDTO.userId);
 
-      storage.put(key: 'user', value: json.encode(user.toJson()));
+        storage.put(key: 'user', value: json.encode(user.toJson()));
 
-      if (context.mounted) {
-        if (user.role == 'ROLE_USER') {
-          GoRouter.of(context).go('/protected/home');
-        } else if (user.role == 'ROLE_SELLER') {
-          GoRouter.of(context).go('/protected/restaurant-home');
-        } else {
-          GoRouter.of(context).go('/protected/staff-home');
+        if (context.mounted) {
+          if (user.role == 'ROLE_USER') {
+            GoRouter.of(context).go('/protected/home');
+          } else if (user.role == 'ROLE_SELLER') {
+            GoRouter.of(context).go('/protected/restaurant-home');
+          } else {
+            GoRouter.of(context).go('/protected/staff-home');
+          }
+        }
+      } else {
+        logger.error('Login failed');
+        if (context.mounted) {
+          onError("Đăng nhập thất bại. Vui lòng thử lại.");
         }
       }
-    } else {
-      logger.error('Login failed');
+    } catch (e) {
+      logger.error(e.toString());
       if (context.mounted) {
         onError("Đăng nhập thất bại. Vui lòng thử lại.");
       }
     }
-  } catch (e) {
-    logger.error(e.toString());
-    if (context.mounted) {
-      onError("Đăng nhập thất bại. Vui lòng thử lại.");
-    }
   }
-}
-
 
   void _showErrorDialog(BuildContext context, String message) {
     showDialog(

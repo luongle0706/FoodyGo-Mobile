@@ -5,6 +5,7 @@ import 'package:foodygo/service/notification_service.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/hub/hub_home_wrapper.dart';
 import 'package:foodygo/view/pages/add_to_cart.dart';
+import 'package:foodygo/view/pages/confirm_order_customer.dart';
 import 'package:foodygo/view/pages/notification_page.dart';
 import 'package:foodygo/view/pages/restaurant/add_dish_page.dart';
 import 'package:foodygo/view/pages/restaurant/add_edit_category.dart';
@@ -128,13 +129,19 @@ class Main extends StatelessWidget {
                       return MaterialPage(child: OrderListRestaurantPage());
                     }),
                 GoRoute(
-                    name: 'order_list_customer',
-                    path: 'protected/order-list-customer',
+                    name: 'order_list_customer', //S-013
+                    path: '/protected/order-list-customer',
                     pageBuilder: (context, state) {
                       return MaterialPage(child: OrderListCustomerPage());
                     }),
                 GoRoute(
-                    name: 'confirm_order',
+                    name: 'confirm_order_page',
+                    path: '/protected/confirm-order-cart',
+                    pageBuilder: (context, state) {
+                      return MaterialPage(child: ConfirmOrderPage());
+                    }),
+                GoRoute(
+                    name: 'confirm_order', // Dau do trong restaurant
                     path: '/protected/confirm-order',
                     pageBuilder: (context, state) {
                       return MaterialPage(

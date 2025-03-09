@@ -11,7 +11,7 @@ class ConfirmOrderPage extends StatelessWidget {
         title: Text("Xác nhận giao hàng"),
         leading: GestureDetector(
           onTap: () {
-            GoRouter.of(context).pop();
+            GoRouter.of(context).go('/protected/home');
           },
           child: Icon(Icons.arrow_back),
         ),

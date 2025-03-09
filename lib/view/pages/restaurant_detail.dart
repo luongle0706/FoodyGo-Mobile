@@ -89,7 +89,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
         price: product.price,
         quantity: 1);
     if (result) {
-      fetchItemsInCart(user: _user!);
+      await fetchItemsInCart(user: _user!);
     } else {
       _logger.info('failed');
     }
@@ -101,7 +101,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
         userId: _user?.userId,
         accessToken: _user?.token);
     if (result) {
-      fetchItemsInCart(user: _user!);
+      await fetchItemsInCart(user: _user!);
     } else {
       _logger.info('Failed to delete item from cart');
     }
@@ -359,107 +359,114 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                         BorderRadius.vertical(top: Radius.circular(16)),
                   ),
                   builder: (context) {
-                    return DraggableScrollableSheet(
-                      expand: false,
-                      initialChildSize: 0.5,
-                      minChildSize: 0.3,
-                      maxChildSize: 0.9,
-                      builder: (context, scrollController) {
-                        return Container(
-                          padding: EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Giỏ hàng",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold)),
-                              Divider(),
-                              Expanded(
-                                child: _cartItems == null || _cartItems!.isEmpty
-                                    ? Center(child: Text("Giỏ hàng trống"))
-                                    : ListView.builder(
-                                        controller: scrollController,
-                                        itemCount: _cartItems!.length,
-                                        itemBuilder: (context, index) {
-                                          final item = _cartItems![index];
-                                          final product = ProductDto(
-                                              id: item['productId'],
-                                              code:
-                                                  item['productId'].toString(),
-                                              name: item['productName'],
-                                              price: item['price'],
-                                              description: '',
-                                              prepareTime: 0.0,
-                                              available: true);
-                                          return ListTile(
-                                            leading: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              child: Image.network(
-                                                'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg/1280px-Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg',
-                                                width: 50,
-                                                height: 50,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                            title: Text(item['productName']),
-                                            subtitle: Text(
-                                                "Giá: ${NumberFormat("#,###", "vi_VN").format(item['price'])}đ"),
-                                            trailing: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                IconButton(
-                                                  icon: Icon(Icons.remove,
-                                                      color: Colors.red),
-                                                  onPressed: () {
-                                                    removeFromCart(
-                                                        product: product);
-                                                  },
-                                                ),
-                                                Text("${item['quantity']}"),
-                                                IconButton(
-                                                  icon: Icon(Icons.add,
-                                                      color: Colors.green),
-                                                  onPressed: () {
-                                                    addToCart(product: product);
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
-                              ),
-                              Divider(),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Tổng: ${NumberFormat("#,###", "vi_VN").format(_cartTotal)}đ',
+                    return StatefulBuilder(builder: (context, setModalState) {
+                      return DraggableScrollableSheet(
+                        expand: false,
+                        initialChildSize: 0.5,
+                        minChildSize: 0.3,
+                        maxChildSize: 0.9,
+                        builder: (context, scrollController) {
+                          return Container(
+                            padding: EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Giỏ hàng",
                                     style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      // Handle checkout
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 12),
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold)),
+                                Divider(),
+                                Expanded(
+                                  child: _cartItems == null ||
+                                          _cartItems!.isEmpty
+                                      ? Center(child: Text("Giỏ hàng trống"))
+                                      : ListView.builder(
+                                          controller: scrollController,
+                                          itemCount: _cartItems!.length,
+                                          itemBuilder: (context, index) {
+                                            final item = _cartItems![index];
+                                            final product = ProductDto(
+                                                id: item['productId'],
+                                                code: item['productId']
+                                                    .toString(),
+                                                name: item['productName'],
+                                                price: item['price'],
+                                                description: '',
+                                                prepareTime: 0.0,
+                                                available: true);
+                                            return ListTile(
+                                              leading: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                child: Image.network(
+                                                  'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg/1280px-Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg',
+                                                  width: 50,
+                                                  height: 50,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              title: Text(item['productName']),
+                                              subtitle: Text(
+                                                  "Giá: ${NumberFormat("#,###", "vi_VN").format(item['price'])}đ"),
+                                              trailing: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  IconButton(
+                                                    icon: Icon(Icons.remove,
+                                                        color: Colors.red),
+                                                    onPressed: () async {
+                                                      await removeFromCart(
+                                                          product: product);
+                                                      setModalState(() {});
+                                                    },
+                                                  ),
+                                                  Text("${item['quantity']}"),
+                                                  IconButton(
+                                                    icon: Icon(Icons.add,
+                                                        color: Colors.green),
+                                                    onPressed: () async {
+                                                      await addToCart(
+                                                          product: product);
+                                                      setModalState(() {});
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                ),
+                                Divider(),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Tổng: ${NumberFormat("#,###", "vi_VN").format(_cartTotal)}đ',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black),
                                     ),
-                                    child: Text("Thanh toán"),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        );
-                      },
-                    );
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        GoRouter.of(context).go(
+                                            '/protected/confirm-order-cart');
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 12),
+                                      ),
+                                      child: Text("Thanh toán"),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    });
                   },
                 );
               },
@@ -505,7 +512,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
             ),
             ElevatedButton(
               onPressed: () {
-                // Handle checkout
+                GoRouter.of(context).go('/protected/confirm-order-cart');
               },
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),

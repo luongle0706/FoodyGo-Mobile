@@ -39,7 +39,7 @@ class AuthRepository {
     }
   }
 
-  Future<LoginResponseDTO> loginByGoogle(
+  Future<Map<String, dynamic>> loginByGoogle(
       String googleIdToken, String fcmToken) async {
     final url =
         '$globalURL/api/v1/authentications/firebase?googleIdToken=$googleIdToken&fcmToken=$fcmToken';
@@ -58,15 +58,7 @@ class AuthRepository {
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
         final Map<String, dynamic> data = jsonResponse['data'];
 
-        return LoginResponseDTO(
-            code: data['code'],
-            message: data['message'],
-            token: data['token'],
-            refreshToken: data['refreshToken'],
-            fullName: data['fullName'],
-            email: data['email'],
-            role: data['role'],
-            userId: data['userId']);
+        return data;
       } else {
         throw Exception(
             'Failed to load data! Status Code: ${response.statusCode}');
