@@ -75,4 +75,23 @@ class OrderRepository {
       return null;
     }
   }
+
+  Future<List<dynamic>?> getOrdersByStatus(
+      {required accessToken, status}) async {
+    final response = await http
+        .get(Uri.parse('$globalURL/api/v1/orders?status=$status'), headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken'
+    });
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      _logger.info("jsonResponse" + jsonResponse.toString());
+
+      List<dynamic> data = jsonResponse['data'] ?? [];
+      _logger.info("data" + jsonResponse.toString());
+
+      return data;
+    }
+    return null;
+  }
 }

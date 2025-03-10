@@ -1,0 +1,2 @@
+E:/FPTU/Ky7/SWD391/FoodyGo-Mobile/android/app/.cxx/Debug/1292w2r3/x86/CMakeFiles/edit_cache.dir
+E:/FPTU/Ky7/SWD391/FoodyGo-Mobile/android/app/.cxx/Debug/1292w2r3/x86/CMakeFiles/rebuild_cache.dir

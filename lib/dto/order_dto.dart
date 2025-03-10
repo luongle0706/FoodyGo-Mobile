@@ -43,9 +43,9 @@ class OrderDto {
       status: json['status'] ?? 'UNKNOWN',
       expectedDeliveryTime: DateTime.parse(json['expectedDeliveryTime']),
       time: DateTime.parse(json['time']),
-      customerPhone: json['customerPhone'] ?? '', 
-      shipperPhone: json['shipperPhone'],   // Giữ nguyên null nếu không có
-      notes: json['notes'],                 // Giữ nguyên null nếu không có
+      customerPhone: json['customerPhone'] ?? '',
+      shipperPhone: json['shipperPhone'], // Giữ nguyên null nếu không có
+      notes: json['notes'], // Giữ nguyên null nếu không có
       employeeName: json['employeeName'] ?? 'Unknown Employee',
       customerName: json['customerName'] ?? 'Unknown Customer',
       restaurantName: json['restaurantName'] ?? 'Unknown Restaurant',

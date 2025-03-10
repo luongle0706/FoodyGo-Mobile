@@ -117,7 +117,19 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
   /// Nút chọn tab con
   Widget _tabSelector(String text, int index) {
     return GestureDetector(
-      onTap: () => setState(() => selectedSubTab = index),
+      onTap: () {
+        setState(() {
+          selectedSubTab = index;
+        });
+
+        // Nếu chọn "Đã xác nhận" (index == 1), điều hướng sang màn hình ConfirmedOrderRestaurantScreen
+        if (index == 1) {
+          GoRouter.of(context).push('/protected/confirm-order');
+        }
+        if (index == 2) {
+          GoRouter.of(context).push('/home');
+        }
+      },
       child: Column(
         children: [
           Text(
@@ -212,7 +224,8 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    GoRouter.of(context).push('/protected/order-detail-restaurant', extra: 1);
+                    GoRouter.of(context)
+                        .push('/protected/order-detail-restaurant', extra: 1);
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Color.fromARGB(255, 141, 136, 133)),

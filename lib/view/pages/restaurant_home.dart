@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foodygo/view/pages/restaurant/order_view_restaurant.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
 
 class Restaurant {
@@ -88,6 +89,11 @@ class _RestaurantHomeState extends State<RestaurantHome> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => WelcomeScreen()),
+          );
+        } else if (title == "Đơn hàng") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => OrderListRestaurantPage()),
           );
         }
       },

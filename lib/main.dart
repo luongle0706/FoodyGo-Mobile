@@ -12,12 +12,12 @@ import 'package:foodygo/view/pages/restaurant/add_dish_page.dart';
 import 'package:foodygo/view/pages/restaurant/add_edit_category.dart';
 import 'package:foodygo/view/pages/restaurant/add_topping_item.dart';
 import 'package:foodygo/view/pages/restaurant/add_topping_section.dart';
-import 'package:foodygo/view/pages/restaurant/confirm_order_restaurant.dart';
 import 'package:foodygo/view/pages/detail_order.dart';
 import 'package:foodygo/view/pages/empty_page.dart';
 import 'package:foodygo/view/pages/food_detail.dart';
 import 'package:foodygo/view/pages/restaurant/manage_category_list.dart';
 import 'package:foodygo/view/pages/restaurant/open_hours_setting.dart';
+import 'package:foodygo/view/pages/restaurant/order_confirm_restaurant.dart';
 import 'package:foodygo/view/pages/restaurant/order_detail_restaurant.dart';
 import 'package:foodygo/view/pages/restaurant/product_detail_restaurant.dart';
 import 'package:foodygo/view/pages/restaurant/topping_section_setting.dart';
@@ -72,7 +72,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/map',
+        initialLocation: '/login',
         routes: [
           GoRoute(
               name: 'test_map',
@@ -345,7 +345,10 @@ class Main extends StatelessWidget {
             path: '/protected/order-detail-restaurant',
             pageBuilder: (context, state) {
               final orderId = state.extra as int;
-              return MaterialPage(child: OrderDetailRestaurant(orderId: orderId,));
+              return MaterialPage(
+                  child: OrderDetailRestaurant(
+                orderId: orderId,
+              ));
             },
           ),
           GoRoute(
