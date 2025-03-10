@@ -72,7 +72,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/map/hub',
+        initialLocation: '/login',
         routes: [
           GoRoute(
               name: 'test_map',

@@ -113,7 +113,6 @@ class _FoodyGoNavigationBarState extends State<FoodyGoNavigationBar> {
                       'Trang chủ'),
                   _getNavComp(context, '/protected/restaurant-foodygo', 'fork',
                       'FoodyGo'),
-                  // _getNavComp(context, '/protected/wallet', 'wallet', 'Ví'),
                   _getNavComp(
                       context, '/protected/notification', 'bell', 'Thông báo'),
                   _getNavComp(context, '/protected/user', 'user', 'Tài khoản'),
@@ -132,7 +131,6 @@ class _FoodyGoNavigationBarState extends State<FoodyGoNavigationBar> {
                           context, '/protected/home', 'fork', 'Trang chủ'),
                       _getNavComp(
                           context, '/protected/order', 'paper', 'Đơn hàng'),
-                      // _getNavComp(context, '/protected/wallet', 'wallet', 'Ví'),
                       _getNavComp(context, '/protected/notification', 'bell',
                           'Thông báo'),
                       _getNavComp(
