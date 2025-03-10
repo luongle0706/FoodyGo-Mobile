@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodygo/view/pages/restaurant/order_view_restaurant.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class Restaurant {
   String name;
@@ -39,7 +40,11 @@ class _RestaurantHomeState extends State<RestaurantHome> {
               restaurant.name,
               style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
             ),
-            Row(
+            GestureDetector(
+              onTap: () {
+                GoRouter.of(context).push("/protected/open-hours-setting", extra: 1);
+              },
+              child: Row(
               children: [
                 Icon(Icons.circle,
                     size: 11,
@@ -56,6 +61,7 @@ class _RestaurantHomeState extends State<RestaurantHome> {
                 Icon(Icons.arrow_forward_ios, size: 15, color: Colors.grey),
               ],
             ),
+            )
           ],
         ),
       ),

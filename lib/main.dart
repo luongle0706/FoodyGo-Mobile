@@ -76,9 +76,12 @@ class Main extends StatelessWidget {
         routes: [
           GoRoute(
               name: 'test_map',
-              path: '/map',
+              path: '/map/:location',
               pageBuilder: (context, state) {
-                return MaterialPage(child: HubSelectionMapPage());
+                final location =
+                    state.pathParameters['location']!.toUpperCase();
+                return MaterialPage(
+                    child: HubSelectionMapPage(location: location));
               }),
           ShellRoute(
               builder: (context, state, child) {
@@ -316,7 +319,8 @@ class Main extends StatelessWidget {
             name: 'protected_open_hours_seting', // S-038
             path: '/protected/open-hours-setting',
             pageBuilder: (context, state) {
-              return MaterialPage(child: OpenHoursSetting());
+              final restaurantId = state.extra as int;
+              return MaterialPage(child: OpenHoursSetting(restaurantId: restaurantId));
             },
           ),
           GoRoute(
