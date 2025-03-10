@@ -191,18 +191,12 @@ class _TopupPageState extends State<TopupPage> {
         throw Exception("Invalid payment URL received");
       }
 
-      // Open the payment URL in a WebView
-      // ignore: duplicate_ignore
-      // ignore: use_build_context_synchronously
+      // Open the payment URL in a WebView using Navigator
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => PaymentWebView(
             paymentUrl: paymentUrl,
-            onPaymentComplete: (bool success) {
-              Navigator.of(context).pop(); // Return to TopupPage
-              Navigator.of(context)
-                  .pop(success); // Return to Wallet page with result
-            },
+            // Remove this callback - we'll handle navigation directly in _handlePaymentSuccess
           ),
         ),
       );
@@ -253,34 +247,41 @@ class _PaymentWebViewState extends State<PaymentWebView> {
             setState(() {
               isLoading = true;
             });
+
+            // Check for callback URLs as early as possible
+            if (url.contains('/api/v1/payment/vn-pay-callback') ||
+                url.contains('/api/v1/payment/momo-callback')) {
+              _logger.info("Payment callback detected on page start: $url");
+              _handleCallbackUrl(url);
+            }
           },
           onPageFinished: (String url) {
             setState(() {
               isLoading = false;
             });
 
-            // Check if the URL is the return URL from payment gateway
+            // Also check for callback URLs when page finishes loading
             if (url.contains('/api/v1/payment/vn-pay-callback') ||
                 url.contains('/api/v1/payment/momo-callback')) {
-              _logger.info("Payment callback detected: $url");
-
-              // Open this URL in the browser instead of handling it in WebView
-              _openCallbackInBrowser(url);
+              _logger.info("Payment callback detected on page finish: $url");
+              _handleCallbackUrl(url);
             }
           },
           onWebResourceError: (WebResourceError error) {
             _logger.error("WebView error: ${error.description}");
           },
-          // Navigation delegate to decide which URLs to handle in WebView vs external browser
+          // Navigation delegate to decide which URLs to handle
           onNavigationRequest: (NavigationRequest request) {
             final url = request.url;
 
-            // If this is a callback URL, open it in browser
+            // If this is a callback URL, handle it in the app
             if (url.contains('/api/v1/payment/vn-pay-callback') ||
                 url.contains('/api/v1/payment/momo-callback')) {
               _logger.info("Intercepted callback navigation: $url");
-              _openCallbackInBrowser(url);
-              return NavigationDecision.prevent;
+              _handleCallbackUrl(url);
+              // We'll allow the navigation to continue, as we've already handled the response
+              // This is important because sometimes the payment gateway expects a response
+              return NavigationDecision.navigate;
             }
 
             // Allow all other URLs to load in WebView
@@ -291,89 +292,93 @@ class _PaymentWebViewState extends State<PaymentWebView> {
       ..loadRequest(Uri.parse(widget.paymentUrl));
   }
 
-  Future<void> _openCallbackInBrowser(String url) async {
-    _logger.info("Opening payment callback in browser: $url");
+  Future<void> _handleCallbackUrl(String url) async {
+    _logger.info("Handling payment callback: $url");
 
     try {
-      // Check for success parameter in URL
-      bool isSuccess =
-          url.contains('vnp_ResponseCode=00') || url.contains('resultCode=0');
-
-      // Try to launch the URL in browser
       final Uri uri = Uri.parse(url);
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
 
-        // Show success or failure message
+      // For VNPAY
+      if (url.contains('/api/v1/payment/vn-pay-callback')) {
+        // Check for success parameter in URL (vnp_ResponseCode=00 indicates success)
+        bool isSuccess = uri.queryParameters['vnp_ResponseCode'] == '00' &&
+            uri.queryParameters['vnp_TransactionStatus'] == '00';
+
         if (isSuccess) {
           _handlePaymentSuccess();
         } else {
-          _handlePaymentFailure(url);
+          String errorMsg = 'Thanh toán không thành công.';
+          // Try to extract error message if available
+          if (uri.queryParameters.containsKey('message')) {
+            errorMsg = uri.queryParameters['message'] ?? errorMsg;
+          }
+          _handlePaymentFailure(errorMsg);
         }
-      } else {
-        _logger.error("Could not launch URL: $url");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Không thể mở trình duyệt.')),
-        );
+      }
+      // For MOMO
+      else if (url.contains('/api/v1/payment/momo-callback')) {
+        // Check for success parameter in URL (resultCode=0 indicates success for MOMO)
+        bool isSuccess = uri.queryParameters['resultCode'] == '0';
+
+        if (isSuccess) {
+          _handlePaymentSuccess();
+        } else {
+          String errorMsg = 'Thanh toán không thành công.';
+          if (uri.queryParameters.containsKey('message')) {
+            errorMsg = uri.queryParameters['message'] ?? errorMsg;
+          }
+          _handlePaymentFailure(errorMsg);
+        }
       }
     } catch (e) {
-      _logger.error("Error opening URL in browser: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi khi mở trình duyệt: $e')),
-      );
+      _logger.error("Error parsing callback URL: $e");
+      _handlePaymentFailure("Lỗi xử lý phản hồi thanh toán: $e");
     }
   }
 
   void _handlePaymentSuccess() {
-    // Navigate back to the wallet page with success result
+    _logger.info("Payment successful");
+
+    // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Thanh toán thành công! Ví của bạn đã được cập nhật.'),
+        duration: Duration(seconds: 2),
       ),
     );
 
     // Return to wallet page after a short delay
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 0), () {
       if (widget.onPaymentComplete != null) {
         widget.onPaymentComplete!(true);
       } else {
-        // Navigate back if no callback provided
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop(); // Return to TopupPage
-        // ignore: use_build_context_synchronously
-        Navigator.of(context)
-            .pop(true); // Return to Wallet page with refresh flag
+        // Use GoRouter to navigate directly to the wallet page
+        if (mounted) {
+          // This will close all previous pages and go directly to wallet
+          context.goNamed('protected_wallet');
+        }
       }
     });
   }
 
-  void _handlePaymentFailure(String url) {
-    String errorMsg = 'Thanh toán không thành công.';
-
-    // Extract error message from URL if available
-    if (url.contains('message=')) {
-      try {
-        final uri = Uri.parse(url);
-        final message = uri.queryParameters['message'];
-        if (message != null && message.isNotEmpty) {
-          errorMsg = message;
-        }
-      } catch (e) {
-        _logger.error("Error parsing callback URL: $e");
-      }
-    }
+  void _handlePaymentFailure(String errorMsg) {
+    _logger.error("Payment failed: $errorMsg");
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(errorMsg)),
+      SnackBar(
+        content: Text(errorMsg),
+        duration: Duration(seconds: 2),
+      ),
     );
 
     Future.delayed(Duration(seconds: 2), () {
       if (widget.onPaymentComplete != null) {
         widget.onPaymentComplete!(false);
       } else {
-        // Navigate back if no callback provided
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop(); // Return to TopupPage
+        // Navigate back to the topup page
+        if (mounted) {
+          context.pop();
+        }
       }
     });
   }
@@ -393,13 +398,13 @@ class _PaymentWebViewState extends State<PaymentWebView> {
             icon: Icon(Icons.refresh),
             onPressed: () => _controller.reload(),
           ),
-          // Add an open-in-browser button
+          // Update the open-in-browser button to use _handleCallbackUrl
           IconButton(
             icon: Icon(Icons.open_in_browser),
             onPressed: () async {
               final currentUrl = await _controller.currentUrl();
               if (currentUrl != null) {
-                _openCallbackInBrowser(currentUrl);
+                _handleCallbackUrl(currentUrl);
               }
             },
           ),
