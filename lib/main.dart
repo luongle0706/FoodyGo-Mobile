@@ -6,6 +6,7 @@ import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/hub/hub_home_wrapper.dart';
 import 'package:foodygo/view/pages/add_to_cart.dart';
 import 'package:foodygo/view/pages/confirm_order_customer.dart';
+import 'package:foodygo/view/pages/map_page.dart';
 import 'package:foodygo/view/pages/notification_page.dart';
 import 'package:foodygo/view/pages/restaurant/add_dish_page.dart';
 import 'package:foodygo/view/pages/restaurant/add_edit_category.dart';
@@ -73,6 +74,15 @@ class Main extends StatelessWidget {
   GoRouter get _router => GoRouter(
         initialLocation: '/login',
         routes: [
+          GoRoute(
+              name: 'test_map',
+              path: '/map/:location',
+              pageBuilder: (context, state) {
+                final location =
+                    state.pathParameters['location']!.toUpperCase();
+                return MaterialPage(
+                    child: HubSelectionMapPage(location: location));
+              }),
           ShellRoute(
               builder: (context, state, child) {
                 return ProtectedRoutes(child: child);
@@ -339,7 +349,10 @@ class Main extends StatelessWidget {
             path: '/protected/order-detail-restaurant',
             pageBuilder: (context, state) {
               final orderId = state.extra as int;
-              return MaterialPage(child: OrderDetailRestaurant(orderId: orderId,));
+              return MaterialPage(
+                  child: OrderDetailRestaurant(
+                orderId: orderId,
+              ));
             },
           ),
           GoRoute(

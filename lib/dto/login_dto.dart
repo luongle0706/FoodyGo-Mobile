@@ -23,7 +23,8 @@ class LoginResponseDTO {
   final String email;
   final String role;
   final int userId;
-  final int customerId;
+  final int? customerId;
+  final int? restaurantId;
 
   LoginResponseDTO(
       {required this.code,
@@ -34,5 +35,6 @@ class LoginResponseDTO {
       required this.email,
       required this.role,
       required this.userId,
-      required this.customerId});
+      required this.customerId,
+      required this.restaurantId});
 }

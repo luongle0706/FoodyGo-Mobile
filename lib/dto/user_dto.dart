@@ -4,7 +4,8 @@ class SavedUser {
   String fullName;
   String role;
   int userId;
-  int customerId;
+  int? customerId;
+  int? restaurantId;
 
   SavedUser(
       {required this.email,
@@ -12,7 +13,8 @@ class SavedUser {
       required this.fullName,
       required this.role,
       required this.userId,
-      required this.customerId});
+      required this.customerId,
+      required this.restaurantId});
 
   toJson() {
     return {
@@ -21,7 +23,8 @@ class SavedUser {
       'fullName': fullName,
       'role': role,
       'userId': userId,
-      'customerId': customerId
+      'customerId': customerId,
+      'restaurantId': restaurantId
     };
   }
 
@@ -32,6 +35,7 @@ class SavedUser {
         fullName: json['fullName'],
         role: json['role'],
         userId: json['userId'],
-        customerId: json['customerId']);
+        customerId: json['customerId'],
+        restaurantId: json['restaurantId']);
   }
 }
