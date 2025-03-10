@@ -1,14 +1,34 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/operating_hour_dto.dart';
+import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/repository/operating_hour_repository.dart';
+import 'package:foodygo/utils/app_logger.dart';
+import 'package:foodygo/utils/constants.dart';
+import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/theme.dart';
+import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 
 class OpenHoursSetting extends StatefulWidget {
-  const OpenHoursSetting({super.key});
+  final int restaurantId;
+
+  const OpenHoursSetting({super.key, required this.restaurantId});
 
   @override
   _OpenHoursSettingState createState() => _OpenHoursSettingState();
 }
 
 class _OpenHoursSettingState extends State<OpenHoursSetting> {
+  final _storage = SecureStorage.instance;
+  final AppLogger _logger = AppLogger.instance;
+  final OperatingHourRepository _operatingHourRepository =
+      OperatingHourRepository.instance;
+  SavedUser? _user;
+  bool _isLoading = true;
+  List<OperatingHourDTO>? _operatingHourList;
+
   final Map<int, bool> isOpen = {};
   final Map<int, bool> is24Hours = {};
   final Map<int, TimeOfDay> openTime = {};
@@ -26,41 +46,105 @@ class _OpenHoursSettingState extends State<OpenHoursSetting> {
       closeTime[i] = const TimeOfDay(hour: 0, minute: 0);
     }
     _updateCurrentState();
+    loadUser();
+  }
+
+  Future<bool> fetchOperatingHour(String accessToken) async {
+    List<OperatingHourDTO>? fetchData = await _operatingHourRepository
+        .loadOperatingHoursByRestaurantId(accessToken, widget.restaurantId);
+    if (fetchData != null) {
+      setState(() {
+        _operatingHourList = fetchData;
+        for (var item in fetchData) {
+          int dayIndex = _convertDayToIndex(item.day);
+          isOpen[dayIndex] = item.open;
+          is24Hours[dayIndex] = item.hours;
+          openTime[dayIndex] = _parseTime(item.openingTime);
+          closeTime[dayIndex] = _parseTime(item.closingTime);
+        }
+      });
+      return true;
+    }
+    return false;
+  }
+
+  int _convertDayToIndex(String day) {
+    Map<String, int> days = {
+      "Thứ 2": 1,
+      "Thứ 3": 2,
+      "Thứ 4": 3,
+      "Thứ 5": 4,
+      "Thứ 6": 5,
+      "Thứ 7": 6,
+      "Chủ Nhật": 7,
+    };
+    return days[day] ?? 1;
+  }
+
+  TimeOfDay _parseTime(String time) {
+    List<String> parts = time.split(":");
+    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+  }
+
+  Future<void> loadUser() async {
+    String? userData = await _storage.get(key: 'user');
+    SavedUser? user =
+        userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
+    if (user != null) {
+      setState(() {
+        _user = user;
+      });
+      bool fetchData = await fetchOperatingHour(user.token);
+
+      if (fetchData) {
+        setState(() {
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = true;
+        });
+      }
+    } else {
+      _logger.info('Failed to load user');
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _pickTime(int day, bool isOpening) async {
-  final TimeOfDay? picked = await showTimePicker(
-    context: context,
-    initialTime: isOpening ? openTime[day]! : closeTime[day]!,
-    builder: (context, child) {
-      return Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: ColorScheme.light(
-            primary: AppColors.primary, // Màu chính (nút xác nhận)
-            onPrimary: Colors.white, // Màu chữ trên nút chính
-            onSurface: Colors.black, // Màu chữ trên nền picker
-          ),
-          textButtonTheme: TextButtonThemeData(
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.black, // Màu của nút "Hủy" và "OK"
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: isOpening ? openTime[day]! : closeTime[day]!,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors.primary, // Màu chính (nút xác nhận)
+              onPrimary: Colors.white, // Màu chữ trên nút chính
+              onSurface: Colors.black, // Màu chữ trên nền picker
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // Màu của nút "Hủy" và "OK"
+              ),
             ),
           ),
-        ),
-        child: child!,
-      );
-    },
-  );
-  if (picked != null) {
-    setState(() {
-      if (isOpening) {
-        openTime[day] = picked;
-      } else {
-        closeTime[day] = picked;
-      }
-    });
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        if (isOpening) {
+          openTime[day] = picked;
+        } else {
+          closeTime[day] = picked;
+        }
+      });
+    }
   }
-}
-
 
   void _updateCurrentState() {
     DateTime now = DateTime.now();
@@ -80,6 +164,55 @@ class _OpenHoursSettingState extends State<OpenHoursSetting> {
     }
   }
 
+  String _formatTime(TimeOfDay time) {
+    return "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
+  }
+
+  Future<void> _saveOperatingHours() async {
+    String accessToken = _user!.token;
+
+    // Chuyển đổi dữ liệu thành JSON
+    List<Map<String, dynamic>> operatingHourList =
+        _operatingHourList!.map((item) {
+      int dayIndex = _convertDayToIndex(item.day);
+      return {
+        "id": item.id,
+        "open": isOpen[dayIndex] ?? false,
+        "hours": is24Hours[dayIndex] ?? false,
+        "openingTime": _formatTime(openTime[dayIndex]!),
+        "closingTime": _formatTime(closeTime[dayIndex]!),
+      };
+    }).toList();
+
+    // Body JSON cần gửi
+  Map<String, dynamic> body = {"operatingHourList": operatingHourList};
+
+  try {
+    final response = await http.put(
+      Uri.parse('$globalURL/api/v1/operating-hours'),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $accessToken",
+      },
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Cập nhật thành công!")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Lỗi cập nhật: ${response.body}")),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Lỗi kết nối: $e")),
+    );
+  }
+  }
+
   @override
   Widget build(BuildContext context) {
     _updateCurrentState();
@@ -88,11 +221,12 @@ class _OpenHoursSettingState extends State<OpenHoursSetting> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => GoRouter.of(context).pop(),
         ),
         title: const Text(
           "Trạng thái hoạt động",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(
+              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: AppColors.primary,
         elevation: 1,
@@ -130,19 +264,10 @@ class _OpenHoursSettingState extends State<OpenHoursSetting> {
             // Danh sách ngày trong tuần
             Expanded(
               child: ListView.builder(
-                itemCount: 7, // Hiển thị đủ 7 ngày trong tuần
+                itemCount: _operatingHourList?.length ?? 0,
                 itemBuilder: (context, index) {
-                  int day =
-                      index + 1; // Lấy ngày từ 1 (Thứ Hai) đến 7 (Chủ Nhật)
-                  String dayName = [
-                    "Thứ Hai",
-                    "Thứ Ba",
-                    "Thứ Tư",
-                    "Thứ Năm",
-                    "Thứ Sáu",
-                    "Thứ Bảy",
-                    "Chủ Nhật"
-                  ][index];
+                  final item = _operatingHourList![index];
+                  int day = _convertDayToIndex(item.day); // Chuyển "Monday" → 1
 
                   return Card(
                     margin: const EdgeInsets.symmetric(vertical: 8),
@@ -153,11 +278,10 @@ class _OpenHoursSettingState extends State<OpenHoursSetting> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(dayName,
+                              Text(item.day,
                                   style: const TextStyle(fontSize: 16)),
                               Switch(
-                                value: isOpen[day] ??
-                                    false,
+                                value: isOpen[day]!,
                                 activeColor: Colors.green[600],
                                 onChanged: (value) {
                                   setState(() {
@@ -232,7 +356,7 @@ class _OpenHoursSettingState extends State<OpenHoursSetting> {
               child: ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    _updateCurrentState();
+                    _saveOperatingHours();
                   });
                 },
                 style: ElevatedButton.styleFrom(
@@ -244,7 +368,10 @@ class _OpenHoursSettingState extends State<OpenHoursSetting> {
                 ),
                 child: const Text(
                   "Lưu",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
               ),
             ),
