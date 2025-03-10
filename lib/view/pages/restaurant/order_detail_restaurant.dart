@@ -1,13 +1,80 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/order_dto.dart';
+import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/repository/order_repository.dart';
+import 'package:foodygo/utils/app_logger.dart';
+import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/theme.dart';
 
-class OrderDetailRestaurant extends StatelessWidget {
-  const OrderDetailRestaurant({super.key});
+class OrderDetailRestaurant extends StatefulWidget {
+  final int orderId;
+
+  const OrderDetailRestaurant({super.key, required this.orderId});
+
+  @override
+  State<StatefulWidget> createState() => _OrderDetailRestaurantState();
+}
+
+class _OrderDetailRestaurantState extends State<OrderDetailRestaurant> {
+  final _storage = SecureStorage.instance;
+  final AppLogger _logger = AppLogger.instance;
+  final OrderRepository _orderRepository = OrderRepository.instance;
+  SavedUser? _user;
+  OrderDto? _orderDto;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUser();
+  }
+
+  Future<bool> fetchOrder(String accessToken) async {
+    OrderDto? fetchOrder =
+        await _orderRepository.loadOrderById(accessToken, widget.orderId);
+    if (fetchOrder != null) {
+      setState(() {
+        _orderDto = fetchOrder;
+      });
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> loadUser() async {
+    String? userData = await _storage.get(key: 'user');
+    SavedUser? user =
+        userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
+    if (user != null) {
+      setState(() {
+        _user = user;
+      });
+      bool fetchOrderData = await fetchOrder(user.token);
+
+      if (fetchOrderData) {
+        setState(() {
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = true;
+        });
+      }
+    } else {
+      _logger.info('Failed to load user');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    if (_isLoading) {
+      return Scaffold(
+          appBar: AppBar(
         title: Text(
           "Chi tiết đơn hàng",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -20,122 +87,147 @@ class OrderDetailRestaurant extends StatelessWidget {
           ),
           onPressed: () => {},
         ),
+      ));
+    }
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "Chi tiết đơn hàng",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: AppColors.primary,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Khách đặt đơn
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.black12,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: AppColors.primary,
-                    child: Icon(Icons.person, color: Colors.white),
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Nguyễn Thế Anh",
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text("0337895404",
-                            style: TextStyle(color: Colors.grey[700])),
-                      ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Khách đặt đơn
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.black12,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 24,
+                      backgroundColor: AppColors.primary,
+                      child: Icon(Icons.person, color: Colors.white),
                     ),
-                  ),
-                  Icon(Icons.phone, color: AppColors.primary),
-                ],
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(_orderDto!.customerName,
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          Text(
+                              _orderDto!.customerPhone ??
+                                  "Không có số điện thoại",
+                              style: TextStyle(color: Colors.grey[700])),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.phone, color: AppColors.primary),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 16),
 
-            // Danh sách món
-            SizedBox(height: 8),
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey[300]!),
-                color: Colors.black12,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                children: [
-                  OrderItem(name: "Trái Cây Thập Cẩm", price: "30.000"),
-                  Divider(),
-                  OrderItem(name: "Đùi gà rán", price: "45.000"),
-                ],
-              ),
-            ),
-            SizedBox(height: 12),
+              SizedBox(height: 16),
 
-            // Tổng tiền
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                "Tổng tiền món:   75.000đ",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              // Danh sách món ăn
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[300]!),
+                  color: Colors.black12,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: _orderDto!.orderDetails
+                      .map((detail) => OrderItem(
+                            name: detail.productName,
+                            price: "${detail.price.toStringAsFixed(2)}đ",
+                            quantity: detail.quantity,
+                          ))
+                      .toList(),
+                ),
               ),
-            ),
-            SizedBox(height: 16),
 
-            // Thông tin đơn hàng
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.black12,
-                borderRadius: BorderRadius.circular(8),
+              SizedBox(height: 12),
+
+              // Tổng tiền
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  "Tổng tiền: ${_orderDto!.totalPrice.toStringAsFixed(2)}đ",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
               ),
-              child: Column(
-                children: [
-                  OrderInfoRow(label: "Mã đơn hàng", value: "30124-509192124"),
-                  OrderInfoRow(
-                      label: "Thời gian đặt hàng", value: "Hôm nay 14:08"),
-                  OrderInfoRow(label: "Khoảng cách", value: "2.2km"),
-                  OrderInfoRow(label: "Quán xác nhận", value: "1.6m"),
-                  OrderInfoRow(
-                      label: "Thời gian lấy hàng dự kiến",
-                      value: "Hôm nay 14:38"),
-                  OrderInfoRow(
-                      label: "Ghi chú của khách", value: "Thêm gói tương ớt"),
-                ],
-              ),
-            ),
-          ],
+
+              SizedBox(height: 16),
+
+              // Thông tin đơn hàng
+              Container(
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.black12,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: [
+          OrderInfoRow(label: "Mã đơn hàng", value: _orderDto!.id.toString()),
+          OrderInfoRow(label: "Thời gian đặt hàng", value: _orderDto!.time.toString()),
+          OrderInfoRow(label: "Khoảng cách", value: "2.2km"),
+          OrderInfoRow(label: "Quán xác nhận", value: "1.6m"),
+          OrderInfoRow(
+              label: "Thời gian giao dự kiến",
+              value: _orderDto!.expectedDeliveryTime.toString()),
+          OrderInfoRow(
+              label: "Ghi chú của khách",
+              value: _orderDto!.notes ?? "Không có ghi chú"),
+        ],
+      ),
+    ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-// Widget hiển thị một món ăn
+/// Widget hiển thị một món ăn trong đơn hàng
 class OrderItem extends StatelessWidget {
   final String name;
   final String price;
+  final int quantity;
 
-  const OrderItem({super.key, required this.name, required this.price});
+  const OrderItem({super.key, required this.name, required this.price, required this.quantity});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text("1 x  $name"),
-        Text(price, style: TextStyle(fontWeight: FontWeight.bold)),
-      ],
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("$quantity x $name"),
+          Text(price, style: TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
     );
   }
 }
 
-// Widget hiển thị thông tin đơn hàng
+/// Widget hiển thị một dòng thông tin đơn hàng
 class OrderInfoRow extends StatelessWidget {
   final String label;
   final String value;

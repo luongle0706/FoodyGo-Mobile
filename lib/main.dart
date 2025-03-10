@@ -337,7 +337,8 @@ class Main extends StatelessWidget {
             name: 'protected_order_detail_restaurant', // S-026
             path: '/protected/order-detail-restaurant',
             pageBuilder: (context, state) {
-              return MaterialPage(child: OrderDetailRestaurant());
+              final orderId = state.extra as int;
+              return MaterialPage(child: OrderDetailRestaurant(orderId: orderId,));
             },
           ),
           GoRoute(
