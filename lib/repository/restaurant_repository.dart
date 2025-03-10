@@ -47,7 +47,7 @@ class RestaurantRepository {
           image: data['image'],
           available: data['available']);
     } else {
-      logger.error('Failed to get restaurant info in repository');
+      logger.error('Failed to load data!');
       return null;
     }
   }

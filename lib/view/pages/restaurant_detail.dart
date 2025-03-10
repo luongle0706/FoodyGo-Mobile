@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:foodygo/dto/product_dto.dart';
+import 'package:foodygo/dto/restaurant_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/cart_repository.dart';
 import 'package:foodygo/repository/product_repository.dart';
+import 'package:foodygo/repository/restaurant_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/theme.dart';
@@ -12,9 +14,9 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class RestaurantDetailPage extends StatefulWidget {
-  final Map<String, dynamic> restaurantDto;
+  final int restaurantId;
 
-  const RestaurantDetailPage({super.key, required this.restaurantDto});
+  const RestaurantDetailPage({super.key, required this.restaurantId});
 
   @override
   State<RestaurantDetailPage> createState() => _RestaurantDetailPageState();
@@ -22,10 +24,12 @@ class RestaurantDetailPage extends StatefulWidget {
 
 class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   final _storage = SecureStorage.instance;
+  final RestaurantRepository _restaurantRepository = RestaurantRepository.instance;
   final ProductRepository _productRepository = ProductRepository.instance;
   final CartRepository _cartRepository = CartRepository.instance;
   final AppLogger _logger = AppLogger.instance;
   SavedUser? _user;
+  RestaurantDto? _restaurant;
   List<ProductDto>? _products;
   List<dynamic>? _cartItems;
   bool _isLoading = true;
@@ -46,10 +50,11 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
       setState(() {
         _user = user;
       });
+      bool fetchRestaurantById = await fetchRestaurant(user.token);
       bool fetchedProducts = await fetchProducts(user);
       bool fetchedCartItems = await fetchItemsInCart(user: user);
 
-      if (fetchedProducts && fetchedCartItems) {
+      if (fetchedProducts && fetchedCartItems && fetchRestaurantById) {
         setState(() {
           _isLoading = false;
         });
@@ -66,9 +71,20 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
     }
   }
 
+  Future<bool> fetchRestaurant(String accessToken) async {
+    RestaurantDto? fetchRestaurant = await _restaurantRepository.loadRestaurantById(accessToken, widget.restaurantId);
+    if (fetchRestaurant != null) {
+      setState(() {
+        _restaurant = fetchRestaurant;
+      });
+      return true;
+    }
+    return false;
+  }
+
   Future<bool> fetchProducts(SavedUser user) async {
     List<ProductDto>? fetchProducts = await _productRepository
-        .getProductsByRestaurantId(widget.restaurantDto['id'], user.token);
+        .getProductsByRestaurantId(widget.restaurantId, user.token);
     if (fetchProducts != null) {
       setState(() {
         _products = fetchProducts;
@@ -83,7 +99,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
     bool result = await _cartRepository.addToCart(
         accessToken: _user?.token,
         userId: _user?.userId,
-        restaurantId: widget.restaurantDto['id'],
+        restaurantId: widget.restaurantId,
         productId: product.id,
         productName: product.name,
         price: product.price,
@@ -111,7 +127,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
     List<dynamic>? data = await _cartRepository.getCartByRestaurant(
         accessToken: _user?.token,
         userId: _user?.userId,
-        restaurantId: widget.restaurantDto['id']);
+        restaurantId: widget.restaurantId);
     if (data != null) {
       int total = data.isNotEmpty
           ? data
@@ -223,14 +239,14 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.restaurantDto['name'],
+                        _restaurant!.name,
                         style: TextStyle(
                             fontSize: 24, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 8),
-                      Text("📞 ${widget.restaurantDto['phone']}"),
-                      Text("✉️ ${widget.restaurantDto['email']}"),
-                      Text("📍 ${widget.restaurantDto['address']}"),
+                      Text("📞 ${_restaurant?.phone}"),
+                      Text("✉️ ${_restaurant?.email}"),
+                      Text("📍 ${_restaurant?.address}"),
                     ],
                   ),
                 ),
@@ -255,7 +271,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                     child: GestureDetector(
                       onTap: () {
                         GoRouter.of(context).push('/protected/product', extra: {
-                          'restaurantId': widget.restaurantDto['id'],
+                          'restaurantId': widget.restaurantId,
                           'productId': item.id
                         });
                       },
@@ -451,7 +467,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                     ElevatedButton(
                                       onPressed: () {
                                         GoRouter.of(context).go(
-                                            '/protected/confirm-order-cart/${widget.restaurantDto['id']}');
+                                            '/protected/confirm-order-cart/${widget.restaurantId}');
                                       },
                                       style: ElevatedButton.styleFrom(
                                         padding: EdgeInsets.symmetric(
@@ -513,7 +529,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
             ElevatedButton(
               onPressed: () {
                 GoRouter.of(context).go(
-                    '/protected/confirm-order-cart/${widget.restaurantDto['id']}');
+                    '/protected/confirm-order-cart/${widget.restaurantId}');
               },
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),

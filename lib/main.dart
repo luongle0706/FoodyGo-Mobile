@@ -306,9 +306,9 @@ class Main extends StatelessWidget {
             name: 'protected_restaurant_detail', // S-007
             path: '/protected/restaurant-detail',
             pageBuilder: (context, state) {
-              final restaurantDto = state.extra as Map<String, dynamic>;
+              final restaurantId = state.extra as int;
               return MaterialPage(
-                child: RestaurantDetailPage(restaurantDto: restaurantDto),
+                child: RestaurantDetailPage(restaurantId: restaurantId),
               );
             },
           ),
@@ -344,7 +344,8 @@ class Main extends StatelessWidget {
             name: 'protected_order_detail_restaurant', // S-026
             path: '/protected/order-detail-restaurant',
             pageBuilder: (context, state) {
-              return MaterialPage(child: OrderDetailRestaurant());
+              final orderId = state.extra as int;
+              return MaterialPage(child: OrderDetailRestaurant(orderId: orderId,));
             },
           ),
           GoRoute(

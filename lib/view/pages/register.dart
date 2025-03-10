@@ -47,7 +47,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
               content: Text(
-                  "Ẹmail của bạn đã được đăng ký. Vui lòng nhập email mới")),
+                  "Email của bạn đã được đăng ký. Vui lòng nhập email mới")),
         );
         return;
       }

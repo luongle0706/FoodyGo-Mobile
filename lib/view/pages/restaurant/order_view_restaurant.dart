@@ -212,7 +212,7 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    GoRouter.of(context).push('/orderDetail');
+                    GoRouter.of(context).push('/protected/order-detail-restaurant', extra: 1);
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Color.fromARGB(255, 141, 136, 133)),

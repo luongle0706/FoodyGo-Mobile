@@ -11,7 +11,7 @@ class RestaurantPreview extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         GoRouter.of(context)
-            .push('/protected/restaurant-detail', extra: restaurant);
+            .push('/protected/restaurant-detail', extra: restaurant['id']);
       },
       child: Container(
         width: 150,
