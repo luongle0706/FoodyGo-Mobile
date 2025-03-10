@@ -116,7 +116,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
             DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(_expectedDeliveryTime),
         customerPhone: _customerPhone,
         notes: _notes,
-        customerId: _user!.customerId,
+        customerId: _user!.customerId!,
         restaurantId: widget.restaurantId,
         hubId: _hubId,
         cartLists: _cartItems!);

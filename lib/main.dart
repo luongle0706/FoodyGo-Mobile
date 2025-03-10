@@ -72,13 +72,16 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/map',
+        initialLocation: '/map/hub',
         routes: [
           GoRoute(
               name: 'test_map',
-              path: '/map',
+              path: '/map/:location',
               pageBuilder: (context, state) {
-                return MaterialPage(child: HubSelectionMapPage());
+                final location =
+                    state.pathParameters['location']!.toUpperCase();
+                return MaterialPage(
+                    child: HubSelectionMapPage(location: location));
               }),
           ShellRoute(
               builder: (context, state, child) {
@@ -345,7 +348,10 @@ class Main extends StatelessWidget {
             path: '/protected/order-detail-restaurant',
             pageBuilder: (context, state) {
               final orderId = state.extra as int;
-              return MaterialPage(child: OrderDetailRestaurant(orderId: orderId,));
+              return MaterialPage(
+                  child: OrderDetailRestaurant(
+                orderId: orderId,
+              ));
             },
           ),
           GoRoute(

@@ -21,7 +21,6 @@ class _OrderDetailRestaurantState extends State<OrderDetailRestaurant> {
   final _storage = SecureStorage.instance;
   final AppLogger _logger = AppLogger.instance;
   final OrderRepository _orderRepository = OrderRepository.instance;
-  SavedUser? _user;
   OrderDto? _orderDto;
   bool _isLoading = true;
 
@@ -48,9 +47,6 @@ class _OrderDetailRestaurantState extends State<OrderDetailRestaurant> {
     SavedUser? user =
         userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
     if (user != null) {
-      setState(() {
-        _user = user;
-      });
       bool fetchOrderData = await fetchOrder(user.token);
 
       if (fetchOrderData) {
@@ -128,9 +124,7 @@ class _OrderDetailRestaurantState extends State<OrderDetailRestaurant> {
                         children: [
                           Text(_orderDto!.customerName,
                               style: TextStyle(fontWeight: FontWeight.bold)),
-                          Text(
-                              _orderDto!.customerPhone ??
-                                  "Không có số điện thoại",
+                          Text(_orderDto!.customerPhone,
                               style: TextStyle(color: Colors.grey[700])),
                         ],
                       ),
@@ -176,26 +170,29 @@ class _OrderDetailRestaurantState extends State<OrderDetailRestaurant> {
 
               // Thông tin đơn hàng
               Container(
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.black12,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        children: [
-          OrderInfoRow(label: "Mã đơn hàng", value: _orderDto!.id.toString()),
-          OrderInfoRow(label: "Thời gian đặt hàng", value: _orderDto!.time.toString()),
-          OrderInfoRow(label: "Khoảng cách", value: "2.2km"),
-          OrderInfoRow(label: "Quán xác nhận", value: "1.6m"),
-          OrderInfoRow(
-              label: "Thời gian giao dự kiến",
-              value: _orderDto!.expectedDeliveryTime.toString()),
-          OrderInfoRow(
-              label: "Ghi chú của khách",
-              value: _orderDto!.notes ?? "Không có ghi chú"),
-        ],
-      ),
-    ),
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.black12,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: [
+                    OrderInfoRow(
+                        label: "Mã đơn hàng", value: _orderDto!.id.toString()),
+                    OrderInfoRow(
+                        label: "Thời gian đặt hàng",
+                        value: _orderDto!.time.toString()),
+                    OrderInfoRow(label: "Khoảng cách", value: "2.2km"),
+                    OrderInfoRow(label: "Quán xác nhận", value: "1.6m"),
+                    OrderInfoRow(
+                        label: "Thời gian giao dự kiến",
+                        value: _orderDto!.expectedDeliveryTime.toString()),
+                    OrderInfoRow(
+                        label: "Ghi chú của khách",
+                        value: _orderDto!.notes ?? "Không có ghi chú"),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -210,7 +207,11 @@ class OrderItem extends StatelessWidget {
   final String price;
   final int quantity;
 
-  const OrderItem({super.key, required this.name, required this.price, required this.quantity});
+  const OrderItem(
+      {super.key,
+      required this.name,
+      required this.price,
+      required this.quantity});
 
   @override
   Widget build(BuildContext context) {
