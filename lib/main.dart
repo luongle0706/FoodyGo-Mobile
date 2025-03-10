@@ -299,9 +299,9 @@ class Main extends StatelessWidget {
             name: 'protected_restaurant_detail', // S-007
             path: '/protected/restaurant-detail',
             pageBuilder: (context, state) {
-              final restaurantDto = state.extra as Map<String, dynamic>;
+              final restaurantId = state.extra as int;
               return MaterialPage(
-                child: RestaurantDetailPage(restaurantDto: restaurantDto),
+                child: RestaurantDetailPage(restaurantId: restaurantId),
               );
             },
           ),

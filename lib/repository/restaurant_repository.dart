@@ -26,7 +26,7 @@ class RestaurantRepository {
     }
   }
 
-  Future<RestaurantDto> loadRestaurantById(String accessToken, int id) async {
+  Future<RestaurantDto?> loadRestaurantById(String accessToken, int id) async {
     final response = await http.get(
       Uri.parse('$globalURL/api/v1/restaurants/$id'),
       headers: {
@@ -47,7 +47,8 @@ class RestaurantRepository {
           image: data['image'],
           available: data['available']);
     } else {
-      throw Exception('Failed to load data!');
+      logger.error('Failed to load data!');
+      return null;
     }
   }
 }
