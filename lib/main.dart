@@ -139,7 +139,7 @@ class Main extends StatelessWidget {
                     path: '/protected/confirm-order-cart/:restaurantId',
                     pageBuilder: (context, state) {
                       final restaurantId =
-                          state.pathParameters['restaurantId'] as int;
+                          int.parse(state.pathParameters['restaurantId']!);
                       return MaterialPage(
                           child: ConfirmOrderPage(restaurantId: restaurantId));
                     }),

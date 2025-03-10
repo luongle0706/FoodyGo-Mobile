@@ -74,4 +74,16 @@ class CartRepository {
     }
     return false;
   }
+
+  Future<bool> clearCart({required accessToken, required userId}) async {
+    final response = await http
+        .delete(Uri.parse('$globalURL/api/v1/carts/users/$userId'), headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken'
+    });
+    if (response.statusCode == 200) {
+      return true;
+    }
+    return false;
+  }
 }
