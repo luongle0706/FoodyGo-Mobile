@@ -129,8 +129,7 @@ class _OrderDetailRestaurantState extends State<OrderDetailRestaurant> {
                           Text(_orderDto!.customerName,
                               style: TextStyle(fontWeight: FontWeight.bold)),
                           Text(
-                              _orderDto!.customerPhone ??
-                                  "Không có số điện thoại",
+                              _orderDto!.customerPhone,
                               style: TextStyle(color: Colors.grey[700])),
                         ],
                       ),

@@ -309,7 +309,8 @@ class Main extends StatelessWidget {
             name: 'protected_open_hours_seting', // S-038
             path: '/protected/open-hours-setting',
             pageBuilder: (context, state) {
-              return MaterialPage(child: OpenHoursSetting());
+              final restaurantId = state.extra as int;
+              return MaterialPage(child: OpenHoursSetting(restaurantId: restaurantId));
             },
           ),
           GoRoute(
