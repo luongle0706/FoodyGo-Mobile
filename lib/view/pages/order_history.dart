@@ -1,24 +1,32 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/order_dto.dart';
+import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/repository/order_repository.dart';
+import 'package:foodygo/utils/app_logger.dart';
+import 'package:foodygo/utils/secure_storage.dart';
+import 'package:foodygo/view/pages/detail_order.dart';
 import 'package:intl/intl.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
 
 class OrderHistory extends StatefulWidget {
-  const OrderHistory({super.key});
+  final int orderId;
+
+  const OrderHistory({super.key, required this.orderId});
 
   @override
   _OrderHistoryState createState() => _OrderHistoryState();
 }
 
 class _OrderHistoryState extends State<OrderHistory> {
-  int _selectedIndex = 1;
-
   String selectedService = "Tất cả";
   String selectedStatus = "Tất cả";
   DateTime startDate = DateTime.now().subtract(Duration(days: 30));
   DateTime endDate = DateTime.now();
 
   List<String> services = ["Tất cả", "Giao hàng", "Mang đi"];
-  List<String> statuses = ["Tất cả", "Đang xử lý", "Hoàn thành", "Đã hủy"];
+  List<String> statuses = ["Tất cả", "Hoàn thành", "Đã hủy"];
 
   Future<void> _selectDateRange(BuildContext context) async {
     DateTimeRange? picked = await showDateRangePicker(
@@ -35,38 +43,70 @@ class _OrderHistoryState extends State<OrderHistory> {
     }
   }
 
-  final List<Map<String, dynamic>> orders = [
-    {
-      "id": "#P11111",
-      "title": "Xoài non mắm ruốc",
-      "restaurant": "Nhà hàng Gil Lê",
-      "price": "59.000đ",
-      "quantity": "2 món",
-      "name": "Xoài non",
-      "status": "Hoàn thành",
-      "time": "Hôm nay 11:02",
-    },
-    {
-      "id": "#P11112",
-      "title": "Gỏi cuốn tôm thịt",
-      "restaurant": "Nhà hàng Phúc",
-      "price": "75.000đ",
-      "quantity": "3 cuốn",
-      "name": "Xoài non",
-      "status": "Hoàn thành",
-      "time": "Hôm qua 18:45"
-    },
-    {
-      "id": "#P11112",
-      "title": "Gỏi cuốn tôm thịt",
-      "restaurant": "Nhà hàng Phúc",
-      "price": "75.000đ",
-      "quantity": "3 cuốn",
-      "name": "Xoài non",
-      "status": "Hoàn thành",
-      "time": "Hôm qua 18:45"
+  final _storage = SecureStorage.instance;
+  final AppLogger _logger = AppLogger.instance;
+  final OrderRepository _orderRepository = OrderRepository.instance;
+  List<OrderDto>? _orderDto;
+  List<OrderDto>? filteredOrders;
+  SavedUser? _user;
+
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUser();
+  }
+
+  List<OrderDto> filterOrdersByStatus(List<OrderDto>? orders, String status) {
+    if (orders == null || status.isEmpty) {
+      return [];
     }
-  ];
+
+    return orders.where((order) => order.status.toLowerCase() == status.toLowerCase()).toList();
+  }
+
+  Future<bool> fetchOrder(String accessToken) async {
+    List<OrderDto>? fetchOrder =
+    await _orderRepository.getOrdersByCustomerId(accessToken, widget.orderId);
+
+    if (fetchOrder != null) {
+      setState(() {
+        _orderDto = fetchOrder;
+        filteredOrders = filterOrdersByStatus(_orderDto, "COMPLETED");
+        _isLoading = false;
+      });
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> loadUser() async {
+    String? userData = await _storage.get(key: 'user');
+    SavedUser? user =
+    userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
+    if (user != null) {
+      setState(() {
+        _user = user;
+      });
+      bool fetchOrderData = await fetchOrder(user.token);
+
+      if (fetchOrderData) {
+        setState(() {
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = true;
+        });
+      }
+    } else {
+      _logger.info('Failed to load user');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,34 +115,14 @@ class _OrderHistoryState extends State<OrderHistory> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            GestureDetector(
-              onTap: () => setState(() => _selectedIndex = 0),
-              child: Text(
-                "Đang đến",
-                style: TextStyle(
-                  color: _selectedIndex == 0 ? Colors.black : Colors.grey,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
             SizedBox(width: 20),
-            GestureDetector(
-              onTap: () => setState(() => _selectedIndex = 1),
-              child: Text(
-                "Lịch sử",
-                style: TextStyle(
-                  color: _selectedIndex == 1 ? Colors.black : Colors.grey,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
           ],
         ),
         centerTitle: true,
       ),
-      body: _selectedIndex == 1
-          ? filter()
-          : Center(child: Text("Không có đơn hàng đang đến")),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : filter(),
     );
   }
 
@@ -171,33 +191,29 @@ class _OrderHistoryState extends State<OrderHistory> {
   }
 
   Widget buildHistoryList() {
-    List<Map<String, dynamic>> filteredOrders = orders.where((order) {
-      DateTime orderDate;
-      if (order["time"].contains("Hôm nay")) {
-        orderDate = DateTime.now();
-      } else if (order["time"].contains("Hôm qua")) {
-        orderDate = DateTime.now().subtract(Duration(days: 1));
-      } else {
-        orderDate = DateFormat("dd/MM/yyyy HH:mm").parse(order["time"]);
-      }
+    if (filteredOrders == null || filteredOrders!.isEmpty) {
+      return Center(child: Text("Không có đơn hàng nào"));
+    }
 
+    List<OrderDto> filteredOrdersByDate = filteredOrders!.where((order) {
+      DateTime orderDate = DateTime.parse("${order.time}");
       bool isInDateRange =
           orderDate.isAfter(startDate.subtract(Duration(days: 1))) &&
               orderDate.isBefore(endDate.add(Duration(days: 1)));
 
       bool matchesService =
-          selectedService == "Tất cả" || order["service"] == selectedService;
+          selectedService == "Tất cả" || order.status == selectedService;
 
       bool matchesStatus =
-          selectedStatus == "Tất cả" || order["status"] == selectedStatus;
+          selectedStatus == "Tất cả" || order.status == selectedStatus;
 
       return isInDateRange && matchesService && matchesStatus;
     }).toList();
 
     return ListView.builder(
-      itemCount: filteredOrders.length,
+      itemCount: filteredOrdersByDate.length,
       itemBuilder: (context, index) {
-        final order = filteredOrders[index];
+        final order = filteredOrdersByDate[index];
         return Card(
           margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
           child: Padding(
@@ -208,19 +224,19 @@ class _OrderHistoryState extends State<OrderHistory> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Đồ ăn ${order["id"]}",
+                    Text("Đồ ăn #${order.id}",
                         style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(order["time"], style: TextStyle(color: Colors.grey)),
+                    Text("${order.time.day}/${order.time.month}/${order.time.year} ${order.time.hour}:${order.time.minute}"),
                   ],
                 ),
-                Text("${order["title"]} - ${order["restaurant"]}",
+                Text("${order.restaurantName}",
                     style: TextStyle(color: Colors.grey)),
                 SizedBox(height: 10),
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => WelcomeScreen()),
+                      MaterialPageRoute(builder: (context) => DetailOrder(orderId: order.id)),
                     );
                   },
                   child: Container(
@@ -244,15 +260,15 @@ class _OrderHistoryState extends State<OrderHistory> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Text(order["price"],
+                                    Text("${order.totalPrice.toStringAsFixed(2)}đ",
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold)),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
-                                        Text(order["quantity"],
+                                        Text("${order.orderDetails.length} món",
                                             style:
-                                                TextStyle(color: Colors.grey)),
+                                            TextStyle(color: Colors.grey)),
                                         Icon(Icons.arrow_forward_ios,
                                             size: 14, color: Colors.grey),
                                       ],
@@ -266,7 +282,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                         SizedBox(height: 10),
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 5),
-                          child: Text(order["name"],
+                          child: Text("Đơn hàng ${order.id}",
                               style: TextStyle(color: Colors.black)),
                         ),
                       ],
@@ -277,7 +293,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(order["status"],
+                    Text(order.status,
                         style: TextStyle(color: Colors.green)),
                     ElevatedButton(
                       onPressed: () {

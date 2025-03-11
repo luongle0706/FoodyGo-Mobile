@@ -1,15 +1,92 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/order_dto.dart';
+import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/repository/order_repository.dart';
+import 'package:foodygo/utils/app_logger.dart';
+import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
 import 'package:go_router/go_router.dart';
 
-class DetailOrder extends StatelessWidget {
-  final int status = 3;
+class DetailOrder extends StatefulWidget {
 
-  const DetailOrder({super.key}); // 1: Đơn hàng đã được xác nhận,
-  // 2: Đơn đang được chuẩn bị,
-  // 3: Đơn hàng đang được giao,
-  // 4: Đơn hàng đã đến nơi,
-  // other: Đang xử lý đơn hàng
+  final int orderId;
+
+  const DetailOrder({super.key, required this.orderId});
+
+  @override
+  _DetailOrderState createState() => _DetailOrderState();
+}
+
+class _DetailOrderState extends State<DetailOrder> {
+
+  final _storage = SecureStorage.instance;
+  final AppLogger _logger = AppLogger.instance;
+  final OrderRepository _orderRepository = OrderRepository.instance;
+  SavedUser? _user;
+  OrderDto? _orderDto;
+
+  bool _isLoading = true;
+
+  int status = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUser();
+  }
+
+  Future<bool> fetchOrder(String accessToken) async {
+    OrderDto? fetchOrder =
+    await _orderRepository.loadOrderById(accessToken, widget.orderId);
+
+    if (fetchOrder != null) {
+      setState(() {
+        _orderDto = fetchOrder;
+        if (_orderDto?.status == "HUB_ARRIVED") {
+          status = 4;
+        } else if (_orderDto?.status == "SHIPPING") {
+          status = 3;
+        } else if (_orderDto?.status == "RESTAURANT_ACCEPTED") {
+          status = 2;
+        } else if (_orderDto?.status == "ORDERED") {
+          status = 1;
+        } else if (_orderDto?.status == "COMPLETED") {
+          status = 5;
+        }
+      });
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> loadUser() async {
+    String? userData = await _storage.get(key: 'user');
+    SavedUser? user =
+    userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
+    if (user != null) {
+      setState(() {
+        _user = user;
+      });
+      bool fetchOrderData = await fetchOrder(user.token);
+
+      if (fetchOrderData) {
+        setState(() {
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = true;
+        });
+      }
+    } else {
+      _logger.info('Failed to load user');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +101,7 @@ class DetailOrder extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        // thêm vào để cuon man hình
-        physics: BouncingScrollPhysics(), // Scroll smouth
+        physics: BouncingScrollPhysics(),
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Column(
@@ -102,7 +178,7 @@ class DetailOrder extends StatelessWidget {
                             children: [
                               Text('Từ',
                                   style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
+                                  TextStyle(fontWeight: FontWeight.bold)),
                               SizedBox(height: 4),
                               Text(
                                 'Xoài non mắm ruốc - Cửa hàng Gì Lê\nNhà văn hóa sinh viên, Quận 9, TP.Thủ Đức',
@@ -133,10 +209,10 @@ class DetailOrder extends StatelessWidget {
                             children: [
                               Text('Đến',
                                   style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
+                                  TextStyle(fontWeight: FontWeight.bold)),
                               SizedBox(height: 4),
                               Text(
-                                'Lưu Hữu Phước, Đông Hòa, Dĩ An, Bình Dương, Việt Nam, TP.HCM\nQuân Nguyễn - 0823574803',
+                                'Lưu Hữu Phước, Đông Hòa, Dĩ An, Bình Dương, Việt Nam, TP.HCM\n${_orderDto?.customerName} - ${_orderDto?.customerPhone}',
                                 style: TextStyle(color: Colors.black87),
                               ),
                             ],
@@ -156,53 +232,52 @@ class DetailOrder extends StatelessWidget {
                 ),
               ),
 
-              // List san pham
               Column(
-                children: List.generate(
-                  5,
-                  (index) => // 5 sản pham
-                      Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 80,
-                          height: 80,
-                          color: Colors.grey[300],
-                          child: Center(child: Text('Ảnh $index')),
+                children: _orderDto?.orderDetails?.map((orderDetail) => Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        color: Colors.grey[300],
+                        child: Center(
+                          child: Text('Ảnh ${orderDetail.id}'),
                         ),
-                        SizedBox(width: 16),
-                        Expanded(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('1 x Xoài non',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold)),
-                                  Text('Muối tôm',
-                                      style: TextStyle(color: Colors.grey)),
-                                ],
-                              ),
-                              Spacer(), // đẩy 2 vật giống space-bêtween
-
-                              Text(
-                                '59.000 đ',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.right,
-                              ),
-                            ],
-                          ),
+                      ),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${orderDetail.quantity} x ${orderDetail.productName}',
+                                  style: TextStyle(
+                                      fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  orderDetail.addonItems?.toString() ?? 'Không có món thêm',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                            Spacer(),
+                            Text(
+                              '${orderDetail.price.toStringAsFixed(0)} đ', // Hiển thị giá
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.right,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ),
+                ))?.toList() ??
+                    [],
               ),
-
               Divider(),
               Column(
                 children: [
@@ -211,9 +286,9 @@ class DetailOrder extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Tổng (5 món)',
+                        Text('Tổng (${_orderDto?.orderDetails.length} món)',
                             style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text('295.000đ',
+                        Text('${_orderDto?.serviceFee.toStringAsFixed(2)} đ',
                             style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
@@ -224,7 +299,7 @@ class DetailOrder extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Phí giao hàng'),
-                        Text('16.000đ'),
+                        Text('${_orderDto?.shippingFee.toStringAsFixed(2)} đ'),
                       ],
                     ),
                   ),
@@ -237,7 +312,7 @@ class DetailOrder extends StatelessWidget {
                         Text('Tổng cộng',
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold)),
-                        Text('311.000đ',
+                        Text('${_orderDto?.totalPrice.toStringAsFixed(2)} đ',
                             style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -257,7 +332,7 @@ class DetailOrder extends StatelessWidget {
                         Text('Ghi chú',
                             style: TextStyle(fontWeight: FontWeight.bold)),
                         Spacer(),
-                        Text('Không có',
+                        Text('${_orderDto?.notes}',
                             textAlign: TextAlign.right,
                             style: TextStyle(color: Colors.grey)),
                       ],
@@ -270,7 +345,7 @@ class DetailOrder extends StatelessWidget {
                         Text('Mã đơn hàng',
                             style: TextStyle(fontWeight: FontWeight.bold)),
                         Spacer(),
-                        Text('O1111',
+                        Text('${_orderDto?.id}',
                             textAlign: TextAlign.right,
                             style: TextStyle(color: Colors.grey)),
                       ],
@@ -283,7 +358,7 @@ class DetailOrder extends StatelessWidget {
                         Text('Thời gian đặt hàng',
                             style: TextStyle(fontWeight: FontWeight.bold)),
                         Spacer(),
-                        Text('Hôm nay 11:02',
+                        Text("${_orderDto?.time.day}/${_orderDto?.time.month}/${_orderDto?.time.year} ${_orderDto?.time.hour}:${_orderDto?.time.minute}",
                             textAlign: TextAlign.right,
                             style: TextStyle(color: Colors.grey)),
                       ],
@@ -304,7 +379,7 @@ class DetailOrder extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 20), // Khoảng cách để tránh bị che mất nút
+              SizedBox(height: 20),
             ],
           ),
         ),
@@ -346,7 +421,7 @@ String getStatusText(int status) {
     case 4:
       return 'Đơn hàng đã đến nơi';
     default:
-      return 'Đang xử lý đơn hàng';
+      return 'Đơn hàng đã giao thành công';
   }
 }
 
@@ -377,14 +452,16 @@ Widget buildLine(bool isActive) {
 IconData getStepIcon(int status) {
   switch (status) {
     case 1:
-      return Icons.receipt; // 1
+      return Icons.receipt;
     case 2:
-      return Icons.kitchen; // 2
+      return Icons.kitchen;
     case 3:
-      return Icons.delivery_dining; // 3
+      return Icons.delivery_dining;
     case 4:
-      return Icons.apartment; // 4
+      return Icons.apartment;
     default:
-      return Icons.pending_actions; // other
+      return Icons.pending_actions;
   }
 }
+
+

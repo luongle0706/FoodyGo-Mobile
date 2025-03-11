@@ -1,24 +1,82 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:foodygo/view/pages/restaurant/order_view_restaurant.dart';
+import 'package:foodygo/dto/restaurant_dto.dart';
+import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/repository/order_repository.dart';
+import 'package:foodygo/repository/restaurant_repository.dart';
+import 'package:foodygo/utils/app_logger.dart';
+import 'package:foodygo/utils/secure_storage.dart';
+// import 'package:foodygo/view/pages/restaurant/order_view_restaurant.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
 import 'package:go_router/go_router.dart';
 
-class Restaurant {
-  String name;
-  bool isOpen;
-
-  Restaurant({required this.name, required this.isOpen});
-}
-
 class RestaurantHome extends StatefulWidget {
-  const RestaurantHome({super.key});
+
+  final int restaurantId;
+
+  const RestaurantHome({super.key, required this.restaurantId});
 
   @override
   State<RestaurantHome> createState() => _RestaurantHomeState();
 }
 
 class _RestaurantHomeState extends State<RestaurantHome> {
-  Restaurant restaurant = Restaurant(name: "Cơm tấm Ngô Quyền", isOpen: true);
+
+  final _storage = SecureStorage.instance;
+  final AppLogger _logger = AppLogger.instance;
+  final RestaurantRepository _restaurantRepository = RestaurantRepository.instance;
+  SavedUser? _user;
+  RestaurantDto? _restaurantDto;
+
+  bool _isLoading = true;
+
+
+  @override
+  void initState() {
+    super.initState();
+    loadUser();
+  }
+
+  Future<bool> fetchRestaurant(String accessToken) async {
+    RestaurantDto? fetchOrder =
+    await _restaurantRepository.loadRestaurantById(accessToken, widget.restaurantId);
+
+    if (fetchOrder != null) {
+      setState(() {
+        _restaurantDto = fetchOrder;
+      });
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> loadUser() async {
+    String? userData = await _storage.get(key: 'user');
+    SavedUser? user =
+    userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
+    if (user != null) {
+      setState(() {
+        _user = user;
+      });
+      bool fetchOrderData = await fetchRestaurant(user.token);
+
+      if (fetchOrderData) {
+        setState(() {
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = true;
+        });
+      }
+    } else {
+      _logger.info('Failed to load user');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   List<Map<String, dynamic>> menuItems = [
     {"icon": Icons.receipt_long, "title": "Đơn hàng"},
@@ -36,36 +94,42 @@ class _RestaurantHomeState extends State<RestaurantHome> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              restaurant.name,
+            _restaurantDto != null
+                ? Text(
+              _restaurantDto!.name,
               style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
-            ),
+            )
+                : SizedBox(),
             GestureDetector(
               onTap: () {
                 GoRouter.of(context).push("/protected/open-hours-setting", extra: 1);
               },
-              child: Row(
-              children: [
-                Icon(Icons.circle,
-                    size: 11,
-                    color: restaurant.isOpen ? Colors.green : Colors.grey),
-                SizedBox(width: 5),
-                Text(
-                  restaurant.isOpen ? "Mở cửa " : "Đóng cửa ",
-                  style: TextStyle(
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.bold,
-                    color: restaurant.isOpen ? Colors.green : Colors.grey,
+              child: _restaurantDto != null
+                  ? Row(
+                children: [
+                  Icon(Icons.circle,
+                      size: 11,
+                      color: _restaurantDto!.available ? Colors.green : Colors.grey),
+                  SizedBox(width: 5),
+                  Text(
+                    _restaurantDto!.available ? "Mở cửa " : "Đóng cửa ",
+                    style: TextStyle(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.bold,
+                      color: _restaurantDto!.available ? Colors.green : Colors.grey,
+                    ),
                   ),
-                ),
-                Icon(Icons.arrow_forward_ios, size: 15, color: Colors.grey),
-              ],
-            ),
+                  Icon(Icons.arrow_forward_ios, size: 15, color: Colors.grey),
+                ],
+              )
+                  : SizedBox(), // Tránh lỗi khi _restaurantDto chưa có giá trị
             )
           ],
         ),
       ),
-      body: Padding(
+      body: _restaurantDto == null
+          ? Center(child: CircularProgressIndicator()) // Hiển thị vòng loading khi dữ liệu chưa sẵn sàng
+          : Padding(
         padding: EdgeInsets.only(top: 0),
         child: Container(
           color: Colors.grey.shade300,
@@ -88,6 +152,7 @@ class _RestaurantHomeState extends State<RestaurantHome> {
     );
   }
 
+
   Widget _buildMenuItem(IconData icon, String title) {
     return GestureDetector(
       onTap: () {
@@ -99,7 +164,20 @@ class _RestaurantHomeState extends State<RestaurantHome> {
         } else if (title == "Đơn hàng") {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => OrderListRestaurantPage()),
+            // MaterialPageRoute(builder: (context) => OrderListRestaurantPage()),
+            MaterialPageRoute(builder: (context) => WelcomeScreen()),
+          );
+        } else if (title == "Báo cáo") {
+          Navigator.push(
+            context,
+            // MaterialPageRoute(builder: (context) => OrderListRestaurantPage()),
+            MaterialPageRoute(builder: (context) => WelcomeScreen()),
+          );
+        } else if (title == "Thông tin") {
+          Navigator.push(
+            context,
+            // MaterialPageRoute(builder: (context) => OrderListRestaurantPage()),
+            MaterialPageRoute(builder: (context) => WelcomeScreen()),
           );
         }
       },

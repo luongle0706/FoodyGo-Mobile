@@ -6,6 +6,7 @@ import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/hub/hub_home_wrapper.dart';
 import 'package:foodygo/view/pages/add_to_cart.dart';
 import 'package:foodygo/view/pages/confirm_order_customer.dart';
+import 'package:foodygo/view/pages/default_order.dart';
 import 'package:foodygo/view/pages/map_page.dart';
 import 'package:foodygo/view/pages/notification_page.dart';
 import 'package:foodygo/view/pages/restaurant/add_dish_page.dart';
@@ -96,13 +97,6 @@ class Main extends StatelessWidget {
                   },
                 ),
                 GoRoute(
-                  name: 'protected_restaurant_home', // S-033
-                  path: '/protected/restaurant-home',
-                  pageBuilder: (context, state) {
-                    return MaterialPage(child: RestaurantHome());
-                  },
-                ),
-                GoRoute(
                     name: 'notifications', // S-032
                     path: '/protected/notifications',
                     pageBuilder: (context, state) {
@@ -137,12 +131,6 @@ class Main extends StatelessWidget {
                     path: '/protected/restaurant-foodygo', //S-022
                     pageBuilder: (context, state) {
                       return MaterialPage(child: OrderListRestaurantPage());
-                    }),
-                GoRoute(
-                    name: 'order_list_customer', //S-013
-                    path: '/protected/order-list-customer',
-                    pageBuilder: (context, state) {
-                      return MaterialPage(child: OrderListCustomerPage());
                     }),
                 GoRoute(
                     name: 'confirm_order_page',
@@ -246,6 +234,60 @@ class Main extends StatelessWidget {
                   },
                 ),
                 GoRoute(
+                  name: 'order-tabs', // tab chung for S-013 và S-015
+                  path: '/order_tabs',
+                  pageBuilder: (context, state) {
+                    // final orderId = state.extra as int;
+                    final orderId = 1;
+                    return MaterialPage(child: OrderTabsPage(orderId: orderId));
+                  },
+                ),
+                GoRoute(
+                  name: 'order_list_customer', //S-013
+                  path: '/protected/order-list-customer',
+                  pageBuilder: (context, state) {
+                    // final orderId = state.extra as int;
+                    final orderId = 1;
+                    return MaterialPage(child: OrderListCustomerPage(orderId: orderId));
+                  },
+                ),
+                GoRoute(
+                  name: 'order_history', // S-015
+                  path: '/protected/order-history',
+                  pageBuilder: (context, state) {
+                    // final orderId = state.extra as int;
+                    final orderId = 1;
+                    return MaterialPage(child: OrderHistory(orderId: orderId));
+                  },
+                ),
+                GoRoute(
+                  name: 'detail_order', // S-014
+                  path: '/protected/detail-order',
+                  pageBuilder: (context, state) {
+                    // final orderId = state.extra as int;
+                    final orderId = 1;
+                    return MaterialPage(child: DetailOrder(orderId: orderId));
+                  },
+                ),
+                GoRoute(
+                  name: 'protected_restaurant_home', // S-033
+                  path: '/protected/restaurant-home',
+                  pageBuilder: (context, state) {
+                    // final restaurantId = state.extra as int;
+                    final restaurantId = 1;
+                    return MaterialPage(child: RestaurantHome(restaurantId: restaurantId));
+                  },
+                ),
+                GoRoute(
+                  name: 'restaurant_menu', // S-016
+                  path: '/protected/restaurant_menu',
+                  pageBuilder: (context, state) {
+                    // final restaurantId = state.extra as int;
+                    final restaurantId = 1;
+                    return MaterialPage(child: RestaurantMenu(restaurantId: restaurantId));
+                  },
+                ),
+                GoRoute(
                   name: 'protected_user',
                   path: '/protected/user',
                   pageBuilder: (context, state) {
@@ -275,12 +317,6 @@ class Main extends StatelessWidget {
                 //   },
                 // ),
                 GoRoute(
-                    name: 'restaurant_menu', // S-016
-                    path: '/protected/restaurant_menu',
-                    pageBuilder: (context, state) {
-                      return MaterialPage(child: RestaurantMenu());
-                    }),
-                GoRoute(
                     name: 'manage_categories', //S-044
                     path: '/protected/manage-categories',
                     pageBuilder: (context, state) {
@@ -292,18 +328,6 @@ class Main extends StatelessWidget {
               path: '/protected/add-dish',
               pageBuilder: (context, state) {
                 return MaterialPage(child: AddDishPage());
-              }),
-          GoRoute(
-              name: 'detail_order', // S-014
-              path: '/protected/detail-order',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: DetailOrder());
-              }),
-          GoRoute(
-              name: 'order_history', // S-015
-              path: '/order-history',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: OrderHistory());
               }),
           GoRoute(
             name: 'protected_restaurant_detail', // S-007

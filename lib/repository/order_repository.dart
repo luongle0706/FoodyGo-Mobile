@@ -57,6 +57,30 @@ class OrderRepository {
     return null;
   }
 
+  Future<List<OrderDto>?> getOrdersByCustomerId(String accessToken, int customerId) async {
+    final response = await http.get(
+      Uri.parse('$globalURL/api/v1/orders/customers/$customerId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+      if (jsonData['data'] != null && jsonData['data']['content'] is List) {
+        return (jsonData['data']['content'] as List)
+            .map((item) => OrderDto.fromJson(item))
+            .toList();
+      } else {
+        throw Exception('Không tìm thấy dữ liệu đơn hàng');
+      }
+    } else {
+      throw Exception('Lỗi khi tải đơn hàng: ${response.statusCode}');
+    }
+  }
+
   Future<OrderDto?> loadOrderById(String accessToken, int id) async {
     final response = await http.get(
       Uri.parse('$globalURL/api/v1/orders/$id'),
