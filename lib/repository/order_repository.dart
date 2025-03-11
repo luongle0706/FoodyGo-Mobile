@@ -57,7 +57,8 @@ class OrderRepository {
     return null;
   }
 
-  Future<List<OrderDto>?> getOrdersByCustomerId(String accessToken, int customerId) async {
+  Future<List<OrderDto>?> getOrdersByCustomerId(
+      String accessToken, int customerId) async {
     final response = await http.get(
       Uri.parse('$globalURL/api/v1/orders/customers/$customerId'),
       headers: {
@@ -121,11 +122,13 @@ class OrderRepository {
 
   Future<List<OrderDto>?> getOrdersByStatusAndRestaurant(
       {required accessToken, required status, required restaurantId}) async {
-    final response = await http
-        .get(Uri.parse('$globalURL/api/v1/orders?status=$status&restaurantId=$restaurantId'), headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $accessToken'
-    });
+    final response = await http.get(
+        Uri.parse(
+            '$globalURL/api/v1/orders?status=$status&restaurantId=$restaurantId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken'
+        });
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonResponse = json.decode(response.body);
       _logger.info("jsonResponse $jsonResponse");
@@ -137,6 +140,21 @@ class OrderRepository {
         return OrderDto.fromJson(item);
       }).toList();
     }
+    return null;
+  }
+
+  Future<Map<String, dynamic>?> getOrders(
+      {required accessToken, required String params}) async {
+    final response = await http
+        .get(Uri.parse('$globalURL/api/v1/orders$params'), headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken'
+    });
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      return jsonResponse;
+    }
+    _logger.error(json.decode(response.body).toString());
     return null;
   }
 }
