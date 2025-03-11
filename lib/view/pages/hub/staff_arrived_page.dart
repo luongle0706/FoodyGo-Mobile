@@ -17,7 +17,9 @@ class _StaffArrivedPageState extends State<StaffArrivedPage> {
   final _orderRepository = OrderRepository.instance;
   final _logger = AppLogger.instance;
   final String status = "HUB_ARRIVED";
+  final String updatedStatus = "COMPLETED";
   bool _isLoading = true;
+  SavedUser? user;
   List<dynamic>? orders;
   int pageNo = 1;
   int pageSize = 100;
@@ -31,10 +33,13 @@ class _StaffArrivedPageState extends State<StaffArrivedPage> {
   Future<void> init() async {
     final storage = SecureStorage.instance;
     String? userData = await storage.get(key: 'user');
-    SavedUser? user =
+    SavedUser? savedUser =
         userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
-    if (user != null) {
-      bool fetchedOrders = await fetchOrders(user: user);
+    if (savedUser != null) {
+      setState(() {
+        user = savedUser;
+      });
+      bool fetchedOrders = await fetchOrders(user: savedUser);
       if (fetchedOrders) {
         setState(() {
           _isLoading = false;
@@ -60,6 +65,33 @@ class _StaffArrivedPageState extends State<StaffArrivedPage> {
       return true;
     }
     return false;
+  }
+
+  Future<void> updateStatus({required int orderId, required context}) async {
+    bool response = await _orderRepository.updateStatusOrder(
+        accessToken: user?.token,
+        orderId: orderId,
+        status: updatedStatus,
+        userId: user!.userId);
+    if (response) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Cập nhật trạng thái thành công!"),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      await fetchOrders(user: user!);
+      return;
+    }
+    _logger.error("FAILED");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Cập nhật thất bại!"),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
@@ -105,7 +137,11 @@ class _StaffArrivedPageState extends State<StaffArrivedPage> {
                             onPressed: () {}, child: Text("Xem thêm")),
                         const SizedBox(width: 8),
                         ElevatedButton(
-                            onPressed: () {}, child: Text("Đã nhận")),
+                            onPressed: () {
+                              updateStatus(
+                                  orderId: order['id'], context: context);
+                            },
+                            child: Text("Đã nhận")),
                       ],
                     )
                   ],

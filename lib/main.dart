@@ -19,7 +19,6 @@ import 'package:foodygo/view/pages/food_detail.dart';
 import 'package:foodygo/view/pages/restaurant/manage_category_list.dart';
 import 'package:foodygo/view/pages/restaurant/open_hours_setting.dart';
 import 'package:foodygo/view/pages/restaurant/order_confirm_restaurant.dart';
-import 'package:foodygo/view/pages/restaurant/order_confirmation_screen.dart';
 import 'package:foodygo/view/pages/restaurant/order_detail_restaurant.dart';
 import 'package:foodygo/view/pages/restaurant/product_detail_restaurant.dart';
 import 'package:foodygo/view/pages/restaurant/topping_section_setting.dart';
