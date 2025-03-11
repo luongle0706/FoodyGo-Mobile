@@ -107,6 +107,26 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
     }
   }
 
+  String formatDateTime(dynamic dateTimeInput) {
+    if (dateTimeInput == null) return 'N/A';
+
+    try {
+      DateTime dateTime;
+
+      if (dateTimeInput is String && dateTimeInput.isNotEmpty) {
+        dateTime = DateTime.parse(dateTimeInput);
+      } else if (dateTimeInput is DateTime) {
+        dateTime = dateTimeInput;
+      } else {
+        return 'N/A'; // Nếu không phải String hoặc DateTime, trả về 'N/A'
+      }
+
+      return DateFormat('HH:mm dd/MM').format(dateTime);
+    } catch (e) {
+      return 'N/A';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     _logger.info(_newOrders.toString());
@@ -135,15 +155,36 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
       children: [
         Padding(
           padding: EdgeInsets.all(10),
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: "Tìm kiếm đơn hàng",
-              prefixIcon: Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 5,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: TextField(
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                hintText: "Tìm kiếm đơn hàng...",
+                hintStyle: TextStyle(color: Colors.grey.shade600),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide:
+                      const BorderSide(color: Color(0xFFEE4D2D), width: 2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
-              filled: true,
             ),
           ),
         ),
@@ -182,11 +223,9 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            DateFormat('yyyy-MM-dd HH:mm').format(item.time),
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green),
+                            "Đặt vào lúc: ${formatDateTime(item.time)}",
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.grey),
                           ),
                         ],
                       ),
@@ -267,12 +306,14 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
         setState(() {
           selectedSubTab = index;
         });
-
+        if (index == 0) {
+          GoRouter.of(context).push('/protected/restaurant-foodygo');
+        }
         if (index == 1) {
           GoRouter.of(context).push('/protected/confirm-order');
         }
         if (index == 2) {
-          GoRouter.of(context).push('/home');
+          GoRouter.of(context).push('/protected/history-order-page');
         }
       },
       child: Column(

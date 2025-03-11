@@ -104,7 +104,7 @@ class OrderRepository {
   Future<List<dynamic>?> getOrdersByStatus(
       {required accessToken, status}) async {
     final response = await http.get(
-      Uri.parse('$globalURL/api/v1/orders?status=RESTAURANT_ACCEPTED'),
+      Uri.parse('$globalURL/api/v1/orders?status=$status'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $accessToken'
