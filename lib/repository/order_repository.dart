@@ -109,12 +109,33 @@ class OrderRepository {
     });
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonResponse = json.decode(response.body);
-      _logger.info("jsonResponse" + jsonResponse.toString());
+      _logger.info("jsonResponse $jsonResponse");
 
       List<dynamic> data = jsonResponse['data'] ?? [];
-      _logger.info("data" + jsonResponse.toString());
+      _logger.info("data $jsonResponse");
 
       return data;
+    }
+    return null;
+  }
+
+  Future<List<OrderDto>?> getOrdersByStatusAndRestaurant(
+      {required accessToken, required status, required restaurantId}) async {
+    final response = await http
+        .get(Uri.parse('$globalURL/api/v1/orders?status=$status&restaurantId=$restaurantId'), headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken'
+    });
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      _logger.info("jsonResponse $jsonResponse");
+
+      List<dynamic> data = jsonResponse['data'] ?? [];
+      _logger.info("data $jsonResponse");
+
+      return data.map((item) {
+        return OrderDto.fromJson(item);
+      }).toList();
     }
     return null;
   }
