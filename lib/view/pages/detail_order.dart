@@ -10,21 +10,20 @@ import 'package:foodygo/view/pages/welcome_screen.dart';
 import 'package:go_router/go_router.dart';
 
 class DetailOrder extends StatefulWidget {
-
   final int orderId;
-
   const DetailOrder({super.key, required this.orderId});
 
   @override
-  _DetailOrderState createState() => _DetailOrderState();
+  State<DetailOrder> createState() => _DetailOrderState();
 }
 
 class _DetailOrderState extends State<DetailOrder> {
-
   final _storage = SecureStorage.instance;
+
   final AppLogger _logger = AppLogger.instance;
+
   final OrderRepository _orderRepository = OrderRepository.instance;
-  SavedUser? _user;
+
   OrderDto? _orderDto;
 
   bool _isLoading = true;
@@ -39,7 +38,7 @@ class _DetailOrderState extends State<DetailOrder> {
 
   Future<bool> fetchOrder(String accessToken) async {
     OrderDto? fetchOrder =
-    await _orderRepository.loadOrderById(accessToken, widget.orderId);
+        await _orderRepository.loadOrderById(accessToken, widget.orderId);
 
     if (fetchOrder != null) {
       setState(() {
@@ -64,11 +63,8 @@ class _DetailOrderState extends State<DetailOrder> {
   Future<void> loadUser() async {
     String? userData = await _storage.get(key: 'user');
     SavedUser? user =
-    userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
+        userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
     if (user != null) {
-      setState(() {
-        _user = user;
-      });
       bool fetchOrderData = await fetchOrder(user.token);
 
       if (fetchOrderData) {
@@ -90,6 +86,14 @@ class _DetailOrderState extends State<DetailOrder> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Chi tiết đơn hàng', style: TextStyle(color: Colors.black)),
@@ -178,7 +182,7 @@ class _DetailOrderState extends State<DetailOrder> {
                             children: [
                               Text('Từ',
                                   style:
-                                  TextStyle(fontWeight: FontWeight.bold)),
+                                      TextStyle(fontWeight: FontWeight.bold)),
                               SizedBox(height: 4),
                               Text(
                                 'Xoài non mắm ruốc - Cửa hàng Gì Lê\nNhà văn hóa sinh viên, Quận 9, TP.Thủ Đức',
@@ -209,7 +213,7 @@ class _DetailOrderState extends State<DetailOrder> {
                             children: [
                               Text('Đến',
                                   style:
-                                  TextStyle(fontWeight: FontWeight.bold)),
+                                      TextStyle(fontWeight: FontWeight.bold)),
                               SizedBox(height: 4),
                               Text(
                                 'Lưu Hữu Phước, Đông Hòa, Dĩ An, Bình Dương, Việt Nam, TP.HCM\n${_orderDto?.customerName} - ${_orderDto?.customerPhone}',
@@ -231,51 +235,59 @@ class _DetailOrderState extends State<DetailOrder> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
-
               Column(
-                children: _orderDto?.orderDetails?.map((orderDetail) => Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        color: Colors.grey[300],
-                        child: Center(
-                          child: Text('Ảnh ${orderDetail.id}'),
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${orderDetail.quantity} x ${orderDetail.productName}',
-                                  style: TextStyle(
-                                      fontSize: 16, fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  orderDetail.addonItems?.toString() ?? 'Không có món thêm',
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                            Spacer(),
-                            Text(
-                              '${orderDetail.price.toStringAsFixed(0)} đ', // Hiển thị giá
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.right,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ))?.toList() ??
+                children: _orderDto?.orderDetails
+                        .map((orderDetail) => Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 80,
+                                    height: 80,
+                                    color: Colors.grey[300],
+                                    child: Center(
+                                      child: Text('Ảnh ${orderDetail.id}'),
+                                    ),
+                                  ),
+                                  SizedBox(width: 16),
+                                  Expanded(
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '${orderDetail.quantity} x ${orderDetail.productName}',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              orderDetail.addonItems
+                                                      ?.toString() ??
+                                                  'Không có món thêm',
+                                              style:
+                                                  TextStyle(color: Colors.grey),
+                                            ),
+                                          ],
+                                        ),
+                                        Spacer(),
+                                        Text(
+                                          '${orderDetail.price.toStringAsFixed(0)} đ', // Hiển thị giá
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ))
+                        .toList() ??
                     [],
               ),
               Divider(),
@@ -358,7 +370,8 @@ class _DetailOrderState extends State<DetailOrder> {
                         Text('Thời gian đặt hàng',
                             style: TextStyle(fontWeight: FontWeight.bold)),
                         Spacer(),
-                        Text("${_orderDto?.time.day}/${_orderDto?.time.month}/${_orderDto?.time.year} ${_orderDto?.time.hour}:${_orderDto?.time.minute}",
+                        Text(
+                            "${_orderDto?.time.day}/${_orderDto?.time.month}/${_orderDto?.time.year} ${_orderDto?.time.hour}:${_orderDto?.time.minute}",
                             textAlign: TextAlign.right,
                             style: TextStyle(color: Colors.grey)),
                       ],
@@ -463,5 +476,3 @@ IconData getStepIcon(int status) {
       return Icons.pending_actions;
   }
 }
-
-

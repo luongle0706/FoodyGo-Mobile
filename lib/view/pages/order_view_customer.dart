@@ -10,25 +10,24 @@ import 'package:foodygo/view/pages/detail_order.dart';
 import 'package:go_router/go_router.dart';
 
 class OrderListCustomerPage extends StatefulWidget {
-
   final int orderId;
-
   const OrderListCustomerPage({super.key, required this.orderId});
 
   @override
-  _OrderListCustomerPageState createState() => _OrderListCustomerPageState();
+  State<OrderListCustomerPage> createState() => _OrderListCustomerPageState();
 }
 
 class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
-
-
   final _storage = SecureStorage.instance;
+
   final AppLogger _logger = AppLogger.instance;
+
   final OrderRepository _orderRepository = OrderRepository.instance;
-  SavedUser? _user;
+
   List<OrderDto>? _orderDto;
 
   String status = 'ordered';
+
   List<OrderDto>? filteredOrders;
 
   bool _isLoading = true;
@@ -44,12 +43,14 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
       return [];
     }
 
-    return orders.where((order) => order.status.toLowerCase() == status.toLowerCase()).toList();
+    return orders
+        .where((order) => order.status.toLowerCase() == status.toLowerCase())
+        .toList();
   }
 
   Future<bool> fetchOrder(String accessToken) async {
-    List<OrderDto>? fetchOrder =
-    await _orderRepository.getOrdersByCustomerId(accessToken, widget.orderId);
+    List<OrderDto>? fetchOrder = await _orderRepository.getOrdersByCustomerId(
+        accessToken, widget.orderId);
 
     if (fetchOrder != null) {
       setState(() {
@@ -64,11 +65,8 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
   Future<void> loadUser() async {
     String? userData = await _storage.get(key: 'user');
     SavedUser? user =
-    userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
+        userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
     if (user != null) {
-      setState(() {
-        _user = user;
-      });
       bool fetchOrderData = await fetchOrder(user.token);
 
       if (fetchOrderData) {
@@ -90,6 +88,14 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -130,12 +136,12 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                             ),
                             Text(
                               "${order.expectedDeliveryTime.day}/${order.expectedDeliveryTime.month}/${order.expectedDeliveryTime.year} ${order.expectedDeliveryTime.hour}:${order.expectedDeliveryTime.minute}",
-                              style: TextStyle(color: Colors.grey, fontSize: 14),
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 14),
                             ),
                           ],
                         ),
                         SizedBox(height: 8),
-
                         GestureDetector(
                           onTap: () {
                             GoRouter.of(context).go("/restaurant");
@@ -160,13 +166,13 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                           ),
                         ),
                         SizedBox(height: 12),
-
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => DetailOrder(orderId: order.id),
+                                builder: (context) =>
+                                    DetailOrder(orderId: order.id),
                               ),
                             );
                           },
@@ -188,7 +194,8 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                                       if (progress == null) {
                                         return child;
                                       } else {
-                                        return Center(child: CircularProgressIndicator());
+                                        return Center(
+                                            child: CircularProgressIndicator());
                                       }
                                     },
                                     errorBuilder: (context, error, stackTrace) {
@@ -212,7 +219,9 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                                     SizedBox(height: 4),
                                     Text(
                                       "${order.totalPrice.toStringAsFixed(2)}đ - ${order.orderDetails.length} món",
-                                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                   ],
                                 ),
@@ -258,20 +267,19 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
               child: CircularProgressIndicator(),
             ),
           ],
-
           Container(
             padding: EdgeInsets.all(16),
             width: double.infinity,
             decoration: BoxDecoration(
               border:
-              Border(top: BorderSide(color: Colors.grey[300]!, width: 1)),
+                  Border(top: BorderSide(color: Colors.grey[300]!, width: 1)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Đã đặt",
                     style:
-                    TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 Text(
                   "Đơn sẽ được giao đến bạn",
                   style: TextStyle(
@@ -286,7 +294,4 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
       ),
     );
   }
-
 }
-
-

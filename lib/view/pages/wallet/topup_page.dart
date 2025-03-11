@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/wallet_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
