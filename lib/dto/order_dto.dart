@@ -42,7 +42,7 @@ class OrderDto {
       shippingFee: (json['shippingFee'] ?? 0.0).toDouble(),
       serviceFee: (json['serviceFee'] ?? 0.0).toDouble(),
       totalPrice: (json['totalPrice'] ?? 0.0).toDouble(),
-      totalItems: int.parse(json['totalItems'].toString()),
+      totalItems: int.parse((json['totalItems'] ?? '0').toString()),
       status: json['status'] ?? 'UNKNOWN',
       expectedDeliveryTime: DateTime.parse(json['expectedDeliveryTime']),
       time: DateTime.parse(json['time']),

@@ -74,7 +74,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/confirm-order',
+        initialLocation: '/login',
         routes: [
           GoRoute(
               name: 'test_map',
@@ -144,7 +144,7 @@ class Main extends StatelessWidget {
                     }),
                 GoRoute(
                     name: 'confirm_order', // Dau do trong restaurant
-                    path: '/confirm-order',
+                    path: '/protected/confirm-order',
                     pageBuilder: (context, state) {
                       return MaterialPage(
                           child: ConfirmedOrderRestaurantScreen());

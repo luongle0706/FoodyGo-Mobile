@@ -10,6 +10,7 @@ class OrderConfirmationScreen extends StatefulWidget {
   const OrderConfirmationScreen({super.key, required this.order});
 
   @override
+  // ignore: library_private_types_in_public_api
   _OrderConfirmationScreenState createState() =>
       _OrderConfirmationScreenState();
 }

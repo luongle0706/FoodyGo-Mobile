@@ -7,11 +7,13 @@ import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/pages/restaurant/custome_appbar_order_restaurant_list.dart';
 import 'package:foodygo/view/pages/restaurant/order_confirmation_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class ConfirmedOrderRestaurantScreen extends StatefulWidget {
   const ConfirmedOrderRestaurantScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ConfirmedOrderRestaurantScreenState createState() =>
       _ConfirmedOrderRestaurantScreenState();
 }
@@ -21,6 +23,8 @@ class _ConfirmedOrderRestaurantScreenState
   final _orderRepository = OrderRepository.instance;
   final _storage = SecureStorage.instance;
   final _logger = AppLogger.instance;
+
+  int selectedSubTab = 1;
 
   SavedUser? _user;
   Future<List<dynamic>?>? _futureOrders;
@@ -52,7 +56,7 @@ class _ConfirmedOrderRestaurantScreenState
 
   void _fetchOrders() async {
     if (_user != null) {
-      _logger.info("User Access: " + _user!.token);
+      _logger.info("User Access: ${_user!.token}");
       setState(() {
         _isLoading = true;
       });
@@ -93,6 +97,18 @@ class _ConfirmedOrderRestaurantScreenState
               ),
             ),
           ),
+          Container(
+            color: Colors.white,
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _tabSelector("Mới", 0),
+                _tabSelector("Đã xác nhận", 1),
+                _tabSelector("Lịch sử", 2),
+              ],
+            ),
+          ),
           Expanded(
             child: FutureBuilder<List<dynamic>?>(
               future: _futureOrders,
@@ -120,6 +136,45 @@ class _ConfirmedOrderRestaurantScreenState
               },
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _tabSelector(String text, int index) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedSubTab = index;
+        });
+        if (index == 0) {
+          GoRouter.of(context).push('/protected/restaurant-foodygo');
+        }
+        if (index == 1) {
+          GoRouter.of(context).push('/protected/confirm-order');
+        }
+        if (index == 2) {
+          GoRouter.of(context).push('/protected/order-history');
+        }
+      },
+      child: Column(
+        children: [
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight:
+                  selectedSubTab == index ? FontWeight.bold : FontWeight.normal,
+              color: selectedSubTab == index ? Colors.black : Colors.grey,
+            ),
+          ),
+          if (selectedSubTab == index)
+            Container(
+              margin: EdgeInsets.only(top: 5),
+              height: 3,
+              width: 40,
+              color: Colors.black,
+            ),
         ],
       ),
     );
@@ -198,7 +253,7 @@ class ConfirmedOrderCard extends StatelessWidget {
             const SizedBox(height: 10),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFEE4D2D), // Màu cam ShopeeFood
+                backgroundColor: const Color(0xFFEE4D2D),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),

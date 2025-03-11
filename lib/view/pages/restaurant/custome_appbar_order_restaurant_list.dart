@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class CustomFootageRestaurantOrderAppBar extends StatelessWidget
@@ -14,7 +13,7 @@ class CustomFootageRestaurantOrderAppBar extends StatelessWidget
       children: [
         Container(
           padding: const EdgeInsets.only(top: 30),
-          color: const Color(0xFFEE4D2D), // Màu cam ShopeeFood
+          color: const Color(0xFFEE4D2D),
           child: Column(
             children: [
               AppBar(
