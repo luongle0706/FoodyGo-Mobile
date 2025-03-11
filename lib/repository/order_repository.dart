@@ -145,6 +145,21 @@ class OrderRepository {
     return null;
   }
 
+  Future<Map<String, dynamic>?> getOrders(
+      {required accessToken, required String params}) async {
+    final response = await http
+        .get(Uri.parse('$globalURL/api/v1/orders$params'), headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken'
+    });
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      return jsonResponse;
+    }
+    _logger.error(json.decode(response.body).toString());
+    return null;
+  }
+
   Future<bool> updateStatusOrder(
       {required accessToken,
       required orderId,

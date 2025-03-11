@@ -50,7 +50,8 @@ class AuthService {
             role: response['role'],
             userId: response['userId'],
             customerId: response['customerId'],
-            restaurantId: response['restaurantId']);
+            restaurantId: response['restaurantId'],
+            hubId: response['hubId']);
 
         storage.put(key: 'user', value: json.encode(user.toJson()));
 
@@ -84,7 +85,8 @@ class AuthService {
             role: loginResponseDTO.role,
             userId: loginResponseDTO.userId,
             customerId: loginResponseDTO.customerId,
-            restaurantId: loginResponseDTO.restaurantId);
+            restaurantId: loginResponseDTO.restaurantId,
+            hubId: loginResponseDTO.hubId);
 
         storage.put(key: 'user', value: json.encode(user.toJson()));
 

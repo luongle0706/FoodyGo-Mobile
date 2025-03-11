@@ -35,7 +35,8 @@ class AuthRepository {
           role: jsonResponse['role'],
           userId: jsonResponse['userId'],
           customerId: jsonResponse['customerId'],
-          restaurantId: jsonResponse['restaurantId']);
+          restaurantId: jsonResponse['restaurantId'],
+          hubId: jsonResponse['hubId']);
     } else {
       throw Exception('Failed to load data!: ${response.body}');
     }
