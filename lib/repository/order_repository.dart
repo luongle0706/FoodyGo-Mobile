@@ -57,7 +57,8 @@ class OrderRepository {
     return null;
   }
 
-  Future<List<OrderDto>?> getOrdersByCustomerId(String accessToken, int customerId) async {
+  Future<List<OrderDto>?> getOrdersByCustomerId(
+      String accessToken, int customerId) async {
     final response = await http.get(
       Uri.parse('$globalURL/api/v1/orders/customers/$customerId'),
       headers: {
@@ -102,20 +103,48 @@ class OrderRepository {
 
   Future<List<dynamic>?> getOrdersByStatus(
       {required accessToken, status}) async {
-    final response = await http
-        .get(Uri.parse('$globalURL/api/v1/orders?status=$status'), headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $accessToken'
-    });
+    final response = await http.get(
+      Uri.parse('$globalURL/api/v1/orders?status=RESTAURANT_ACCEPTED'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWxsZXJAZ21haWwuY29tIiwiaWF0IjoxNzQxNzAwMzkxLCJleHAiOjE3NDE3MDkwMzEsInVzZXJJRCI6NSwiZnVsbE5hbWUiOiJTZWxsZXIiLCJyb2xlIjpbeyJhdXRob3JpdHkiOiJST0xFX1NFTExFUiJ9XX0.2G1SXBXUmL8su3BCyl0ZymDZLhFPKv5bdtkLOkHulWo'
+      },
+    );
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonResponse = json.decode(response.body);
-      _logger.info("jsonResponse" + jsonResponse.toString());
+      _logger.info("jsonResponse$jsonResponse");
 
       List<dynamic> data = jsonResponse['data'] ?? [];
-      _logger.info("data" + jsonResponse.toString());
+      _logger.info("data$jsonResponse");
 
       return data;
     }
     return null;
+  }
+
+  Future<bool> updateStatusOrder(
+      {required accessToken,
+      required orderId,
+      required String status,
+      required int userId}) async {
+    Map<String, dynamic> body = {"status": status, "userId": userId};
+    _logger.info("repo da vao");
+    final response = await http.put(
+      Uri.parse("$globalURL/api/v1/orders/$orderId"),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWxsZXJAZ21haWwuY29tIiwiaWF0IjoxNzQxNzAwMzkxLCJleHAiOjE3NDE3MDkwMzEsInVzZXJJRCI6NSwiZnVsbE5hbWUiOiJTZWxsZXIiLCJyb2xlIjpbeyJhdXRob3JpdHkiOiJST0xFX1NFTExFUiJ9XX0.2G1SXBXUmL8su3BCyl0ZymDZLhFPKv5bdtkLOkHulWo'
+      },
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      _logger.error('Error updating order: ${response.body}');
+      return false;
+    }
   }
 }
