@@ -8,6 +8,7 @@ import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/pages/restaurant/custome_appbar_order_restaurant_list.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class OrderListRestaurantPage extends StatefulWidget {
   const OrderListRestaurantPage({super.key});
@@ -163,7 +164,7 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            "${item.time}",
+                            DateFormat('yyyy-MM-dd HH:mm').format(item.time),
                             style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -176,32 +177,11 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
 
                       // 🔹 Thời gian & Trạng thái
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            selectedSubTab == 0
-                                ? "Mới"
-                                : selectedSubTab == 1
-                                    ? "Đã xác nhận"
-                                    : "Hoàn thành",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: selectedSubTab == 0
-                                  ? Colors.orange
-                                  : selectedSubTab == 1
-                                      ? Colors.blue
-                                      : Colors.green,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      Row(
                         children: [Text(item.customerName)],
                       ),
                       Row(
                         children: [
-                          Text("${item.totalItems} Món | ${item.totalPrice}")
+                          Text("${item.totalItems} Món | ${item.totalPrice.round()} đ")
                         ],
                       ),
 
@@ -220,7 +200,7 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
                             onPressed: () {
                               GoRouter.of(context).push(
                                   '/protected/order-detail-restaurant',
-                                  extra: 1);
+                                  extra: item.id);
                             },
                             style: ElevatedButton.styleFrom(
                                 backgroundColor:
