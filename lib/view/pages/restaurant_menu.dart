@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:foodygo/dto/product_dto.dart';
+// import 'package:foodygo/dto/product_dto.dart';
 import 'package:foodygo/dto/restaurant_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
-import 'package:foodygo/repository/product_repository.dart';
+// import 'package:foodygo/repository/product_repository.dart';
 import 'package:foodygo/repository/restaurant_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
@@ -13,7 +13,6 @@ import 'package:foodygo/view/pages/welcome_screen.dart';
 import 'package:go_router/go_router.dart';
 
 class RestaurantMenu extends StatefulWidget {
-
   final int restaurantId;
 
   const RestaurantMenu({super.key, required this.restaurantId});
@@ -23,14 +22,14 @@ class RestaurantMenu extends StatefulWidget {
 }
 
 class _RestaurantMenuState extends State<RestaurantMenu> {
-
   final _storage = SecureStorage.instance;
   final AppLogger _logger = AppLogger.instance;
-  final ProductRepository _productRepository = ProductRepository.instance;
-  final RestaurantRepository _restaurantRepository = RestaurantRepository.instance;
-  SavedUser? _user;
+  // final ProductRepository _productRepository = ProductRepository.instance;
+  final RestaurantRepository _restaurantRepository =
+      RestaurantRepository.instance;
+  // SavedUser? _user;
   RestaurantDto? _restaurantDto;
-  List<ProductDto>? _productDto;
+  // List<ProductDto>? _productDto;
 
   bool _isLoading = true;
 
@@ -41,16 +40,15 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
   }
 
   Future<bool> fetchRestaurant(String accessToken) async {
-    RestaurantDto? fetchOrder =
-    await _restaurantRepository.loadRestaurantById(accessToken, widget.restaurantId);
+    RestaurantDto? fetchOrder = await _restaurantRepository.loadRestaurantById(
+        accessToken, widget.restaurantId);
 
-    List<ProductDto>? fetchProduct =
-    await _productRepository.getProductsByRestaurantId(widget.restaurantId, accessToken);
+    // List<ProductDto>? fetchProduct = await _productRepository
+    //     .getProductsByRestaurantId(widget.restaurantId, accessToken);
 
     if (fetchOrder != null) {
       setState(() {
         _restaurantDto = fetchOrder;
-        _productDto = fetchProduct;
       });
       return true;
     }
@@ -60,11 +58,11 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
   Future<void> loadUser() async {
     String? userData = await _storage.get(key: 'user');
     SavedUser? user =
-    userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
+        userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
     if (user != null) {
-      setState(() {
-        _user = user;
-      });
+      // setState(() {
+      //   _user = user;
+      // });
       bool fetchOrderData = await fetchRestaurant(user.token);
 
       if (fetchOrderData) {
@@ -139,6 +137,14 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -146,32 +152,38 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
           children: [
             _restaurantDto != null
                 ? Text(
-              _restaurantDto!.name,
-              style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
-            )
+                    _restaurantDto!.name,
+                    style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+                  )
                 : SizedBox(),
             GestureDetector(
               onTap: () {
-                GoRouter.of(context).push("/protected/open-hours-setting", extra: 1);
+                GoRouter.of(context)
+                    .push("/protected/open-hours-setting", extra: 1);
               },
               child: _restaurantDto != null
                   ? Row(
-                children: [
-                  Icon(Icons.circle,
-                      size: 11,
-                      color: _restaurantDto!.available ? Colors.green : Colors.grey),
-                  SizedBox(width: 5),
-                  Text(
-                    _restaurantDto!.available ? "Mở cửa " : "Đóng cửa ",
-                    style: TextStyle(
-                      fontSize: 15.5,
-                      fontWeight: FontWeight.bold,
-                      color: _restaurantDto!.available ? Colors.green : Colors.grey,
-                    ),
-                  ),
-                  Icon(Icons.arrow_forward_ios, size: 15, color: Colors.grey),
-                ],
-              )
+                      children: [
+                        Icon(Icons.circle,
+                            size: 11,
+                            color: _restaurantDto!.available
+                                ? Colors.green
+                                : Colors.grey),
+                        SizedBox(width: 5),
+                        Text(
+                          _restaurantDto!.available ? "Mở cửa " : "Đóng cửa ",
+                          style: TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.bold,
+                            color: _restaurantDto!.available
+                                ? Colors.green
+                                : Colors.grey,
+                          ),
+                        ),
+                        Icon(Icons.arrow_forward_ios,
+                            size: 15, color: Colors.grey),
+                      ],
+                    )
                   : SizedBox(), // Tránh lỗi khi _restaurantDto chưa có giá trị
             )
           ],
@@ -183,7 +195,7 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
           Expanded(
             child: selectedTab == 1
                 ? MenuScreen(
-                toppingGroups: toppingGroups, categoryMenu: categorizedMenu)
+                    toppingGroups: toppingGroups, categoryMenu: categorizedMenu)
                 : WelcomeScreen(),
           ),
         ],
@@ -244,20 +256,20 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> filter = widget.categoryMenu
         .map((category) {
-      List<Map<String, dynamic>> filteredItems =
-      (category["items"] as List<dynamic>)
-          .cast<Map<String, dynamic>>()
-          .where((item) => item["name"]
-          .toLowerCase()
-          .contains(searchQuery.toLowerCase()))
-          .toList();
+          List<Map<String, dynamic>> filteredItems =
+              (category["items"] as List<dynamic>)
+                  .cast<Map<String, dynamic>>()
+                  .where((item) => item["name"]
+                      .toLowerCase()
+                      .contains(searchQuery.toLowerCase()))
+                  .toList();
 
-      return {
-        "title": category["title"],
-        "isExpanded": category["isExpanded"],
-        "items": filteredItems,
-      };
-    })
+          return {
+            "title": category["title"],
+            "isExpanded": category["isExpanded"],
+            "items": filteredItems,
+          };
+        })
         .where((category) => category["items"].isNotEmpty)
         .toList();
 
@@ -275,10 +287,10 @@ class _MenuScreenState extends State<MenuScreen> {
               hintText: "Nhập tên món ăn",
               prefixIcon: Icon(Icons.search),
               border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               isDense: true,
               contentPadding:
-              EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                  EdgeInsets.symmetric(vertical: 10, horizontal: 12),
             ),
           ),
         ),
@@ -355,7 +367,7 @@ class _MenuScreenState extends State<MenuScreen> {
         Expanded(
           child: ListView.builder(
             itemCount:
-            selectedTab == 0 ? filter.length : widget.toppingGroups.length,
+                selectedTab == 0 ? filter.length : widget.toppingGroups.length,
             itemBuilder: (context, categoryIndex) {
               if (selectedTab == 0) {
                 var category = filter[categoryIndex];
@@ -380,12 +392,12 @@ class _MenuScreenState extends State<MenuScreen> {
                               setState(() {
                                 int originalIndex = widget.categoryMenu
                                     .indexWhere((cat) =>
-                                cat["title"] == category["title"]);
+                                        cat["title"] == category["title"]);
                                 if (originalIndex != -1) {
                                   widget.categoryMenu[originalIndex]
-                                  ["isExpanded"] =
-                                  !widget.categoryMenu[originalIndex]
-                                  ["isExpanded"];
+                                          ["isExpanded"] =
+                                      !widget.categoryMenu[originalIndex]
+                                          ["isExpanded"];
                                 }
                               });
                             },

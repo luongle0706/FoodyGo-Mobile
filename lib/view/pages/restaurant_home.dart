@@ -3,12 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:foodygo/dto/restaurant_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
-import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/repository/restaurant_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/pages/restaurant/order_view_restaurant.dart';
-// import 'package:foodygo/view/pages/restaurant/order_view_restaurant.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
 import 'package:go_router/go_router.dart';
 
@@ -26,7 +24,6 @@ class _RestaurantHomeState extends State<RestaurantHome> {
   final AppLogger _logger = AppLogger.instance;
   final RestaurantRepository _restaurantRepository =
       RestaurantRepository.instance;
-  SavedUser? _user;
   RestaurantDto? _restaurantDto;
 
   bool _isLoading = true;
@@ -55,9 +52,6 @@ class _RestaurantHomeState extends State<RestaurantHome> {
     SavedUser? user =
         userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
     if (user != null) {
-      setState(() {
-        _user = user;
-      });
       bool fetchOrderData = await fetchRestaurant(user.token);
 
       if (fetchOrderData) {
@@ -86,6 +80,14 @@ class _RestaurantHomeState extends State<RestaurantHome> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey.shade700,

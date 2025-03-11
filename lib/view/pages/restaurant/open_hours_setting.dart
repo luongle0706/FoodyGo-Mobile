@@ -13,28 +13,36 @@ import 'package:http/http.dart' as http;
 
 class OpenHoursSetting extends StatefulWidget {
   final int restaurantId;
-
   const OpenHoursSetting({super.key, required this.restaurantId});
 
   @override
-  _OpenHoursSettingState createState() => _OpenHoursSettingState();
+  State<OpenHoursSetting> createState() => _OpenHoursSettingState();
 }
 
 class _OpenHoursSettingState extends State<OpenHoursSetting> {
   final _storage = SecureStorage.instance;
+
   final AppLogger _logger = AppLogger.instance;
+
   final OperatingHourRepository _operatingHourRepository =
       OperatingHourRepository.instance;
+
   SavedUser? _user;
+
   bool _isLoading = true;
+
   List<OperatingHourDTO>? _operatingHourList;
 
   final Map<int, bool> isOpen = {};
-  final Map<int, bool> is24Hours = {};
-  final Map<int, TimeOfDay> openTime = {};
-  final Map<int, TimeOfDay> closeTime = {};
-  bool currentState = true; // true = Mở cửa, false = Đóng cửa
 
+  final Map<int, bool> is24Hours = {};
+
+  final Map<int, TimeOfDay> openTime = {};
+
+  final Map<int, TimeOfDay> closeTime = {};
+
+  bool currentState = true;
+  // true = Mở cửa, false = Đóng cửa
   @override
   void initState() {
     super.initState();
@@ -185,36 +193,44 @@ class _OpenHoursSettingState extends State<OpenHoursSetting> {
     }).toList();
 
     // Body JSON cần gửi
-  Map<String, dynamic> body = {"operatingHourList": operatingHourList};
+    Map<String, dynamic> body = {"operatingHourList": operatingHourList};
 
-  try {
-    final response = await http.put(
-      Uri.parse('$globalURL/api/v1/operating-hours'),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $accessToken",
-      },
-      body: jsonEncode(body),
-    );
-
-    if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Cập nhật thành công!")),
+    try {
+      final response = await http.put(
+        Uri.parse('$globalURL/api/v1/operating-hours'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $accessToken",
+        },
+        body: jsonEncode(body),
       );
-    } else {
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Cập nhật thành công!")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Lỗi cập nhật: ${response.body}")),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Lỗi cập nhật: ${response.body}")),
+        SnackBar(content: Text("Lỗi kết nối: $e")),
       );
     }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Lỗi kết nối: $e")),
-    );
-  }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     _updateCurrentState();
 
     return Scaffold(
