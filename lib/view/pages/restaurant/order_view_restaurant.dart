@@ -8,6 +8,7 @@ import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/pages/restaurant/custome_appbar_order_restaurant_list.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class OrderListRestaurantPage extends StatefulWidget {
   const OrderListRestaurantPage({super.key});
@@ -51,6 +52,36 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
     return false;
   }
 
+  Future<void> _confirmDelivery(int orderId) async {
+    String? userData = await _storage.get(key: 'user');
+    if (userData == null) return;
+
+    SavedUser user = SavedUser.fromJson(json.decode(userData));
+
+    bool success = await _orderRepository.updateStatusOrder(
+      accessToken: user.token,
+      orderId: orderId,
+      status: "RESTAURANT_ACCEPTED",
+      userId: user.userId,
+    );
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Cập nhật trạng thái thành công!")),
+      );
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      await loadUser();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Cập nhật trạng thái thất bại!")),
+      );
+    }
+  }
+
   Future<void> loadUser() async {
     String? userData = await _storage.get(key: 'user');
     SavedUser? user =
@@ -78,36 +109,30 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
 
   @override
   Widget build(BuildContext context) {
+    _logger.info(_newOrders.toString());
     if (_isLoading) {
       return Scaffold(
-          backgroundColor: Colors.grey[200],
           appBar: CustomFootageRestaurantOrderAppBar(
             title: "Cơm tấm Ngô Quyền",
           ),
-          // 🔹 Nội dung theo Tab chính
           body: SizedBox(
             height: 100,
             child: Center(
               child: CircularProgressIndicator(),
-              // Show loading indicator
             ),
           ));
     }
     return Scaffold(
-      backgroundColor: Colors.grey[200],
       appBar: CustomFootageRestaurantOrderAppBar(
         title: "Cơm tấm Ngô Quyền",
       ),
-      // 🔹 Nội dung theo Tab chính
       body: selectedTab == 0 ? _buildOrdersTab() : _buildPlaceholderTab(),
     );
   }
 
-  /// 🔹 Giao diện Tab "Đơn"
   Widget _buildOrdersTab() {
     return Column(
       children: [
-        // 🔹 Search Bar
         Padding(
           padding: EdgeInsets.all(10),
           child: TextField(
@@ -119,12 +144,9 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
                 borderSide: BorderSide.none,
               ),
               filled: true,
-              fillColor: Colors.white,
             ),
           ),
         ),
-
-        // 🔹 Tab con: Mới - Đã xác nhận - Lịch sử
         Container(
           color: Colors.white,
           padding: EdgeInsets.symmetric(vertical: 8),
@@ -137,8 +159,6 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
             ],
           ),
         ),
-
-        // 🔹 Danh sách đơn hàng
         Expanded(
           child: ListView.builder(
             itemCount: _newOrders?.length,
@@ -153,17 +173,16 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 🔹 Tiêu đề đơn hàng
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "${item!.id}",
+                            "#${item!.id}",
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            "${item.time}",
+                            DateFormat('yyyy-MM-dd HH:mm').format(item.time),
                             style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -171,40 +190,16 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
                           ),
                         ],
                       ),
-
                       SizedBox(height: 5),
-
-                      // 🔹 Thời gian & Trạng thái
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            selectedSubTab == 0
-                                ? "Mới"
-                                : selectedSubTab == 1
-                                    ? "Đã xác nhận"
-                                    : "Hoàn thành",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: selectedSubTab == 0
-                                  ? Colors.orange
-                                  : selectedSubTab == 1
-                                      ? Colors.blue
-                                      : Colors.green,
-                            ),
-                          ),
-                        ],
-                      ),
-
                       Row(
                         children: [Text(item.customerName)],
                       ),
                       Row(
                         children: [
-                          Text("${item.totalItems} Món | ${item.totalPrice}")
+                          Text(
+                              "${item.totalItems} Món | ${item.totalPrice.round()} đ")
                         ],
                       ),
-
                       for (OrderDetail detail in item.orderDetails)
                         Row(
                           children: [
@@ -212,7 +207,6 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
                           ],
                         ),
                       SizedBox(height: 8),
-
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -220,7 +214,7 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
                             onPressed: () {
                               GoRouter.of(context).push(
                                   '/protected/order-detail-restaurant',
-                                  extra: 1);
+                                  extra: item.id);
                             },
                             style: ElevatedButton.styleFrom(
                                 backgroundColor:
@@ -233,15 +227,15 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
                           ),
                           ElevatedButton(
                             onPressed: () {
-                              setState(() {
-                                selectedSubTab = 1;
-                              });
+                              _confirmDelivery(item.id);
                             },
                             style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Color.fromARGB(255, 235, 93, 4)),
-                            child: Text("Xác nhận",
-                                style: TextStyle(color: Colors.white)),
+                              backgroundColor: const Color(0xFFEE4D2D),
+                            ),
+                            child: const Text(
+                              "Xác nhận",
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
                         ],
                       ),
@@ -256,7 +250,6 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
     );
   }
 
-  /// 🔹 Placeholder cho các Tab khác
   Widget _buildPlaceholderTab() {
     return Center(
       child: Text(
@@ -268,34 +261,6 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
     );
   }
 
-  /// 🔹 Nút chọn tab chính
-  // Widget _tabButton(String text,
-  //     {bool isSelected = false, VoidCallback? onTap}) {
-  //   return GestureDetector(
-  //     onTap: onTap,
-  //     child: Column(
-  //       children: [
-  //         Text(
-  //           text,
-  //           style: TextStyle(
-  //             fontSize: 16,
-  //             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-  //             color: isSelected ? Colors.black : Colors.grey,
-  //           ),
-  //         ),
-  //         if (isSelected)
-  //           Container(
-  //             margin: EdgeInsets.only(top: 5),
-  //             height: 3,
-  //             width: 40,
-  //             color: Colors.black,
-  //           ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  /// Nút chọn tab con
   Widget _tabSelector(String text, int index) {
     return GestureDetector(
       onTap: () {
@@ -303,7 +268,6 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
           selectedSubTab = index;
         });
 
-        // Nếu chọn "Đã xác nhận" (index == 1), điều hướng sang màn hình ConfirmedOrderRestaurantScreen
         if (index == 1) {
           GoRouter.of(context).push('/protected/confirm-order');
         }

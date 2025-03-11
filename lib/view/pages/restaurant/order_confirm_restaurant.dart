@@ -6,11 +6,14 @@ import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/pages/restaurant/custome_appbar_order_restaurant_list.dart';
+import 'package:foodygo/view/pages/restaurant/order_confirmation_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class ConfirmedOrderRestaurantScreen extends StatefulWidget {
   const ConfirmedOrderRestaurantScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ConfirmedOrderRestaurantScreenState createState() =>
       _ConfirmedOrderRestaurantScreenState();
 }
@@ -20,6 +23,8 @@ class _ConfirmedOrderRestaurantScreenState
   final _orderRepository = OrderRepository.instance;
   final _storage = SecureStorage.instance;
   final _logger = AppLogger.instance;
+
+  int selectedSubTab = 1;
 
   SavedUser? _user;
   Future<List<dynamic>?>? _futureOrders;
@@ -51,9 +56,9 @@ class _ConfirmedOrderRestaurantScreenState
 
   void _fetchOrders() async {
     if (_user != null) {
-      _logger.info("User Access: " + _user!.token);
+      _logger.info("User Access: ${_user!.token}");
       setState(() {
-        _isLoading = true; // Chuyển _isLoading về true khi bắt đầu tải
+        _isLoading = true;
       });
 
       List<dynamic>? ordersRepo = await _orderRepository.getOrdersByStatus(
@@ -62,8 +67,8 @@ class _ConfirmedOrderRestaurantScreenState
       );
 
       setState(() {
-        _futureOrders = Future.value(ordersRepo); // Gán Future thay vì List
-        _isLoading = false; // Đặt _isLoading = false khi đã tải xong
+        _futureOrders = Future.value(ordersRepo);
+        _isLoading = false;
       });
     }
   }
@@ -71,19 +76,37 @@ class _ConfirmedOrderRestaurantScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomFootageRestaurantOrderAppBar(title: "Cơm tấm Ngô Quyền"),
+      appBar:
+          const CustomFootageRestaurantOrderAppBar(title: "Cơm tấm Ngô Quyền"),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(10),
             child: TextField(
               decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search),
-                hintText: "Tìm kiếm đơn hàng",
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                hintText: "Tìm kiếm đơn hàng...",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide:
+                      const BorderSide(color: Color(0xFFEE4D2D), width: 2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
+            ),
+          ),
+          Container(
+            color: Colors.white,
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _tabSelector("Mới", 0),
+                _tabSelector("Đã xác nhận", 1),
+                _tabSelector("Lịch sử", 2),
+              ],
             ),
           ),
           Expanded(
@@ -104,7 +127,10 @@ class _ConfirmedOrderRestaurantScreenState
                 return ListView.builder(
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
-                    return ConfirmedOrderCard(order: snapshot.data![index]);
+                    return ConfirmedOrderCard(
+                      order: snapshot.data![index],
+                      onOrderConfirmed: _fetchOrders,
+                    );
                   },
                 );
               },
@@ -114,31 +140,102 @@ class _ConfirmedOrderRestaurantScreenState
       ),
     );
   }
+
+  Widget _tabSelector(String text, int index) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedSubTab = index;
+        });
+        if (index == 0) {
+          GoRouter.of(context).push('/protected/restaurant-foodygo');
+        }
+        if (index == 1) {
+          GoRouter.of(context).push('/protected/confirm-order');
+        }
+        if (index == 2) {
+          GoRouter.of(context).push('/protected/order-history');
+        }
+      },
+      child: Column(
+        children: [
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight:
+                  selectedSubTab == index ? FontWeight.bold : FontWeight.normal,
+              color: selectedSubTab == index ? Colors.black : Colors.grey,
+            ),
+          ),
+          if (selectedSubTab == index)
+            Container(
+              margin: EdgeInsets.only(top: 5),
+              height: 3,
+              width: 40,
+              color: Colors.black,
+            ),
+        ],
+      ),
+    );
+  }
 }
 
 class ConfirmedOrderCard extends StatelessWidget {
   final dynamic order;
+  final VoidCallback onOrderConfirmed;
 
-  const ConfirmedOrderCard({super.key, required this.order});
+  const ConfirmedOrderCard({
+    super.key,
+    required this.order,
+    required this.onOrderConfirmed,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(10),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      elevation: 3,
       child: Padding(
         padding: const EdgeInsets.all(15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("#${order['id']}",
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            const SizedBox(height: 5),
-            Text("Xác nhận lúc ${order['confirmedAt'] ?? 'N/A'}",
-                style: const TextStyle(fontSize: 14, color: Colors.grey)),
-            Text("Khách hàng: ${order['customerName'] ?? 'N/A'}"),
             Text(
-              "Trạng thái: ${order['status'] == 'RESTAURANT_ACCEPTED' ? 'Chưa giao' : (order['status'] ?? 'N/A')}",
+              "#${order['id']}",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            const SizedBox(height: 5),
+            Row(
+              children: [
+                const Icon(Icons.access_time, color: Colors.grey, size: 16),
+                const SizedBox(width: 5),
+                Text(
+                  "Xác nhận lúc: ${order['confirmedAt'] ?? 'N/A'}",
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                const Icon(Icons.person, color: Colors.grey, size: 16),
+                const SizedBox(width: 5),
+                Text("Khách hàng: ${order['customerName'] ?? 'N/A'}"),
+              ],
+            ),
+            Row(
+              children: [
+                const Icon(Icons.assignment_turned_in,
+                    color: Colors.grey, size: 16),
+                const SizedBox(width: 5),
+                Text(
+                  "Trạng thái: ${order['status'] == 'RESTAURANT_ACCEPTED' ? 'Chưa giao' : (order['status'] ?? 'N/A')}",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
             const SizedBox(height: 5),
             Row(
@@ -148,13 +245,42 @@ class ConfirmedOrderCard extends StatelessWidget {
                     style: const TextStyle(fontSize: 14)),
                 Text(
                   "${order['totalPrice'].toStringAsFixed(2)}đ",
-                  style: const TextStyle(fontSize: 14),
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-                onPressed: () {}, child: const Text("Xác nhận giao hàng")),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFEE4D2D),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OrderConfirmationScreen(order: order),
+                  ),
+                ).then((result) {
+                  if (result == true) {
+                    onOrderConfirmed();
+                  }
+                });
+              },
+              child: const Center(
+                child: Text(
+                  "Xác nhận giao hàng",
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+              ),
+            ),
           ],
         ),
       ),

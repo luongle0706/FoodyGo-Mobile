@@ -19,6 +19,7 @@ import 'package:foodygo/view/pages/food_detail.dart';
 import 'package:foodygo/view/pages/restaurant/manage_category_list.dart';
 import 'package:foodygo/view/pages/restaurant/open_hours_setting.dart';
 import 'package:foodygo/view/pages/restaurant/order_confirm_restaurant.dart';
+import 'package:foodygo/view/pages/restaurant/order_confirmation_screen.dart';
 import 'package:foodygo/view/pages/restaurant/order_detail_restaurant.dart';
 import 'package:foodygo/view/pages/restaurant/product_detail_restaurant.dart';
 import 'package:foodygo/view/pages/restaurant/topping_section_setting.dart';
@@ -248,7 +249,8 @@ class Main extends StatelessWidget {
                   pageBuilder: (context, state) {
                     // final orderId = state.extra as int;
                     final orderId = 1;
-                    return MaterialPage(child: OrderListCustomerPage(orderId: orderId));
+                    return MaterialPage(
+                        child: OrderListCustomerPage(orderId: orderId));
                   },
                 ),
                 GoRoute(
@@ -275,7 +277,8 @@ class Main extends StatelessWidget {
                   pageBuilder: (context, state) {
                     // final restaurantId = state.extra as int;
                     final restaurantId = 1;
-                    return MaterialPage(child: RestaurantHome(restaurantId: restaurantId));
+                    return MaterialPage(
+                        child: RestaurantHome(restaurantId: restaurantId));
                   },
                 ),
                 GoRoute(
@@ -284,7 +287,8 @@ class Main extends StatelessWidget {
                   pageBuilder: (context, state) {
                     // final restaurantId = state.extra as int;
                     final restaurantId = 1;
-                    return MaterialPage(child: RestaurantMenu(restaurantId: restaurantId));
+                    return MaterialPage(
+                        child: RestaurantMenu(restaurantId: restaurantId));
                   },
                 ),
                 GoRoute(
@@ -344,7 +348,8 @@ class Main extends StatelessWidget {
             path: '/protected/open-hours-setting',
             pageBuilder: (context, state) {
               final restaurantId = state.extra as int;
-              return MaterialPage(child: OpenHoursSetting(restaurantId: restaurantId));
+              return MaterialPage(
+                  child: OpenHoursSetting(restaurantId: restaurantId));
             },
           ),
           GoRoute(
