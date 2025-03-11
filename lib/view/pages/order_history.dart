@@ -12,20 +12,23 @@ import 'package:foodygo/view/pages/welcome_screen.dart';
 
 class OrderHistory extends StatefulWidget {
   final int orderId;
-
   const OrderHistory({super.key, required this.orderId});
 
   @override
-  _OrderHistoryState createState() => _OrderHistoryState();
+  State<OrderHistory> createState() => _OrderHistoryState();
 }
 
 class _OrderHistoryState extends State<OrderHistory> {
   String selectedService = "Tất cả";
+
   String selectedStatus = "Tất cả";
+
   DateTime startDate = DateTime.now().subtract(Duration(days: 30));
+
   DateTime endDate = DateTime.now();
 
   List<String> services = ["Tất cả", "Giao hàng", "Mang đi"];
+
   List<String> statuses = ["Tất cả", "Hoàn thành", "Đã hủy"];
 
   Future<void> _selectDateRange(BuildContext context) async {
@@ -44,11 +47,14 @@ class _OrderHistoryState extends State<OrderHistory> {
   }
 
   final _storage = SecureStorage.instance;
+
   final AppLogger _logger = AppLogger.instance;
+
   final OrderRepository _orderRepository = OrderRepository.instance;
+
   List<OrderDto>? _orderDto;
+
   List<OrderDto>? filteredOrders;
-  SavedUser? _user;
 
   bool _isLoading = true;
 
@@ -63,12 +69,14 @@ class _OrderHistoryState extends State<OrderHistory> {
       return [];
     }
 
-    return orders.where((order) => order.status.toLowerCase() == status.toLowerCase()).toList();
+    return orders
+        .where((order) => order.status.toLowerCase() == status.toLowerCase())
+        .toList();
   }
 
   Future<bool> fetchOrder(String accessToken) async {
-    List<OrderDto>? fetchOrder =
-    await _orderRepository.getOrdersByCustomerId(accessToken, widget.orderId);
+    List<OrderDto>? fetchOrder = await _orderRepository.getOrdersByCustomerId(
+        accessToken, widget.orderId);
 
     if (fetchOrder != null) {
       setState(() {
@@ -84,11 +92,8 @@ class _OrderHistoryState extends State<OrderHistory> {
   Future<void> loadUser() async {
     String? userData = await _storage.get(key: 'user');
     SavedUser? user =
-    userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
+        userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
     if (user != null) {
-      setState(() {
-        _user = user;
-      });
       bool fetchOrderData = await fetchOrder(user.token);
 
       if (fetchOrderData) {
@@ -120,9 +125,7 @@ class _OrderHistoryState extends State<OrderHistory> {
         ),
         centerTitle: true,
       ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : filter(),
+      body: _isLoading ? Center(child: CircularProgressIndicator()) : filter(),
     );
   }
 
@@ -226,7 +229,8 @@ class _OrderHistoryState extends State<OrderHistory> {
                   children: [
                     Text("Đồ ăn #${order.id}",
                         style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text("${order.time.day}/${order.time.month}/${order.time.year} ${order.time.hour}:${order.time.minute}"),
+                    Text(
+                        "${order.time.day}/${order.time.month}/${order.time.year} ${order.time.hour}:${order.time.minute}"),
                   ],
                 ),
                 Text("${order.restaurantName}",
@@ -236,7 +240,8 @@ class _OrderHistoryState extends State<OrderHistory> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => DetailOrder(orderId: order.id)),
+                      MaterialPageRoute(
+                          builder: (context) => DetailOrder(orderId: order.id)),
                     );
                   },
                   child: Container(
@@ -260,7 +265,8 @@ class _OrderHistoryState extends State<OrderHistory> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Text("${order.totalPrice.toStringAsFixed(2)}đ",
+                                    Text(
+                                        "${order.totalPrice.toStringAsFixed(2)}đ",
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold)),
                                     Row(
@@ -268,7 +274,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                                       children: [
                                         Text("${order.orderDetails.length} món",
                                             style:
-                                            TextStyle(color: Colors.grey)),
+                                                TextStyle(color: Colors.grey)),
                                         Icon(Icons.arrow_forward_ios,
                                             size: 14, color: Colors.grey),
                                       ],
@@ -293,8 +299,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(order.status,
-                        style: TextStyle(color: Colors.green)),
+                    Text(order.status, style: TextStyle(color: Colors.green)),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.push(
