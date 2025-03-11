@@ -107,8 +107,7 @@ class OrderRepository {
       Uri.parse('$globalURL/api/v1/orders?status=RESTAURANT_ACCEPTED'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization':
-            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWxsZXJAZ21haWwuY29tIiwiaWF0IjoxNzQxNzAwMzkxLCJleHAiOjE3NDE3MDkwMzEsInVzZXJJRCI6NSwiZnVsbE5hbWUiOiJTZWxsZXIiLCJyb2xlIjpbeyJhdXRob3JpdHkiOiJST0xFX1NFTExFUiJ9XX0.2G1SXBXUmL8su3BCyl0ZymDZLhFPKv5bdtkLOkHulWo'
+        'Authorization': 'Bearer $accessToken'
       },
     );
     if (response.statusCode == 200) {
@@ -119,6 +118,29 @@ class OrderRepository {
       _logger.info("data$jsonResponse");
 
       return data;
+    }
+    return null;
+  }
+
+  Future<List<OrderDto>?> getOrdersByStatusAndRestaurant(
+      {required accessToken, required status, required restaurantId}) async {
+    final response = await http.get(
+        Uri.parse(
+            '$globalURL/api/v1/orders?status=$status&restaurantId=$restaurantId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken'
+        });
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      _logger.info("jsonResponse $jsonResponse");
+
+      List<dynamic> data = jsonResponse['data'] ?? [];
+      _logger.info("data $jsonResponse");
+
+      return data.map((item) {
+        return OrderDto.fromJson(item);
+      }).toList();
     }
     return null;
   }
@@ -134,8 +156,7 @@ class OrderRepository {
       Uri.parse("$globalURL/api/v1/orders/$orderId"),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization':
-            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZWxsZXJAZ21haWwuY29tIiwiaWF0IjoxNzQxNzAwMzkxLCJleHAiOjE3NDE3MDkwMzEsInVzZXJJRCI6NSwiZnVsbE5hbWUiOiJTZWxsZXIiLCJyb2xlIjpbeyJhdXRob3JpdHkiOiJST0xFX1NFTExFUiJ9XX0.2G1SXBXUmL8su3BCyl0ZymDZLhFPKv5bdtkLOkHulWo'
+        'Authorization': 'Bearer $accessToken'
       },
       body: jsonEncode(body),
     );

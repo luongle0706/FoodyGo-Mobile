@@ -3,6 +3,7 @@ class OrderDto {
   final double shippingFee;
   final double serviceFee;
   final double totalPrice;
+  final int totalItems;
   final String status;
   final DateTime expectedDeliveryTime;
   final DateTime time;
@@ -20,6 +21,7 @@ class OrderDto {
     required this.shippingFee,
     required this.serviceFee,
     required this.totalPrice,
+    required this.totalItems,
     required this.status,
     required this.expectedDeliveryTime,
     required this.time,
@@ -40,6 +42,7 @@ class OrderDto {
       shippingFee: (json['shippingFee'] ?? 0.0).toDouble(),
       serviceFee: (json['serviceFee'] ?? 0.0).toDouble(),
       totalPrice: (json['totalPrice'] ?? 0.0).toDouble(),
+      totalItems: int.parse(json['totalItems'].toString()),
       status: json['status'] ?? 'UNKNOWN',
       expectedDeliveryTime: DateTime.parse(json['expectedDeliveryTime']),
       time: DateTime.parse(json['time']),
