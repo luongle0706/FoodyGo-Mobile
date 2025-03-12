@@ -9,6 +9,7 @@ import 'package:foodygo/repository/product_repository.dart';
 import 'package:foodygo/repository/restaurant_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:foodygo/view/pages/add_to_cart.dart';
 import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -24,7 +25,8 @@ class RestaurantDetailPage extends StatefulWidget {
 
 class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   final _storage = SecureStorage.instance;
-  final RestaurantRepository _restaurantRepository = RestaurantRepository.instance;
+  final RestaurantRepository _restaurantRepository =
+      RestaurantRepository.instance;
   final ProductRepository _productRepository = ProductRepository.instance;
   final CartRepository _cartRepository = CartRepository.instance;
   final AppLogger _logger = AppLogger.instance;
@@ -72,7 +74,8 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   }
 
   Future<bool> fetchRestaurant(String accessToken) async {
-    RestaurantDto? fetchRestaurant = await _restaurantRepository.loadRestaurantById(accessToken, widget.restaurantId);
+    RestaurantDto? fetchRestaurant = await _restaurantRepository
+        .loadRestaurantById(accessToken, widget.restaurantId);
     if (fetchRestaurant != null) {
       setState(() {
         _restaurant = fetchRestaurant;
@@ -85,6 +88,12 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   Future<bool> fetchProducts(SavedUser user) async {
     List<ProductDto>? fetchProducts = await _productRepository
         .getProductsByRestaurantId(widget.restaurantId, user.token);
+    _logger.info("fetchProduct ${fetchProducts.toString()}");
+    if (fetchProducts != null && fetchProducts.isNotEmpty) {
+      for (var product in fetchProducts) {
+        _logger.info("Sản phẩm: ${product.addonSections?.length}");
+      }
+    }
     if (fetchProducts != null) {
       setState(() {
         _products = fetchProducts;
@@ -261,6 +270,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
               itemCount: _products?.length,
               itemBuilder: (context, index) {
                 final item = _products?[index];
+                _logger.info("Item: ${item.toString()}");
                 return Container(
                     margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     padding: EdgeInsets.all(12),
@@ -333,15 +343,33 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                               ),
                               SizedBox(width: 8),
                               ElevatedButton(
-                                onPressed: () => addToCart(product: item),
+                                onPressed: () {
+                                  if (item.addonSections != null &&
+                                      item.addonSections!.isNotEmpty) {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      backgroundColor: Colors.transparent,
+                                      builder: (context) => AddToCartPopup(
+                                        product: item,
+                                        restaurantId: widget.restaurantId,
+                                        onCartUpdated: () {
+                                          fetchItemsInCart(user: _user!);
+                                        },
+                                      ),
+                                    );
+                                  } else {
+                                    addToCart(product: item);
+                                  }
+                                },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.orange,
-                                  minimumSize: Size(32, 32),
+                                  minimumSize: const Size(32, 32),
                                   padding: EdgeInsets.zero,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(4)),
                                 ),
-                                child: Icon(Icons.add,
+                                child: const Icon(Icons.add,
                                     color: Colors.white, size: 18),
                               ),
                             ],
@@ -441,9 +469,31 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                                     icon: Icon(Icons.add,
                                                         color: Colors.green),
                                                     onPressed: () async {
-                                                      await addToCart(
-                                                          product: product);
-                                                      setModalState(() {});
+                                                      if (product.addonSections!
+                                                          .isNotEmpty) {
+                                                        showModalBottomSheet(
+                                                          context: context,
+                                                          isScrollControlled:
+                                                              true,
+                                                          backgroundColor:
+                                                              Colors
+                                                                  .transparent,
+                                                          builder: (context) =>
+                                                              AddToCartPopup(
+                                                            product: item,
+                                                            restaurantId: widget
+                                                                .restaurantId,
+                                                            onCartUpdated: () {
+                                                              fetchItemsInCart(
+                                                                  user: _user!);
+                                                            },
+                                                          ),
+                                                        );
+                                                      } else {
+                                                        await addToCart(
+                                                            product: product);
+                                                        setModalState(() {});
+                                                      }
                                                     },
                                                   ),
                                                 ],
@@ -528,8 +578,8 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
             ),
             ElevatedButton(
               onPressed: () {
-                GoRouter.of(context).go(
-                    '/protected/confirm-order-cart/${widget.restaurantId}');
+                GoRouter.of(context)
+                    .go('/protected/confirm-order-cart/${widget.restaurantId}');
               },
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),

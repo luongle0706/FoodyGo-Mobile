@@ -21,6 +21,7 @@ class CartRepository {
     if (response.statusCode == 200) {
       Map<String, dynamic> responseBody = json.decode(response.body);
       List<dynamic> data = responseBody['data'];
+      _logger.info("Cart $data");
       return data;
     }
     return null;

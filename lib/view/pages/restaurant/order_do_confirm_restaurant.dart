@@ -4,6 +4,7 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:intl/intl.dart';
 
 class OrderConfirmationScreen extends StatefulWidget {
   final dynamic order;
@@ -21,11 +22,12 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
   bool _isLoading = true;
   final SecureStorage _storage = SecureStorage.instance;
   final _logger = AppLogger.instance;
-
+  late final String hubId;
   @override
   void initState() {
     super.initState();
     _loadUserAndFetchOrders();
+    hubId = widget.order['hubName'].toString();
   }
 
   Future<void> _confirmDelivery() async {
@@ -64,6 +66,26 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
     } catch (e) {
       _logger.info('Error loading user: $e');
       setState(() => _isLoading = false);
+    }
+  }
+
+  String formatDateTime(dynamic dateTimeInput) {
+    if (dateTimeInput == null) return 'N/A';
+
+    try {
+      DateTime dateTime;
+
+      if (dateTimeInput is String && dateTimeInput.isNotEmpty) {
+        dateTime = DateTime.parse(dateTimeInput);
+      } else if (dateTimeInput is DateTime) {
+        dateTime = dateTimeInput;
+      } else {
+        return 'N/A'; // Nếu không phải String hoặc DateTime, trả về 'N/A'
+      }
+
+      return DateFormat('HH:mm dd/MM').format(dateTime);
+    } catch (e) {
+      return 'N/A';
     }
   }
 
@@ -189,9 +211,10 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildOrderDetail("Mã đơn hàng", widget.order['id'].toString()),
-            _buildOrderDetail("Thời gian đặt hàng", widget.order['time']),
+            _buildOrderDetail(
+                "Thời gian đặt hàng", formatDateTime(widget.order['time'])),
             _buildOrderDetail("Thời gian lấy hàng dự kiến",
-                widget.order['expectedDeliveryTime']),
+                formatDateTime(widget.order['expectedDeliveryTime'])),
           ],
         ),
       ),
@@ -200,8 +223,10 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
 
   Widget _buildActionButtons() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(
+        SizedBox(
+          width: 120, // Giới hạn chiều rộng của button trái
           child: ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(
@@ -211,13 +236,13 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
               ),
             ),
             child: const Text(
-              "Sửa/Hủy đơn hàng",
+              "Sửa/Hủy",
               style: TextStyle(color: Colors.white),
             ),
           ),
         ),
-        const SizedBox(width: 10),
-        Expanded(
+        SizedBox(
+          width: 220,
           child: ElevatedButton(
             onPressed: _confirmDelivery,
             style: ElevatedButton.styleFrom(
@@ -226,12 +251,13 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text(
+            child: Text(
               "Xác nhận giao hàng",
-              style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
           ),
         ),

@@ -312,13 +312,6 @@ class Main extends StatelessWidget {
                     return MaterialPage(child: ProfileDetailPage());
                   },
                 ),
-                GoRoute(
-                  name: 'protected_add_to_cart',
-                  path: '/protected/add-to-cart',
-                  pageBuilder: (context, state) {
-                    return MaterialPage(child: AddToCartPage());
-                  },
-                ),
                 // Integrated with S=007
                 // GoRoute(
                 //   name: 'protected_view_cart',
