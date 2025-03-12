@@ -13,7 +13,13 @@ import 'package:intl/intl.dart';
 
 class ConfirmOrderPage extends StatefulWidget {
   final int restaurantId;
-  const ConfirmOrderPage({super.key, required this.restaurantId});
+  final int? chosenHubId;
+  final String? chosenHubName;
+  const ConfirmOrderPage(
+      {super.key,
+      required this.restaurantId,
+      this.chosenHubId,
+      this.chosenHubName});
 
   @override
   State<ConfirmOrderPage> createState() => _ConfirmOrderPageState();
@@ -30,17 +36,31 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
   RestaurantDto? _restaurant;
   bool _isLoading = true;
   int _totalPrice = 0;
+  int? chosenHubId;
+  String? chosenHubName;
   // Need to dynamically change (TODO)
   final int _shippingFee = 59000;
   final DateTime _expectedDeliveryTime = DateTime.now().add(Duration(hours: 1));
   final String _customerPhone = '+84938762971';
   final String _notes = 'Not implemented';
-  final int _hubId = 1;
 
   @override
   void initState() {
     super.initState();
     loadUser();
+    setState(() {
+      chosenHubId = widget.chosenHubId;
+      chosenHubName = widget.chosenHubName;
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    setState(() {
+      chosenHubId = widget.chosenHubId;
+      chosenHubName = widget.chosenHubName;
+    });
   }
 
   Future<void> loadUser() async {
@@ -118,7 +138,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
         notes: _notes,
         customerId: _user!.customerId!,
         restaurantId: widget.restaurantId,
-        hubId: _hubId,
+        hubId: chosenHubId ?? -1,
         cartLists: _cartItems!);
     if (result != null) {
       _logger.info("Successfully ordered: Order ID=$result");
@@ -182,7 +202,14 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                             fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       Text("Quận Nguyễn | 0113114115"),
-                      Text("Tòa C3"),
+                      GestureDetector(
+                          onTap: () {
+                            GoRouter.of(context).go('/map/hub', extra: {
+                              'callOfOrigin':
+                                  '/protected/confirm-order-cart/${widget.restaurantId}'
+                            });
+                          },
+                          child: Text(chosenHubName ?? "Chọn Hub")),
                     ],
                   ),
                 ),

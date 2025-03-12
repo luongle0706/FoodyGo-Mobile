@@ -149,8 +149,12 @@ class Main extends StatelessWidget {
                     pageBuilder: (context, state) {
                       final restaurantId =
                           int.parse(state.pathParameters['restaurantId']!);
+                      final extra = state.extra as Map<String, dynamic>?;
                       return MaterialPage(
-                          child: ConfirmOrderPage(restaurantId: restaurantId));
+                          child: ConfirmOrderPage(
+                              restaurantId: restaurantId,
+                              chosenHubId: extra?['chosenHubId'],
+                              chosenHubName: extra?['chosenHubName']));
                     }),
                 GoRoute(
                     name: 'confirm_order',

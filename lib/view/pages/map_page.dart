@@ -270,6 +270,14 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                                     _logger.info("Passing $extra");
                                     GoRouter.of(context)
                                         .go(widget.callOfOrigin, extra: extra);
+                                  } else {
+                                    Map<String, dynamic> extra = {
+                                      'chosenHubId': selectedItem['id'],
+                                      'chosenHubName': selectedItem['name']
+                                    };
+                                    _logger.info("Passing $extra");
+                                    GoRouter.of(context)
+                                        .go(widget.callOfOrigin, extra: extra);
                                   }
                                 },
                                 style: TextButton.styleFrom(

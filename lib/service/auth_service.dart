@@ -74,8 +74,10 @@ class AuthService {
   void signIn(String email, String password, BuildContext context,
       Function(String) onError) async {
     try {
-      LoginResponseDTO loginResponseDTO = await authRepository
-          .login(LoginRequestDTO(email: email, password: password));
+      String? fcmToken = await storage.get(key: 'fcm_token');
+      LoginResponseDTO loginResponseDTO = await authRepository.login(
+          request: LoginRequestDTO(email: email, password: password),
+          fcmToken: fcmToken);
 
       if (loginResponseDTO.token.isNotEmpty) {
         SavedUser user = SavedUser(
@@ -132,6 +134,8 @@ class AuthService {
   }
 
   void signOut(BuildContext context) async {
+    String? fcmToken = await storage.get(key: 'fcm_token');
+    await authRepository.optOut(fcmToken: fcmToken!);
     storage.delete(key: 'user');
     if (context.mounted) {
       GoRouter.of(context).go('/login');
