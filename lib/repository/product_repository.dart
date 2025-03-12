@@ -22,15 +22,7 @@ class ProductRepository {
       final jsonResponse = json.decode(response.body);
       dynamic item = jsonResponse['data'];
       logger.info(item.toString());
-      return ProductDto(
-              id: item['id'],
-              code: item['code'],
-              name: item['name'],
-              price: item['price'],
-              //image: item['image'] ? item['image'] : "i1-giadinh.vnecdn.net/2024/03/07/7Honthinthnhphm1-1709800144-8583-1709800424.jpg",
-              description: item['description'],
-              prepareTime: item['prepareTime'],
-              available: item['available']);
+      return ProductDto.fromJson(item);
     } else {
       throw Exception('Failed to load data!');
     }

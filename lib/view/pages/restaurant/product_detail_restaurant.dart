@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:foodygo/dto/category_dto.dart';
 import 'package:foodygo/dto/product_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/repository/addon_section_repository.dart';
 import 'package:foodygo/repository/category_repostory.dart';
 import 'package:foodygo/repository/product_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
@@ -25,14 +26,17 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
   final _storage = SecureStorage.instance;
   final ProductRepository _productRepository = ProductRepository.instance;
   final CategoryRepostory _categoryRepostory = CategoryRepostory.instance;
+  final AddonSectionRepository _addonSectionRepository = AddonSectionRepository.instance;
   final AppLogger _logger = AppLogger.instance;
   //SavedUser? _user;
   bool _isLoading = true;
   ProductDto? _productDto;
   List<CategoryDto>? _categoryDtoList;
+  List<AddonSectionDto>? _addonSectionList;
 
   bool isAvailable = true;
-  String selectedCategory = "Chọn danh mục";
+  int? selectedCategoryId;
+  List<int>? selectedAddonSectionId;
 
   @override
   void initState() {
@@ -46,6 +50,12 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
 
     if (fetchData != null) {
       setState(() {
+        selectedCategoryId = fetchData.category?.id;
+        if (fetchData.addonSections != null) {
+          for (var addonSection in fetchData.addonSections!) {
+            selectedAddonSectionId?.add(addonSection.id);
+          }
+        }
         _productDto = fetchData;
       });
       return true;
@@ -55,11 +65,26 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
 
   Future<bool> fetchCategory(String accessToken, int restaurantId) async {
     List<CategoryDto>? fetchData =
-        await _categoryRepostory.getCategoriesByRestaurantId(accessToken: accessToken, restaurantId: restaurantId);
+        await _categoryRepostory.getCategoriesByRestaurantId(
+            accessToken: accessToken, restaurantId: restaurantId);
 
     if (fetchData != null) {
       setState(() {
         _categoryDtoList = fetchData;
+      });
+      return true;
+    }
+    return false;
+  }
+
+  Future<bool> fetchAddonSection(String accessToken, int restaurantId) async {
+    List<AddonSectionDto>? fetchData =
+        await _addonSectionRepository.getAddonSectionByRestaurantId(
+            accessToken: accessToken, restaurantId: restaurantId);
+
+    if (fetchData != null) {
+      setState(() {
+        _addonSectionList = fetchData;
       });
       return true;
     }
@@ -76,8 +101,9 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
       });
       bool fetchProductData = await fetchProduct(user.token, widget.productId);
       bool fetchCategoryData = await fetchCategory(user.token, user.restaurantId!);
+      bool fetchAddonSectionData = await fetchAddonSection(user.token, user.restaurantId!);
 
-      if (fetchProductData && fetchCategoryData) {
+      if (fetchProductData && fetchCategoryData && fetchAddonSectionData) {
         setState(() {
           _isLoading = false;
         });
@@ -133,7 +159,9 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
             Icons.arrow_back,
             color: Colors.white,
           ),
-          onPressed: () {GoRouter.of(context).pop();},
+          onPressed: () {
+            GoRouter.of(context).pop();
+          },
         ),
       ),
       body: SingleChildScrollView(
@@ -147,7 +175,8 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
               children: [
                 Text("Mã món ăn",
                     style: TextStyle(fontWeight: FontWeight.bold)),
-                Text("${_productDto?.id}", style: TextStyle(color: Colors.black87)),
+                Text("${_productDto?.id}",
+                    style: TextStyle(color: Colors.black87)),
               ],
             ),
             SizedBox(height: 12),
@@ -181,20 +210,29 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
             SizedBox(height: 12),
 
             // Nhập giá
-            _buildInputField(label: "Giá *", hintText: "${_productDto?.price.round()} đ"),
+            _buildInputField(
+                label: "Giá *", hintText: "${_productDto?.price.round()} đ"),
             SizedBox(height: 12),
 
             // Danh mục (Dropdown)
             Text("Danh mục *", style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              value: selectedCategory,
-              items: ["Chọn danh mục", "Món chính", "Đồ ăn vặt"]
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                  .toList(),
-              onChanged: (value) => setState(() => selectedCategory = value!),
+            DropdownButtonFormField<int>(
+              value: selectedCategoryId, // ID của category đang chỉnh sửa
+              items: _categoryDtoList?.map((category) {
+                return DropdownMenuItem<int>(
+                  value: category.id,
+                  child: Text(category.name),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedCategoryId = value;
+                });
+              },
               decoration: InputDecoration(border: OutlineInputBorder()),
             ),
+
             SizedBox(height: 12),
 
             // Mô tả

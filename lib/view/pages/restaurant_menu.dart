@@ -305,6 +305,9 @@ class _MenuScreenState extends State<MenuScreen> {
                     color: Colors.grey[400],
                     child: Center(child: Text("Ảnh")),
                   ),
+                  onTap: () {
+                    GoRouter.of(context).push("/protected/product-detail-restaurant", extra: product.id);
+                  },
                   title: Text(product.name),
                   subtitle: Text("${product.price.toStringAsFixed(0)}đ"),
                   trailing: Switch(
