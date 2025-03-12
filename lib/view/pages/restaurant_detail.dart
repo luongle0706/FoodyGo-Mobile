@@ -295,7 +295,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(item!.name,
+                                Text(item.name,
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold)),
