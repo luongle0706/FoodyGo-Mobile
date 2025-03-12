@@ -6,6 +6,7 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/restaurant_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:foodygo/view/pages/restaurant/order_view_restaurant.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
 import 'package:go_router/go_router.dart';
 
@@ -172,7 +173,7 @@ class _RestaurantHomeState extends State<RestaurantHome> {
           Navigator.push(
             context,
             // MaterialPageRoute(builder: (context) => OrderListRestaurantPage()),
-            MaterialPageRoute(builder: (context) => WelcomeScreen()),
+            MaterialPageRoute(builder: (context) => OrderListRestaurantPage()),
           );
         } else if (title == "Báo cáo") {
           Navigator.push(

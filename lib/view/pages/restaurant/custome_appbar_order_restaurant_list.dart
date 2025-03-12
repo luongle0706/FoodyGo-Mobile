@@ -11,32 +11,34 @@ class CustomFootageRestaurantOrderAppBar extends StatelessWidget
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Container chung bao gồm AppBar và phần chứa các button
         Container(
-          padding: EdgeInsets.only(top: 30),
-          color: const Color.fromARGB(255, 98, 97, 97),
+          padding: const EdgeInsets.only(top: 30),
+          color: const Color(0xFFEE4D2D),
           child: Column(
             children: [
               AppBar(
                 automaticallyImplyLeading: false,
-                backgroundColor: Colors.transparent, // Để AppBar trong suốt
+                backgroundColor: Colors.transparent,
                 elevation: 0,
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       title,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: Colors.white, // Đổi thành trắng để nổi bật
                       ),
                     ),
                     Row(
-                      children: [
-                        Text("Mở cửa", style: TextStyle(color: Colors.black)),
+                      children: const [
+                        Text(
+                          "Mở cửa",
+                          style: TextStyle(color: Colors.white),
+                        ),
                         Icon(Icons.arrow_forward_ios,
-                            size: 16, color: Colors.black),
+                            size: 16, color: Colors.white),
                       ],
                     ),
                   ],
@@ -44,16 +46,17 @@ class CustomFootageRestaurantOrderAppBar extends StatelessWidget
               ),
               // Phần chứa các button dưới AppBar
               Container(
-                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     _buildTabButton(
                         context, "Đơn", "/protected/restaurant-foodygo"),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     _buildTabButton(
                         context, "Thực đơn", "/protected/restaurant_menu"),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     _buildTabButton(context, "Báo cáo", "/report"),
                   ],
                 ),
@@ -74,13 +77,20 @@ class CustomFootageRestaurantOrderAppBar extends StatelessWidget
         width: 100,
         height: 40,
         decoration: BoxDecoration(
-          color: Color.fromARGB(255, 235, 93, 4),
-          borderRadius: BorderRadius.circular(5),
+          color: const Color(0xFFFF7043), // Màu cam nhạt hơn khi chưa chọn
+          borderRadius: BorderRadius.circular(8), // Bo góc mượt hơn
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            )
+          ],
         ),
         child: Center(
           child: Text(
             text,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w500,
               color: Colors.white,
@@ -92,5 +102,5 @@ class CustomFootageRestaurantOrderAppBar extends StatelessWidget
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(150);
+  Size get preferredSize => const Size.fromHeight(150);
 }
