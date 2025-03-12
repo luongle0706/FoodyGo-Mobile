@@ -24,7 +24,8 @@ class RestaurantDetailPage extends StatefulWidget {
 
 class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   final _storage = SecureStorage.instance;
-  final RestaurantRepository _restaurantRepository = RestaurantRepository.instance;
+  final RestaurantRepository _restaurantRepository =
+      RestaurantRepository.instance;
   final ProductRepository _productRepository = ProductRepository.instance;
   final CartRepository _cartRepository = CartRepository.instance;
   final AppLogger _logger = AppLogger.instance;
@@ -72,7 +73,8 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
   }
 
   Future<bool> fetchRestaurant(String accessToken) async {
-    RestaurantDto? fetchRestaurant = await _restaurantRepository.loadRestaurantById(accessToken, widget.restaurantId);
+    RestaurantDto? fetchRestaurant = await _restaurantRepository
+        .loadRestaurantById(accessToken, widget.restaurantId);
     if (fetchRestaurant != null) {
       setState(() {
         _restaurant = fetchRestaurant;
@@ -528,8 +530,8 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
             ),
             ElevatedButton(
               onPressed: () {
-                GoRouter.of(context).go(
-                    '/protected/confirm-order-cart/${widget.restaurantId}');
+                GoRouter.of(context)
+                    .go('/protected/confirm-order-cart/${widget.restaurantId}');
               },
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),

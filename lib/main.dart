@@ -74,7 +74,7 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/register-info',
+        initialLocation: '/login',
         routes: [
           GoRoute(
               name: 'map',
@@ -414,7 +414,10 @@ class Main extends StatelessWidget {
             pageBuilder: (context, state) {
               final productId = state.extra as int;
               //final productId = 1;
-              return MaterialPage(child: ProductDetailRestaurant(productId: productId,));
+              return MaterialPage(
+                  child: ProductDetailRestaurant(
+                productId: productId,
+              ));
             },
           ),
           GoRoute(
