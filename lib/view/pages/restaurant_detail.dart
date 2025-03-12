@@ -104,6 +104,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
         restaurantId: widget.restaurantId,
         productId: product.id,
         productName: product.name,
+        image: product.image,
         price: product.price,
         quantity: 1);
     if (result) {
@@ -283,7 +284,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.network(
-                              'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg/1280px-Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg',
+                              item!.image,
                               height: 60,
                               width: 60,
                               fit: BoxFit.cover,
@@ -405,6 +406,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                             final item = _cartItems![index];
                                             final product = ProductDto(
                                                 id: item['productId'],
+                                                image: item['image'],
                                                 code: item['productId']
                                                     .toString(),
                                                 name: item['productName'],
@@ -417,7 +419,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                                 borderRadius:
                                                     BorderRadius.circular(8),
                                                 child: Image.network(
-                                                  'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg/1280px-Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg',
+                                                  item['image'],
                                                   width: 50,
                                                   height: 50,
                                                   fit: BoxFit.cover,

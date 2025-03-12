@@ -4,6 +4,7 @@ class ProductDto {
   final String name;
   final double price;
   final String description;
+  final String image;
   final double prepareTime;
   final bool available;
   final List<AddonSectionDto>? addonSections;
@@ -15,6 +16,7 @@ class ProductDto {
     required this.name,
     required this.price,
     required this.description,
+    required this.image,
     required this.prepareTime,
     required this.available,
     this.addonSections,
@@ -28,10 +30,15 @@ class ProductDto {
       name: json['name'] ?? 'Unknown Product',
       price: (json['price'] ?? 0.0).toDouble(),
       description: json['description'] ?? 'No description available',
+      image: json['image'] ?? '',
       prepareTime: (json['prepareTime'] ?? 0.0).toDouble(),
       available: json['available'] ?? false,
-      addonSections: (json['addonSections'] as List<dynamic>?)?.map((e) => AddonSectionDto.fromJson(e)).toList(),
-      category: json['category'] != null ? CategoryDTO.fromJson(json['category']) : null,
+      addonSections: (json['addonSections'] as List<dynamic>?)
+          ?.map((e) => AddonSectionDto.fromJson(e))
+          .toList(),
+      category: json['category'] != null
+          ? CategoryDTO.fromJson(json['category'])
+          : null,
     );
   }
 
@@ -71,7 +78,9 @@ class AddonSectionDto {
       name: json['name'] ?? '',
       maxChoice: json['maxChoice'] ?? 0,
       required: json['required'] ?? false,
-      items: (json['items'] as List<dynamic>?)?.map((e) => AddonItemDto.fromJson(e)).toList(),
+      items: (json['items'] as List<dynamic>?)
+          ?.map((e) => AddonItemDto.fromJson(e))
+          .toList(),
     );
   }
 

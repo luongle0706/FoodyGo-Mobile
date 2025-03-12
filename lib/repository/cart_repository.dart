@@ -50,6 +50,7 @@ class CartRepository {
       required productName,
       required price,
       required quantity,
+      required image,
       cartAddonItems}) async {
     Map<String, dynamic> body = {
       'restaurantId': restaurantId,
@@ -57,6 +58,7 @@ class CartRepository {
       'productName': productName,
       'price': price,
       'quantity': quantity,
+      'image': image,
       'cartAddOnItems': cartAddonItems ?? []
     };
 
