@@ -5,20 +5,22 @@ import 'package:foodygo/repository/building_repository.dart';
 import 'package:foodygo/repository/hub_repository.dart';
 import 'package:foodygo/service/location_service.dart';
 import 'package:foodygo/utils/app_logger.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 
-class HubSelectionMapPage extends StatefulWidget {
+class MapPage extends StatefulWidget {
   final String location; // 'building' or 'hub'
+  final String callOfOrigin;
 
-  const HubSelectionMapPage({super.key, required this.location});
+  const MapPage(
+      {super.key, required this.location, required this.callOfOrigin});
 
   @override
-  State<HubSelectionMapPage> createState() => _HubSelectionMapPageState();
+  State<MapPage> createState() => _MapPageState();
 }
 
-class _HubSelectionMapPageState extends State<HubSelectionMapPage>
-    with TickerProviderStateMixin {
+class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   late final _animatedMapController = AnimatedMapController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -194,14 +196,16 @@ class _HubSelectionMapPageState extends State<HubSelectionMapPage>
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 4,
-                            spreadRadius: 2)
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          spreadRadius: 2,
+                        )
                       ],
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment
+                          .center, // Ensure vertical centering
                       children: [
                         // Image or Placeholder
                         ClipRRect(
@@ -214,28 +218,73 @@ class _HubSelectionMapPageState extends State<HubSelectionMapPage>
                                   height: 80,
                                   fit: BoxFit.cover,
                                 )
-                              : Image.asset('assets/images/no_image.jpg',
-                                  width: 80, height: 80, fit: BoxFit.cover),
+                              : Image.asset(
+                                  'assets/images/no_image.jpg',
+                                  width: 80,
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                ),
                         ),
                         SizedBox(width: 10),
-                        // Details
+                        // Details and Button
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment
+                                .spaceBetween, // Align text & button properly
+                            crossAxisAlignment: CrossAxisAlignment
+                                .center, // Center everything vertically
                             children: [
-                              Text(
-                                selectedItem?["name"] ?? "Unknown",
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment
+                                      .center, // Center vertically inside Column
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      selectedItem?["name"] ?? "Unknown",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      selectedItem?["description"] ??
+                                          "No description available",
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[700]),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
                               ),
-                              SizedBox(height: 5),
-                              Text(
-                                selectedItem?["description"] ??
-                                    "No description available",
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.grey[700]),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                              SizedBox(width: 10),
+                              TextButton(
+                                onPressed: () {
+                                  if (widget.location == 'BUILDING') {
+                                    Map<String, dynamic> extra = {
+                                      'chosenBuildingId': selectedItem['id'],
+                                      'chosenBuildingName': selectedItem['name']
+                                    };
+                                    _logger.info("Passing $extra");
+                                    GoRouter.of(context)
+                                        .go(widget.callOfOrigin, extra: extra);
+                                  }
+                                },
+                                style: TextButton.styleFrom(
+                                  backgroundColor: Colors.red, // Red background
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        10), // Rounded border
+                                  ),
+                                ),
+                                child: Text(
+                                  "Xác nhận",
+                                  style: TextStyle(
+                                      color: Colors
+                                          .white), // White text for contrast
+                                ),
                               ),
                             ],
                           ),
@@ -262,7 +311,7 @@ class _HubSelectionMapPageState extends State<HubSelectionMapPage>
                               selectedItem = item;
                             });
                           },
-                          child: Text("Select"),
+                          child: Text("Chọn địa điểm"),
                         ),
                       );
                     }).toList(),

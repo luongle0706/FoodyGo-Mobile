@@ -74,16 +74,19 @@ class Main extends StatelessWidget {
   }
 
   GoRouter get _router => GoRouter(
-        initialLocation: '/login',
+        initialLocation: '/register-info',
         routes: [
           GoRoute(
-              name: 'test_map',
+              name: 'map',
               path: '/map/:location',
               pageBuilder: (context, state) {
                 final location =
                     state.pathParameters['location']!.toUpperCase();
+                final extra = state.extra as Map<String, dynamic>?;
                 return MaterialPage(
-                    child: HubSelectionMapPage(location: location));
+                    child: MapPage(
+                        location: location,
+                        callOfOrigin: extra?['callOfOrigin']));
               }),
           ShellRoute(
               builder: (context, state, child) {
@@ -435,7 +438,12 @@ class Main extends StatelessWidget {
               name: 'register info', //S-003
               path: '/register-info',
               pageBuilder: (context, state) {
-                return MaterialPage(child: RegisterInfo());
+                final extra = state.extra as Map<String, dynamic>?;
+                return MaterialPage(
+                    child: RegisterInfo(
+                  chosenBuildingId: extra?['chosenBuildingId'],
+                  chosenBuildingName: extra?['chosenBuildingName'],
+                ));
               }),
           GoRoute(
               name: 'otp', //S-004
