@@ -26,13 +26,14 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
   final _storage = SecureStorage.instance;
   final ProductRepository _productRepository = ProductRepository.instance;
   final CategoryRepostory _categoryRepostory = CategoryRepostory.instance;
-  final AddonSectionRepository _addonSectionRepository = AddonSectionRepository.instance;
+  final AddonSectionRepository _addonSectionRepository =
+      AddonSectionRepository.instance;
   final AppLogger _logger = AppLogger.instance;
   //SavedUser? _user;
   bool _isLoading = true;
   ProductDto? _productDto;
   List<CategoryDto>? _categoryDtoList;
-  List<AddonSectionDto>? _addonSectionList;
+  List<AddonSectionDto>? addonSectionList;
 
   bool isAvailable = true;
   int? selectedCategoryId;
@@ -84,7 +85,7 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
 
     if (fetchData != null) {
       setState(() {
-        _addonSectionList = fetchData;
+        addonSectionList = fetchData;
       });
       return true;
     }
@@ -100,8 +101,10 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
         //_user = user;
       });
       bool fetchProductData = await fetchProduct(user.token, widget.productId);
-      bool fetchCategoryData = await fetchCategory(user.token, user.restaurantId!);
-      bool fetchAddonSectionData = await fetchAddonSection(user.token, user.restaurantId!);
+      bool fetchCategoryData =
+          await fetchCategory(user.token, user.restaurantId!);
+      bool fetchAddonSectionData =
+          await fetchAddonSection(user.token, user.restaurantId!);
 
       if (fetchProductData && fetchCategoryData && fetchAddonSectionData) {
         setState(() {
