@@ -16,7 +16,7 @@ class StaffHomePage extends StatefulWidget {
 class _StaffHomePageState extends State<StaffHomePage> {
   final _orderRepository = OrderRepository.instance;
   final _logger = AppLogger.instance;
-  final String status = "RESTAURANT_ACCEPTED";
+  final String status = "SHIPPING";
   final String updatedStatus = "HUB_ARRIVED";
   bool _isLoading = true;
   SavedUser? user;
