@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:foodygo/dto/category_dto.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/constants.dart';
 import 'package:http/http.dart' as http;
@@ -7,7 +8,7 @@ import 'package:http/http.dart' as http;
 class CategoryRepostory {
   CategoryRepostory._();
   static final CategoryRepostory instance = CategoryRepostory._();
-  final AppLogger logger = AppLogger.instance;
+  final AppLogger _logger = AppLogger.instance;
 
   Future<Map<String, dynamic>?> loadCategories({
     required String accessToken,
@@ -28,7 +29,27 @@ class CategoryRepostory {
       Map<String, dynamic> jsonResponse = json.decode(response.body);
       return jsonResponse;
     }
-    logger.error('Get all categories returned ${response.statusCode}');
+    _logger.error('Get all categories returned ${response.statusCode}');
+    return null;
+  }
+
+  Future<List<CategoryDto>?> getCategoriesByRestaurantId({required accessToken, required restaurantId}) async {
+    final response = await http
+        .get(Uri.parse('$globalURL/api/v1/categories?restaurantId=$restaurantId&params=id,name,description,restaurantId,restaurantName'), headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken'
+    });
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      _logger.info("jsonResponse $jsonResponse");
+
+      List<dynamic> data = jsonResponse['data'] ?? [];
+      _logger.info("data $jsonResponse");
+
+      return data.map((item) {
+        return CategoryDto.fromJson(item);
+      }).toList();
+    }
     return null;
   }
 }
