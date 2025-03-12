@@ -26,7 +26,9 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
 
   List<OrderDto>? _orderDto;
 
-  String status = 'ordered';
+  // String status = 'ordered';
+
+  List<String> filterStatuses = ["ORDERED", "RESTAURANT_ACCEPTED", "SHIPPING", "HUB_ARRIVED"];
 
   List<OrderDto>? filteredOrders;
 
@@ -38,14 +40,24 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
     loadUser();
   }
 
-  List<OrderDto> filterOrdersByStatus(List<OrderDto>? orders, String status) {
-    if (orders == null || status.isEmpty) {
+  // List<OrderDto> filterOrdersByStatus(List<OrderDto>? orders, String status) {
+  //   if (orders == null || status.isEmpty) {
+  //     return [];
+  //   }
+  //
+  //   return orders
+  //       .where((order) => order.status.toLowerCase() == status.toLowerCase())
+  //       .toList();
+  // }
+
+  List<OrderDto> filterOrdersByStatus(List<OrderDto>? orders, List<String> statuses) {
+    if (orders == null || statuses.isEmpty) {
       return [];
     }
 
-    return orders
-        .where((order) => order.status.toLowerCase() == status.toLowerCase())
-        .toList();
+    Set<String> statusSet = statuses.map((s) => s.toLowerCase()).toSet();
+
+    return orders.where((order) => statusSet.contains(order.status.toLowerCase())).toList();
   }
 
   Future<bool> fetchOrder(String accessToken) async {
@@ -55,7 +67,7 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
     if (fetchOrder != null) {
       setState(() {
         _orderDto = fetchOrder;
-        filteredOrders = filterOrdersByStatus(_orderDto, status);
+        filteredOrders = filterOrdersByStatus(_orderDto, filterStatuses);
       });
       return true;
     }

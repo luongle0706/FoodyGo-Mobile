@@ -75,10 +75,10 @@ class OrderRepository {
             .map((item) => OrderDto.fromJson(item))
             .toList();
       } else {
-        throw Exception('Không tìm thấy dữ liệu đơn hàng');
+        throw Exception('Failed to load data');
       }
     } else {
-      throw Exception('Lỗi khi tải đơn hàng: ${response.statusCode}');
+      throw Exception('Failed to load data: ${response.statusCode}');
     }
   }
 
