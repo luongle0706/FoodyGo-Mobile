@@ -148,7 +148,7 @@ class _OrderDetailRestaurantState extends State<OrderDetailRestaurant> {
                   children: _orderDto!.orderDetails
                       .map((detail) => OrderItem(
                             name: detail.productName,
-                            price: "${detail.price.toStringAsFixed(2)}đ",
+                            price: "${detail.price.toStringAsFixed(2)} xu",
                             quantity: detail.quantity,
                           ))
                       .toList(),
@@ -161,7 +161,7 @@ class _OrderDetailRestaurantState extends State<OrderDetailRestaurant> {
               Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  "Tổng tiền: ${_orderDto!.totalPrice.toStringAsFixed(2)}đ",
+                  "Tổng tiền: ${_orderDto!.totalPrice.toStringAsFixed(2)} xu",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),

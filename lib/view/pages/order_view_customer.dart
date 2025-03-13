@@ -230,7 +230,7 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                                     ),
                                     SizedBox(height: 4),
                                     Text(
-                                      "${order.totalPrice.toStringAsFixed(2)}đ - ${order.orderDetails.length} món",
+                                      "${order.totalPrice.toStringAsFixed(2)} xu - ${order.orderDetails.length} món",
                                       style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold),

@@ -210,7 +210,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '${NumberFormat("#,###", "vi_VN").format(_cartTotal)}đ',
+                              '${NumberFormat("#,###", "vi_VN").format(_cartTotal)} xu',
                               style: const TextStyle(
                                   color: Colors.red,
                                   fontSize: 18,
@@ -237,7 +237,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                       : MyButton(
                           onTap: () => addToCart(product: _product!),
                           text:
-                              'Thêm vào giỏ hàng - ${NumberFormat("#,###", "vi_VN").format(_product?.price ?? 0)}đ',
+                              'Thêm vào giỏ hàng - ${NumberFormat("#,###", "vi_VN").format(_product?.price ?? 0)} xu',
                           color: AppColors.primary,
                         ),
                 ],

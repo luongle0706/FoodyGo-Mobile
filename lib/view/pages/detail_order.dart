@@ -276,7 +276,7 @@ class _DetailOrderState extends State<DetailOrder> {
                                         ),
                                         Spacer(),
                                         Text(
-                                          '${orderDetail.price.toStringAsFixed(0)} đ', // Hiển thị giá
+                                          '${orderDetail.price.toStringAsFixed(0)} xu', // Hiển thị giá
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold),
                                           textAlign: TextAlign.right,
@@ -300,7 +300,7 @@ class _DetailOrderState extends State<DetailOrder> {
                       children: [
                         Text('Tổng (${_orderDto?.orderDetails.length} món)',
                             style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text('${_orderDto?.serviceFee.toStringAsFixed(2)} đ',
+                        Text('${_orderDto?.serviceFee.toStringAsFixed(2)} xu',
                             style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
@@ -311,7 +311,7 @@ class _DetailOrderState extends State<DetailOrder> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Phí giao hàng'),
-                        Text('${_orderDto?.shippingFee.toStringAsFixed(2)} đ'),
+                        Text('${_orderDto?.shippingFee.toStringAsFixed(2)} xu'),
                       ],
                     ),
                   ),
@@ -324,7 +324,7 @@ class _DetailOrderState extends State<DetailOrder> {
                         Text('Tổng cộng',
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold)),
-                        Text('${_orderDto?.totalPrice.toStringAsFixed(2)} đ',
+                        Text('${_orderDto?.totalPrice.toStringAsFixed(2)} xu',
                             style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,

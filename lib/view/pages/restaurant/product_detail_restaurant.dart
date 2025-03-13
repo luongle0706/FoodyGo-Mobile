@@ -214,7 +214,7 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
 
             // Nhập giá
             _buildInputField(
-                label: "Giá *", hintText: "${_productDto?.price.round()} đ"),
+                label: "Giá *", hintText: "${_productDto?.price.round()} xu"),
             SizedBox(height: 12),
 
             // Danh mục (Dropdown)

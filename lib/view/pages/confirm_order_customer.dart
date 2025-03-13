@@ -39,7 +39,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
   int? chosenHubId;
   String? chosenHubName;
   // Need to dynamically change (TODO)
-  final int _shippingFee = 59000;
+  final int _shippingFee = 5;
   final DateTime _expectedDeliveryTime = DateTime.now().add(Duration(hours: 1));
   final String _customerPhone = '+84938762971';
   final String _notes = 'Not implemented';
@@ -290,7 +290,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                           ),
                         ),
                         Text(
-                          "${NumberFormat("#,###", "vi_VN").format(item['price'])}đ",
+                          "${NumberFormat("#,###", "vi_VN").format(item['price'])} xu",
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -306,7 +306,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Tổng giá món"),
-                Text("${NumberFormat("#,###", "vi_VN").format(_totalPrice)}đ"),
+                Text("${NumberFormat("#,###", "vi_VN").format(_totalPrice)} xu"),
               ],
             ),
             SizedBox(height: 10),
@@ -314,7 +314,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Phí giao hàng"),
-                Text('$_shippingFee'),
+                Text('$_shippingFee xu'),
               ],
             ),
             Divider(),
@@ -326,7 +326,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                 Text("Tổng thanh toán",
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 Text(
-                    "${NumberFormat("#,###", "vi_VN").format(_totalPrice + _shippingFee)}đ",
+                    "${NumberFormat("#,###", "vi_VN").format(_totalPrice + _shippingFee)} xu",
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               ],

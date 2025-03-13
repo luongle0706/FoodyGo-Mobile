@@ -304,7 +304,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                     "⏳ Thời gian chuẩn bị: ${item.prepareTime.round()} phút"),
                                 SizedBox(height: 4),
                                 Text(
-                                    "Giá: ${NumberFormat("#,###", "vi_VN").format(item.price)}đ",
+                                    "Giá: ${NumberFormat("#,###", "vi_VN").format(item.price)} xu",
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold)),
@@ -427,7 +427,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                               ),
                                               title: Text(item['productName']),
                                               subtitle: Text(
-                                                  "Giá: ${NumberFormat("#,###", "vi_VN").format(item['price'])}đ"),
+                                                  "Giá: ${NumberFormat("#,###", "vi_VN").format(item['price'])}xu"),
                                               trailing: Row(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
@@ -462,7 +462,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Tổng: ${NumberFormat("#,###", "vi_VN").format(_cartTotal)}đ',
+                                      'Tổng: ${NumberFormat("#,###", "vi_VN").format(_cartTotal)} xu',
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
@@ -523,7 +523,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
               ),
             ),
             Text(
-              'Tổng: ${NumberFormat("#,###", "vi_VN").format(_cartTotal)}đ',
+              'Tổng: ${NumberFormat("#,###", "vi_VN").format(_cartTotal)} xu',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
