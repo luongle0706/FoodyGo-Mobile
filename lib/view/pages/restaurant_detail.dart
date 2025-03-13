@@ -192,403 +192,413 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
             ),
           ));
     }
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-          onPressed: () => GoRouter.of(context).pop(),
-        ),
-        actions: [
-          IconButton(
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppColors.primary,
+          leading: IconButton(
             icon: Icon(
-              Icons.search,
+              Icons.arrow_back,
               color: Colors.white,
             ),
-            onPressed: () {},
-          )
-        ],
-      ),
-      body: Column(
-        children: [
-          // Restaurant Info
-          Container(
-            color: AppColors.secondary,
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg/1280px-Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg',
-                    height: 100,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Container(
-                  padding: EdgeInsets.all(12),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 2,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _restaurant!.name,
-                        style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                      Text("📞 ${_restaurant?.phone}"),
-                      Text("✉️ ${_restaurant?.email}"),
-                      Text("📍 ${_restaurant?.address}"),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            onPressed: () => GoRouter.of(context).pop(),
           ),
-
-          Divider(),
-          // Menu List
-          Expanded(
-            child: ListView.builder(
-              itemCount: _products?.length,
-              itemBuilder: (context, index) {
-                final item = _products?[index];
-                _logger.info("Item: ${item.toString()}");
-                return Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey),
-                    ),
-                    child: GestureDetector(
-                      onTap: () {
-                        GoRouter.of(context).push('/protected/product', extra: {
-                          'restaurantId': widget.restaurantId,
-                          'productId': item.id
-                        });
-                      },
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              item!.image,
-                              height: 60,
-                              width: 60,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(item.name,
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold)),
-                                Text(item.description),
-                                Text(
-                                    "⏳ Thời gian chuẩn bị: ${item.prepareTime.round()} phút"),
-                                SizedBox(height: 4),
-                                Text(
-                                    "Giá: ${NumberFormat("#,###", "vi_VN").format(item.price)} xu",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () => removeFromCart(product: item),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orange,
-                                  minimumSize: Size(32, 32),
-                                  padding: EdgeInsets.zero,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(4)),
-                                ),
-                                child: Icon(Icons.remove,
-                                    color: Colors.white, size: 18),
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                '${_cartItems?.firstWhere((i) => i['productId'] == item.id, orElse: () => {
-                                      'quantity': 0
-                                    })['quantity']}',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(width: 8),
-                              ElevatedButton(
-                                onPressed: () {
-                                  if (item.addonSections != null &&
-                                      item.addonSections!.isNotEmpty) {
-                                    showModalBottomSheet(
-                                      context: context,
-                                      isScrollControlled: true,
-                                      backgroundColor: Colors.transparent,
-                                      builder: (context) => AddToCartPopup(
-                                        product: item,
-                                        restaurantId: widget.restaurantId,
-                                        onCartUpdated: () {
-                                          fetchItemsInCart(user: _user!);
-                                        },
-                                      ),
-                                    );
-                                  } else {
-                                    addToCart(product: item);
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orange,
-                                  minimumSize: const Size(32, 32),
-                                  padding: EdgeInsets.zero,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(4)),
-                                ),
-                                child: const Icon(Icons.add,
-                                    color: Colors.white, size: 18),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ));
-              },
-            ),
-          ),
-        ],
-      ),
-      // Bottom Cart Summary
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Colors.grey, width: 1)),
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.search,
+                color: Colors.white,
+              ),
+              onPressed: () {},
+            )
+          ],
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        body: Column(
           children: [
-            GestureDetector(
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(16)),
-                  ),
-                  builder: (context) {
-                    return StatefulBuilder(builder: (context, setModalState) {
-                      return DraggableScrollableSheet(
-                        expand: false,
-                        initialChildSize: 0.5,
-                        minChildSize: 0.3,
-                        maxChildSize: 0.9,
-                        builder: (context, scrollController) {
-                          return Container(
-                            padding: EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Giỏ hàng",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold)),
-                                Divider(),
-                                Expanded(
-                                  child: _cartItems == null ||
-                                          _cartItems!.isEmpty
-                                      ? Center(child: Text("Giỏ hàng trống"))
-                                      : ListView.builder(
-                                          controller: scrollController,
-                                          itemCount: _cartItems!.length,
-                                          itemBuilder: (context, index) {
-                                            final item = _cartItems![index];
-                                            final product = ProductDto(
-                                                id: item['productId'],
-                                                image: item['image'],
-                                                code: item['productId']
-                                                    .toString(),
-                                                name: item['productName'],
-                                                price: item['price'],
-                                                description: '',
-                                                prepareTime: 0.0,
-                                                available: true);
-                                            return ListTile(
-                                              leading: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                child: Image.network(
-                                                  item['image'],
-                                                  width: 50,
-                                                  height: 50,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                              title: Text(item['productName']),
-                                              subtitle: Text(
-                                                  "Giá: ${NumberFormat("#,###", "vi_VN").format(item['price'])}xu"),
-                                              trailing: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  IconButton(
-                                                    icon: Icon(Icons.remove,
-                                                        color: Colors.red),
-                                                    onPressed: () async {
-                                                      await removeFromCart(
-                                                          product: product);
-                                                      setModalState(() {});
-                                                    },
-                                                  ),
-                                                  Text("${item['quantity']}"),
-                                                  IconButton(
-                                                    icon: Icon(Icons.add,
-                                                        color: Colors.green),
-                                                    onPressed: () async {
-                                                      if (product.addonSections!
-                                                          .isNotEmpty) {
-                                                        showModalBottomSheet(
-                                                          context: context,
-                                                          isScrollControlled:
-                                                              true,
-                                                          backgroundColor:
-                                                              Colors
-                                                                  .transparent,
-                                                          builder: (context) =>
-                                                              AddToCartPopup(
-                                                            product: item,
-                                                            restaurantId: widget
-                                                                .restaurantId,
-                                                            onCartUpdated: () {
-                                                              fetchItemsInCart(
-                                                                  user: _user!);
-                                                            },
-                                                          ),
-                                                        );
-                                                      } else {
-                                                        await addToCart(
-                                                            product: product);
-                                                        setModalState(() {});
-                                                      }
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                ),
-                                Divider(),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Tổng: ${NumberFormat("#,###", "vi_VN").format(_cartTotal)} xu',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        GoRouter.of(context).go(
-                                            '/protected/confirm-order-cart/${widget.restaurantId}');
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 20, vertical: 12),
-                                      ),
-                                      child: Text("Thanh toán"),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    });
-                  },
-                );
-              },
-              child: Stack(
-                clipBehavior: Clip.none,
+            // Restaurant Info
+            Container(
+              color: AppColors.secondary,
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.shopping_cart, size: 24),
-                  if (_cartItemCount > 0)
-                    Positioned(
-                      right: -10,
-                      top: -20,
-                      child: Container(
-                        padding: EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        constraints: BoxConstraints(
-                          minWidth: 20,
-                          minHeight: 20,
-                        ),
-                        child: Text(
-                          '$_cartItemCount',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg/1280px-Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg',
+                      height: 100,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
                     ),
+                  ),
+                  SizedBox(height: 8),
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 2,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _restaurant!.name,
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        Text("📞 ${_restaurant?.phone}"),
+                        Text("✉️ ${_restaurant?.email}"),
+                        Text("📍 ${_restaurant?.address}"),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-            Text(
-              'Tổng: ${NumberFormat("#,###", "vi_VN").format(_cartTotal)} xu',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+
+            Divider(),
+            // Menu List
+            Expanded(
+              child: ListView.builder(
+                itemCount: _products?.length,
+                itemBuilder: (context, index) {
+                  final item = _products?[index];
+                  _logger.info("Item: ${item.toString()}");
+                  return Container(
+                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey),
+                      ),
+                      child: GestureDetector(
+                        onTap: () {
+                          GoRouter.of(context).push('/protected/product',
+                              extra: {
+                                'restaurantId': widget.restaurantId,
+                                'productId': item.id
+                              });
+                        },
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                item!.image,
+                                height: 60,
+                                width: 60,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(item.name,
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold)),
+                                  Text(item.description),
+                                  Text(
+                                      "⏳ Thời gian chuẩn bị: ${item.prepareTime.round()} phút"),
+                                  SizedBox(height: 4),
+                                  Text(
+                                      "Giá: ${NumberFormat("#,###", "vi_VN").format(item.price)} xu",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () =>
+                                      removeFromCart(product: item),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange,
+                                    minimumSize: Size(32, 32),
+                                    padding: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(4)),
+                                  ),
+                                  child: Icon(Icons.remove,
+                                      color: Colors.white, size: 18),
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  '${_cartItems?.firstWhere((i) => i['productId'] == item.id, orElse: () => {
+                                        'quantity': 0
+                                      })['quantity']}',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(width: 8),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    if (item.addonSections != null &&
+                                        item.addonSections!.isNotEmpty) {
+                                      showModalBottomSheet(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        backgroundColor: Colors.transparent,
+                                        builder: (context) => AddToCartPopup(
+                                          product: item,
+                                          restaurantId: widget.restaurantId,
+                                          onCartUpdated: () {
+                                            fetchItemsInCart(user: _user!);
+                                          },
+                                        ),
+                                      );
+                                    } else {
+                                      addToCart(product: item);
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange,
+                                    minimumSize: const Size(32, 32),
+                                    padding: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(4)),
+                                  ),
+                                  child: const Icon(Icons.add,
+                                      color: Colors.white, size: 18),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ));
+                },
               ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                GoRouter.of(context)
-                    .go('/protected/confirm-order-cart/${widget.restaurantId}');
-              },
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              ),
-              child: Text("Thanh toán"),
             ),
           ],
+        ),
+        // Bottom Cart Summary
+        bottomNavigationBar: Container(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(top: BorderSide(color: Colors.grey, width: 1)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(16)),
+                    ),
+                    builder: (context) {
+                      return StatefulBuilder(builder: (context, setModalState) {
+                        return DraggableScrollableSheet(
+                          expand: false,
+                          initialChildSize: 0.5,
+                          minChildSize: 0.3,
+                          maxChildSize: 0.9,
+                          builder: (context, scrollController) {
+                            return Container(
+                              padding: EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Giỏ hàng",
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold)),
+                                  Divider(),
+                                  Expanded(
+                                    child: _cartItems == null ||
+                                            _cartItems!.isEmpty
+                                        ? Center(child: Text("Giỏ hàng trống"))
+                                        : ListView.builder(
+                                            controller: scrollController,
+                                            itemCount: _cartItems!.length,
+                                            itemBuilder: (context, index) {
+                                              final item = _cartItems![index];
+                                              final product = ProductDto(
+                                                  id: item['productId'],
+                                                  image: item['image'],
+                                                  code: item['productId']
+                                                      .toString(),
+                                                  name: item['productName'],
+                                                  price: item['price'],
+                                                  description: '',
+                                                  prepareTime: 0.0,
+                                                  available: true);
+                                              return ListTile(
+                                                leading: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  child: Image.network(
+                                                    item['image'],
+                                                    width: 50,
+                                                    height: 50,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                                title:
+                                                    Text(item['productName']),
+                                                subtitle: Text(
+                                                    "Giá: ${NumberFormat("#,###", "vi_VN").format(item['price'])}xu"),
+                                                trailing: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    IconButton(
+                                                      icon: Icon(Icons.remove,
+                                                          color: Colors.red),
+                                                      onPressed: () async {
+                                                        await removeFromCart(
+                                                            product: product);
+                                                        setModalState(() {});
+                                                      },
+                                                    ),
+                                                    Text("${item['quantity']}"),
+                                                    IconButton(
+                                                      icon: Icon(Icons.add,
+                                                          color: Colors.green),
+                                                      onPressed: () async {
+                                                        if (product
+                                                            .addonSections!
+                                                            .isNotEmpty) {
+                                                          showModalBottomSheet(
+                                                            context: context,
+                                                            isScrollControlled:
+                                                                true,
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                            builder: (context) =>
+                                                                AddToCartPopup(
+                                                              product: item,
+                                                              restaurantId: widget
+                                                                  .restaurantId,
+                                                              onCartUpdated:
+                                                                  () {
+                                                                fetchItemsInCart(
+                                                                    user:
+                                                                        _user!);
+                                                              },
+                                                            ),
+                                                          );
+                                                        } else {
+                                                          await addToCart(
+                                                              product: product);
+                                                          setModalState(() {});
+                                                        }
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                  ),
+                                  Divider(),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Tổng: ${NumberFormat("#,###", "vi_VN").format(_cartTotal)} xu',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          GoRouter.of(context).go(
+                                              '/protected/confirm-order-cart/${widget.restaurantId}');
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 12),
+                                        ),
+                                        child: Text("Thanh toán"),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      });
+                    },
+                  );
+                },
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(Icons.shopping_cart, size: 24),
+                    if (_cartItemCount > 0)
+                      Positioned(
+                        right: -10,
+                        top: -20,
+                        child: Container(
+                          padding: EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: BoxConstraints(
+                            minWidth: 20,
+                            minHeight: 20,
+                          ),
+                          child: Text(
+                            '$_cartItemCount',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              Text(
+                'Tổng: ${NumberFormat("#,###", "vi_VN").format(_cartTotal)} xu',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  GoRouter.of(context).go(
+                      '/protected/confirm-order-cart/${widget.restaurantId}');
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                ),
+                child: Text("Thanh toán"),
+              ),
+            ],
+          ),
         ),
       ),
     );

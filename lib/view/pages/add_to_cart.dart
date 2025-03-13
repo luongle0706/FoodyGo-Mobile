@@ -25,8 +25,6 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
   final CartRepository _cartRepository = CartRepository.instance;
   SavedUser? _user;
   Map<int, bool> _selectedAddonsMap = {};
-  Map<int, List<int>> _selectedAddonsBySection = {};
-  bool _isLoading = true;
   final _storage = SecureStorage.instance;
   final AppLogger _logger = AppLogger.instance;
 
@@ -50,9 +48,7 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
       });
     } else {
       _logger.info('Failed to load user');
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() {});
     }
   }
 

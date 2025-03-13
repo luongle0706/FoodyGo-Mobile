@@ -138,113 +138,115 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Scaffold(
-      body: Column(
-        children: [
-          // Food image and back button
-          Stack(
-            children: [
-              // Food image
-              Image.network(
-                _product?.image ?? '',
-                height: 300,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-              // Back button
-              Positioned(
-                top: 40,
-                left: 10,
-                child: GestureDetector(
-                  onTap: () => context.pop(),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Colors.black38,
-                      shape: BoxShape.circle,
+    return SafeArea(
+      child: Scaffold(
+        body: Column(
+          children: [
+            // Food image and back button
+            Stack(
+              children: [
+                // Food image
+                Image.network(
+                  _product?.image ?? '',
+                  height: 300,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+                // Back button
+                Positioned(
+                  top: 40,
+                  left: 10,
+                  child: GestureDetector(
+                    onTap: () => context.pop(),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: Colors.black38,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.arrow_back,
+                          color: Colors.white, size: 24),
                     ),
-                    child: const Icon(Icons.arrow_back,
-                        color: Colors.white, size: 24),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
 
-          // Food detail
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: AppColors.background),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Food description
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: AppColors.secondary,
-                      borderRadius: BorderRadius.circular(10),
+            // Food detail
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(color: AppColors.background),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Food description
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppColors.secondary,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _product?.name ?? "Không có tên",
+                            style: const TextStyle(
+                                fontSize: 22, fontWeight: FontWeight.bold),
+                          ),
+                          Text(_product?.description ?? "Không có mô tả"),
+                          const SizedBox(height: 4),
+                          Text(
+                              "Thời gian chuẩn bị: ${_product?.prepareTime ?? 0} phút"),
+                        ],
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _product?.name ?? "Không có tên",
-                          style: const TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold),
-                        ),
-                        Text(_product?.description ?? "Không có mô tả"),
-                        const SizedBox(height: 4),
-                        Text(
-                            "Thời gian chuẩn bị: ${_product?.prepareTime ?? 0} phút"),
-                      ],
-                    ),
-                  ),
 
-                  const Spacer(),
+                    const Spacer(),
 
-                  _cartItemCount > 0
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '${NumberFormat("#,###", "vi_VN").format(_cartTotal)} xu',
-                              style: const TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            Row(
-                              children: [
-                                _buildQuantityButton(
-                                    Icons.remove,
-                                    _cartItemCount > 0,
-                                    () => removeFromCart(product: _product!)),
-                                const SizedBox(width: 8),
-                                Text('$_cartItemCount',
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold)),
-                                const SizedBox(width: 8),
-                                _buildQuantityButton(Icons.add, true,
-                                    () => addToCart(product: _product!)),
-                              ],
-                            ),
-                          ],
-                        )
-                      : MyButton(
-                          onTap: () => addToCart(product: _product!),
-                          text:
-                              'Thêm vào giỏ hàng - ${NumberFormat("#,###", "vi_VN").format(_product?.price ?? 0)} xu',
-                          color: AppColors.primary,
-                        ),
-                ],
+                    _cartItemCount > 0
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '${NumberFormat("#,###", "vi_VN").format(_cartTotal)} xu',
+                                style: const TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Row(
+                                children: [
+                                  _buildQuantityButton(
+                                      Icons.remove,
+                                      _cartItemCount > 0,
+                                      () => removeFromCart(product: _product!)),
+                                  const SizedBox(width: 8),
+                                  Text('$_cartItemCount',
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold)),
+                                  const SizedBox(width: 8),
+                                  _buildQuantityButton(Icons.add, true,
+                                      () => addToCart(product: _product!)),
+                                ],
+                              ),
+                            ],
+                          )
+                        : MyButton(
+                            onTap: () => addToCart(product: _product!),
+                            text:
+                                'Thêm vào giỏ hàng - ${NumberFormat("#,###", "vi_VN").format(_product?.price ?? 0)} xu',
+                            color: AppColors.primary,
+                          ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
