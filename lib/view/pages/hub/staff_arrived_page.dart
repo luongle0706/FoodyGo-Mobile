@@ -5,6 +5,7 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:go_router/go_router.dart';
 
 class StaffArrivedPage extends StatefulWidget {
   const StaffArrivedPage({super.key});
@@ -134,7 +135,12 @@ class _StaffArrivedPageState extends State<StaffArrivedPage> {
                     Row(
                       children: [
                         OutlinedButton(
-                            onPressed: () {}, child: Text("Xem thêm")),
+                            onPressed: () {
+                              GoRouter.of(context).push(
+                                  '/protected/order-detail-restaurant',
+                                  extra: order['id']);
+                            },
+                            child: Text("Xem thêm")),
                         const SizedBox(width: 8),
                         ElevatedButton(
                             onPressed: () {

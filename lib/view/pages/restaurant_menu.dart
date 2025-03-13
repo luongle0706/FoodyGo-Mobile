@@ -1,15 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-// import 'package:foodygo/dto/product_dto.dart';
+import 'package:foodygo/dto/product_dto.dart';
 import 'package:foodygo/dto/restaurant_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
-// import 'package:foodygo/repository/product_repository.dart';
 import 'package:foodygo/repository/restaurant_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 // import 'package:foodygo/view/pages/restaurant/custome_appbar_order_restaurant_list.dart';
-import 'package:foodygo/view/pages/welcome_screen.dart';
 import 'package:go_router/go_router.dart';
 
 class RestaurantMenu extends StatefulWidget {
@@ -24,12 +22,10 @@ class RestaurantMenu extends StatefulWidget {
 class _RestaurantMenuState extends State<RestaurantMenu> {
   final _storage = SecureStorage.instance;
   final AppLogger _logger = AppLogger.instance;
-  // final ProductRepository _productRepository = ProductRepository.instance;
   final RestaurantRepository _restaurantRepository =
       RestaurantRepository.instance;
-  // SavedUser? _user;
   RestaurantDto? _restaurantDto;
-  // List<ProductDto>? _productDto;
+  List<ProductDto>? _productDto;
 
   bool _isLoading = true;
 
@@ -43,12 +39,14 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
     RestaurantDto? fetchOrder = await _restaurantRepository.loadRestaurantById(
         accessToken, widget.restaurantId);
 
-    // List<ProductDto>? fetchProduct = await _productRepository
-    //     .getProductsByRestaurantId(widget.restaurantId, accessToken);
+    List<ProductDto>? fetchProduct = await _restaurantRepository
+        .getProductsByRestaurantId(accessToken, widget.restaurantId);
 
     if (fetchOrder != null) {
       setState(() {
         _restaurantDto = fetchOrder;
+        _productDto = fetchProduct;
+        _isLoading = false;
       });
       return true;
     }
@@ -60,9 +58,6 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
     SavedUser? user =
         userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
     if (user != null) {
-      // setState(() {
-      //   _user = user;
-      // });
       bool fetchOrderData = await fetchRestaurant(user.token);
 
       if (fetchOrderData) {
@@ -84,51 +79,6 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
 
   int selectedTab = 1;
 
-  List<Map<String, dynamic>> categorizedMenu = [
-    {
-      "title": "Cơm",
-      "isExpanded": true,
-      "items": [
-        {
-          "name": "Cơm tấm sườn que",
-          "price": "25.000đ",
-          "image": "assets/comtam.png",
-          "isAvailable": true
-        },
-        {
-          "name": "Cơm gà xối mỡ",
-          "price": "30.000đ",
-          "image": "assets/comga.png",
-          "isAvailable": false
-        },
-      ]
-    },
-    {
-      "title": "Phở",
-      "isExpanded": true,
-      "items": [
-        {
-          "name": "Phở bò",
-          "price": "35.000đ",
-          "image": "assets/phobo.png",
-          "isAvailable": true
-        },
-      ]
-    },
-    {
-      "title": "Bún",
-      "isExpanded": true,
-      "items": [
-        {
-          "name": "Bún bò Huế",
-          "price": "40.000đ",
-          "image": "assets/bunbo.png",
-          "isAvailable": true
-        },
-      ]
-    },
-  ];
-
   List<Map<String, dynamic>> toppingGroups = [
     {"name": "Topping 1", "description": "Mô tả topping 1"},
     {"name": "Topping 2", "description": "Mô tả topping 2"},
@@ -137,14 +87,6 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -184,22 +126,22 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
                             size: 15, color: Colors.grey),
                       ],
                     )
-                  : SizedBox(), // Tránh lỗi khi _restaurantDto chưa có giá trị
+                  : SizedBox(),
             )
           ],
         ),
       ),
       backgroundColor: Colors.grey[300],
-      body: Column(
-        children: [
-          Expanded(
-            child: selectedTab == 1
-                ? MenuScreen(
-                    toppingGroups: toppingGroups, categoryMenu: categorizedMenu)
-                : WelcomeScreen(),
-          ),
-        ],
-      ),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                Expanded(
+                  child: MenuScreen(
+                      toppingGroups: toppingGroups, productDto: _productDto),
+                ),
+              ],
+            ),
     );
   }
 
@@ -239,38 +181,23 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
 
 class MenuScreen extends StatefulWidget {
   final List<Map<String, dynamic>> toppingGroups;
-  final List<Map<String, dynamic>> categoryMenu;
+  final List<ProductDto>? productDto;
   const MenuScreen(
-      {super.key, required this.toppingGroups, required this.categoryMenu});
+      {super.key, required this.toppingGroups, required this.productDto});
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  int selectedTab = 0;
-  // 0: Món, 1: Nhóm Topping
+  int selectedTab = 0; // 0: Món, 1: Nhóm Topping
   String searchQuery = "";
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> filter = widget.categoryMenu
-        .map((category) {
-          List<Map<String, dynamic>> filteredItems =
-              (category["items"] as List<dynamic>)
-                  .cast<Map<String, dynamic>>()
-                  .where((item) => item["name"]
-                      .toLowerCase()
-                      .contains(searchQuery.toLowerCase()))
-                  .toList();
-
-          return {
-            "title": category["title"],
-            "isExpanded": category["isExpanded"],
-            "items": filteredItems,
-          };
-        })
-        .where((category) => category["items"].isNotEmpty)
+    List<ProductDto> filteredProducts = widget.productDto!
+        .where((product) =>
+            product.name.toLowerCase().contains(searchQuery.toLowerCase()))
         .toList();
 
     return Column(
@@ -363,72 +290,36 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
         ),
 
-        // Nội dung dựa theo tab
         Expanded(
           child: ListView.builder(
-            itemCount:
-                selectedTab == 0 ? filter.length : widget.toppingGroups.length,
+            itemCount: selectedTab == 0
+                ? filteredProducts.length
+                : widget.toppingGroups.length,
             itemBuilder: (context, categoryIndex) {
               if (selectedTab == 0) {
-                var category = filter[categoryIndex];
-                return Column(
-                  children: [
-                    ListTile(
-                      title: Text(
-                        category["title"],
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                              "${category["items"].where((item) => item["isAvailable"] == true).length}/${category["items"].length}"),
-                          IconButton(
-                            icon: Icon(category["isExpanded"]
-                                ? Icons.expand_less
-                                : Icons.expand_more),
-                            onPressed: () {
-                              setState(() {
-                                int originalIndex = widget.categoryMenu
-                                    .indexWhere((cat) =>
-                                        cat["title"] == category["title"]);
-                                if (originalIndex != -1) {
-                                  widget.categoryMenu[originalIndex]
-                                          ["isExpanded"] =
-                                      !widget.categoryMenu[originalIndex]
-                                          ["isExpanded"];
-                                }
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (category["isExpanded"])
-                      Column(
-                        children: category["items"].map<Widget>((item) {
-                          return ListTile(
-                            leading: Container(
-                              width: 50,
-                              height: 50,
-                              color: Colors.grey[400],
-                              child: Center(child: Text("Ảnh")),
-                            ),
-                            title: Text(item["name"]),
-                            subtitle: Text(item["price"]),
-                            trailing: Switch(
-                              value: item["isAvailable"],
-                              onChanged: (value) {
-                                setState(() {
-                                  item["isAvailable"] = value;
-                                });
-                              },
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                  ],
+                var product = filteredProducts[categoryIndex];
+                return ListTile(
+                  leading: Container(
+                    width: 50,
+                    height: 50,
+                    color: Colors.grey[400],
+                    child: Center(child: Text("Ảnh")),
+                  ),
+                  onTap: () {
+                    GoRouter.of(context).push(
+                        "/protected/product-detail-restaurant",
+                        extra: product.id);
+                  },
+                  title: Text(product.name),
+                  subtitle: Text("${product.price.toStringAsFixed(0)}đ"),
+                  trailing: Switch(
+                    value: product.available,
+                    onChanged: (value) {
+                      setState(() {
+                        // product.available = value;
+                      });
+                    },
+                  ),
                 );
               } else {
                 var item = widget.toppingGroups[categoryIndex];

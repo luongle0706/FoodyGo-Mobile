@@ -1,3 +1,4 @@
+import 'package:foodygo/dto/product_dto.dart';
 import 'package:foodygo/dto/restaurant_dto.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/constants.dart';
@@ -51,4 +52,29 @@ class RestaurantRepository {
       return null;
     }
   }
+
+  Future<List<ProductDto>?> getProductsByRestaurantId(String accessToken, int restaurantId) async {
+    final response = await http.get(
+      Uri.parse('$globalURL/api/v1/restaurants/$restaurantId/products'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+      if (jsonData['data'] != null && jsonData['data']['content'] is List) {
+        return (jsonData['data']['content'] as List)
+            .map((item) => ProductDto.fromJson(item))
+            .toList();
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } else {
+      throw Exception('Failed to load data: ${response.statusCode}');
+    }
+  }
+
 }

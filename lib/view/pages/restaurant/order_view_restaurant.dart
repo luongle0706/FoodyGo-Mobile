@@ -236,7 +236,7 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
                       Row(
                         children: [
                           Text(
-                              "${item.totalItems} Món | ${item.totalPrice.round()} đ")
+                              "${item.totalItems} Món | ${item.totalPrice.round()} xu")
                         ],
                       ),
                       for (OrderDetail detail in item.orderDetails)

@@ -12,9 +12,14 @@ class AuthRepository {
 
   final logger = AppLogger.instance;
 
-  Future<LoginResponseDTO> login(LoginRequestDTO request) async {
+  Future<LoginResponseDTO> login(
+      {required LoginRequestDTO request, String? fcmToken}) async {
+    logger.info('fcmToken=$fcmToken');
     final response = await http.post(
-      Uri.parse('$globalURL/api/v1/authentications/login'),
+      fcmToken != null
+          ? Uri.parse(
+              '$globalURL/api/v1/authentications/login?fcmToken=$fcmToken')
+          : Uri.parse('$globalURL/api/v1/authentications/login'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -107,5 +112,13 @@ class AuthRepository {
     } else {
       throw Exception('Failed to load data in send OTP!');
     }
+  }
+
+  Future<void> optOut({required String fcmToken}) async {
+    final response = await http.post(
+        Uri.parse(
+            '$globalURL/api/v1/authentications/opt-out?fcmToken=$fcmToken'),
+        headers: {'Content-Type': 'application/json'});
+    if (response.statusCode != 200) logger.error("Sai r");
   }
 }

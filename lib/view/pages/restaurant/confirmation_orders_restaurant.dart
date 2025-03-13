@@ -276,7 +276,7 @@ class ConfirmedOrderCard extends StatelessWidget {
                 Text("${order['totalItems']} món",
                     style: const TextStyle(fontSize: 14)),
                 Text(
-                  "${order['totalPrice'].round()}đ",
+                  "${order['totalPrice'].round()} xu",
                   style: const TextStyle(
                       fontSize: 14, fontWeight: FontWeight.bold),
                 ),

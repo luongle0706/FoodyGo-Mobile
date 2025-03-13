@@ -7,9 +7,9 @@ class BuildingRepository {
   BuildingRepository._();
   static final instance = BuildingRepository._();
 
-  Future<List<dynamic>?> getAllBuildings() async {
+  Future<List<dynamic>?> getAllBuildings({int pageSize = -1}) async {
     final response = await http.get(
-      Uri.parse('$globalURL/api/v1/public/buildings'),
+      Uri.parse('$globalURL/api/v1/public/buildings?pageSize=$pageSize'),
       headers: {
         'Content-Type': 'application/json',
       },

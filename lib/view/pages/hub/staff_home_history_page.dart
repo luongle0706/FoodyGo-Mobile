@@ -5,6 +5,7 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:go_router/go_router.dart';
 
 class StaffHomeHistoryPage extends StatefulWidget {
   const StaffHomeHistoryPage({super.key});
@@ -100,7 +101,11 @@ class _StaffHomeHistoryPageState extends State<StaffHomeHistoryPage> {
                         .toString()
                         .split('T')[1]), // Hiển thị giờ đặt
                     OutlinedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        GoRouter.of(context).push(
+                            '/protected/order-detail-restaurant',
+                            extra: order['id']);
+                      },
                       child: Text("Xem thêm"),
                     ),
                   ],

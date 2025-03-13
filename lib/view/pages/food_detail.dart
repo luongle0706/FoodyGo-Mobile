@@ -44,6 +44,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
     String? userData = await _storage.get(key: 'user');
     SavedUser? user =
         userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
+
     if (user != null) {
       setState(() {
         _user = user;
@@ -51,15 +52,9 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
       bool fetchedProduct = await fetchProduct(user);
       bool fetchedItemsInCart = await fetchItemsInCart(user: user);
 
-      if (fetchedProduct && fetchedItemsInCart) {
-        setState(() {
-          _isLoading = false;
-        });
-      } else {
-        setState(() {
-          _isLoading = true;
-        });
-      }
+      setState(() {
+        _isLoading = !(fetchedProduct && fetchedItemsInCart);
+      });
     } else {
       _logger.info('Failed to load user');
       setState(() {
@@ -69,90 +64,80 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
   }
 
   Future<bool> fetchProduct(SavedUser user) async {
-    ProductDto? fetchProduct =
+    ProductDto? fetchedProduct =
         await _productRepository.getProductById(widget.productId, user.token);
-    if (fetchProduct != null) {
+    if (fetchedProduct != null) {
       setState(() {
-        _product = fetchProduct;
+        _product = fetchedProduct;
       });
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   Future<bool> fetchItemsInCart({required SavedUser user}) async {
     List<dynamic>? data = await _cartRepository.getCartByRestaurant(
-        accessToken: _user?.token,
-        userId: _user?.userId,
+        accessToken: user.token,
+        userId: user.userId,
         restaurantId: widget.restaurantId);
+
     if (data != null) {
-      int total = data.isNotEmpty
-          ? data
-              .where((item) => item['productId'] == widget.productId)
-              .map((item) => ((item['price'] as num).toInt() *
-                  (item['quantity'] as num).toInt()))
-              .fold(0, (a, b) => a + b)
-          : 0;
-      int totalQuantity = data.isNotEmpty
-          ? data
-              .where((item) => item['productId'] == widget.productId)
-              .map((item) => (item['quantity'] as num).toInt())
-              .fold(0, (a, b) => a + b)
-          : 0;
+      int total = data
+          .where((item) => item['productId'] == widget.productId)
+          .map((item) => ((item['price'] as num).toInt() *
+              (item['quantity'] as num).toInt()))
+          .fold(0, (a, b) => a + b);
+      int totalQuantity = data
+          .where((item) => item['productId'] == widget.productId)
+          .map((item) => (item['quantity'] as num).toInt())
+          .fold(0, (a, b) => a + b);
+
       setState(() {
         _cartItemCount = totalQuantity;
         _cartTotal = total;
       });
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   Future<void> addToCart({required ProductDto product}) async {
     bool result = await _cartRepository.addToCart(
-        accessToken: _user?.token,
-        userId: _user?.userId,
-        restaurantId: widget.restaurantId,
-        productId: product.id,
-        productName: product.name,
-        price: product.price,
-        image: product.image,
-        quantity: 1);
+      accessToken: _user?.token,
+      userId: _user?.userId,
+      restaurantId: widget.restaurantId,
+      productId: product.id,
+      productName: product.name,
+      image: product.image,
+      price: product.price,
+      quantity: 1,
+    );
     if (result) {
       fetchItemsInCart(user: _user!);
     } else {
-      _logger.info('failed');
+      _logger.info('Failed to add item to cart');
     }
   }
 
   Future<void> removeFromCart({required ProductDto product}) async {
     bool result = await _cartRepository.removeFromCart(
-        productId: product.id,
-        userId: _user?.userId,
-        accessToken: _user?.token);
+      productId: product.id,
+      userId: _user?.userId,
+      accessToken: _user?.token,
+    );
     if (result) {
       fetchItemsInCart(user: _user!);
     } else {
-      _logger.info('Failed to delete item from cart');
+      _logger.info('Failed to remove item from cart');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return SizedBox(
-        height: 100,
-        child: Center(
-          child: Row(
-            children: [
-              CircularProgressIndicator(),
-            ],
-          ), // Show loading indicator
-        ),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
+
     return Scaffold(
       body: Column(
         children: [
@@ -161,30 +146,25 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
             children: [
               // Food image
               Image.network(
-                'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg/1280px-Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg',
+                _product?.image ?? '',
                 height: 300,
                 width: double.infinity,
-                fit: BoxFit.fill,
+                fit: BoxFit.cover,
               ),
               // Back button
               Positioned(
                 top: 40,
                 left: 10,
                 child: GestureDetector(
-                  onTap: () {
-                    context.pop();
-                  },
+                  onTap: () => context.pop(),
                   child: Container(
                     padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.black38,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 24,
-                    ),
+                    child: const Icon(Icons.arrow_back,
+                        color: Colors.white, size: 24),
                   ),
                 ),
               ),
@@ -195,9 +175,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.background,
-              ),
+              decoration: BoxDecoration(color: AppColors.background),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -209,17 +187,18 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                       color: AppColors.secondary,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Cơm tấm sườn trứng",
-                          style: TextStyle(
+                          _product?.name ?? "Không có tên",
+                          style: const TextStyle(
                               fontSize: 22, fontWeight: FontWeight.bold),
                         ),
-                        Text("Cơm tấm siêu cấp ngon"),
-                        SizedBox(height: 4),
-                        Text("Thời gian chuẩn bị: 15 phút"),
+                        Text(_product?.description ?? "Không có mô tả"),
+                        const SizedBox(height: 4),
+                        Text(
+                            "Thời gian chuẩn bị: ${_product?.prepareTime ?? 0} phút"),
                       ],
                     ),
                   ),
@@ -230,76 +209,27 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                       ? Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            // Price section
-                            Row(
-                              children: [
-                                Text(
-                                  '${NumberFormat("#,###", "vi_VN").format(_cartTotal)}đ',
-                                  style: const TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              '${NumberFormat("#,###", "vi_VN").format(_cartTotal)} xu',
+                              style: const TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
                             ),
-                            // Quantity control
                             Row(
                               children: [
-                                // Remove button
-                                InkWell(
-                                  onTap: _cartItemCount > 0
-                                      ? () => removeFromCart(product: _product!)
-                                      : null,
-                                  child: Container(
-                                    width: 32,
-                                    height: 32,
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      color: _cartItemCount > 0
-                                          ? Colors.white
-                                          : Colors.grey.shade300,
-                                      border: Border.all(
-                                        color: _cartItemCount > 0
-                                            ? Colors.red
-                                            : Colors.grey,
-                                        width: 1.5,
-                                      ),
-                                      borderRadius: BorderRadius.circular(
-                                          4), // Square corners
-                                    ),
-                                    child: Icon(Icons.remove,
-                                        color: _cartItemCount > 0
-                                            ? Colors.red
-                                            : Colors.grey,
-                                        size: 20),
-                                  ),
-                                ),
+                                _buildQuantityButton(
+                                    Icons.remove,
+                                    _cartItemCount > 0,
+                                    () => removeFromCart(product: _product!)),
                                 const SizedBox(width: 8),
-                                // Quantity text
-                                Text(
-                                  '$_cartItemCount',
-                                  style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                ),
+                                Text('$_cartItemCount',
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold)),
                                 const SizedBox(width: 8),
-                                // Add button
-                                InkWell(
-                                  onTap: () => addToCart(product: _product!),
-                                  child: Container(
-                                    width: 32,
-                                    height: 32,
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      color: Colors.red,
-                                      borderRadius: BorderRadius.circular(
-                                          4), // Square corners
-                                    ),
-                                    child: const Icon(Icons.add,
-                                        color: Colors.white, size: 20),
-                                  ),
-                                ),
+                                _buildQuantityButton(Icons.add, true,
+                                    () => addToCart(product: _product!)),
                               ],
                             ),
                           ],
@@ -307,13 +237,31 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
                       : MyButton(
                           onTap: () => addToCart(product: _product!),
                           text:
-                              'Thêm vào giỏ hàng - ${NumberFormat("#,###", "vi_VN").format(_product?.price)}đ',
-                          color: AppColors.primary)
+                              'Thêm vào giỏ hàng - ${NumberFormat("#,###", "vi_VN").format(_product?.price ?? 0)} xu',
+                          color: AppColors.primary,
+                        ),
                 ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildQuantityButton(
+      IconData icon, bool isActive, VoidCallback onPressed) {
+    return InkWell(
+      onTap: isActive ? onPressed : null,
+      child: Container(
+        width: 32,
+        height: 32,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: isActive ? Colors.red : Colors.grey.shade300,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Icon(icon, color: Colors.white, size: 20),
       ),
     );
   }

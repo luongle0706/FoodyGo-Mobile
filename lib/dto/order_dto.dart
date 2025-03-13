@@ -66,7 +66,7 @@ class OrderDetail {
   final int quantity;
   final double price;
   final String productName;
-  final List<String>? addonItems;
+  final dynamic addonItems;
 
   OrderDetail({
     required this.id,
@@ -84,9 +84,7 @@ class OrderDetail {
       quantity: json['quantity'] as int,
       price: (json['price'] ?? 0.0).toDouble(),
       productName: json['productName'] ?? 'Unknown Product',
-      addonItems: json['addonItems'] != null
-          ? List<String>.from(json['addonItems'])
-          : null,
+      addonItems: json['addonItems'],
     );
   }
 }

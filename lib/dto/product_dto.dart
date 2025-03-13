@@ -34,8 +34,9 @@ class ProductDto {
       prepareTime: (json['prepareTime'] ?? 0.0).toDouble(),
       available: json['available'] ?? false,
       addonSections: (json['addonSections'] as List<dynamic>?)
-          ?.map((e) => AddonSectionDto.fromJson(e))
-          .toList(),
+              ?.map((e) => AddonSectionDto.fromJson(e))
+              .toList() ??
+          [],
       category: json['category'] != null
           ? CategoryDTO.fromJson(json['category'])
           : null,

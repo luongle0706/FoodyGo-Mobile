@@ -111,8 +111,8 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
         restaurantId: widget.restaurantId,
         productId: product.id,
         productName: product.name,
-        price: product.price,
         image: product.image,
+        price: product.price,
         quantity: 1);
     if (result) {
       await fetchItemsInCart(user: _user!);
@@ -292,7 +292,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.network(
-                              'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg/1280px-Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg',
+                              item!.image,
                               height: 60,
                               width: 60,
                               fit: BoxFit.cover,
@@ -303,7 +303,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(item!.name,
+                                Text(item.name,
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold)),
@@ -312,7 +312,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                     "⏳ Thời gian chuẩn bị: ${item.prepareTime.round()} phút"),
                                 SizedBox(height: 4),
                                 Text(
-                                    "Giá: ${NumberFormat("#,###", "vi_VN").format(item.price)}đ",
+                                    "Giá: ${NumberFormat("#,###", "vi_VN").format(item.price)} xu",
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold)),
@@ -445,7 +445,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                                 borderRadius:
                                                     BorderRadius.circular(8),
                                                 child: Image.network(
-                                                  'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg/1280px-Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg',
+                                                  item['image'],
                                                   width: 50,
                                                   height: 50,
                                                   fit: BoxFit.cover,
@@ -453,7 +453,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                               ),
                                               title: Text(item['productName']),
                                               subtitle: Text(
-                                                  "Giá: ${NumberFormat("#,###", "vi_VN").format(item['price'])}đ"),
+                                                  "Giá: ${NumberFormat("#,###", "vi_VN").format(item['price'])}xu"),
                                               trailing: Row(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
@@ -510,7 +510,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Tổng: ${NumberFormat("#,###", "vi_VN").format(_cartTotal)}đ',
+                                      'Tổng: ${NumberFormat("#,###", "vi_VN").format(_cartTotal)} xu',
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
@@ -571,7 +571,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
               ),
             ),
             Text(
-              'Tổng: ${NumberFormat("#,###", "vi_VN").format(_cartTotal)}đ',
+              'Tổng: ${NumberFormat("#,###", "vi_VN").format(_cartTotal)} xu',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,

@@ -23,9 +23,7 @@ class AddonSectionRepository {
       final jsonResponse = json.decode(response.body);
       dynamic list = jsonResponse['data'];
       _logger.info(list.toString());
-      return list.map((item) {
-        return AddonSectionDto.fromJson(item);
-      });
+      return list.map((item) => AddonSectionDto.fromJson(item)).toList();
     } else {
       throw Exception('Failed to load data!');
     }
