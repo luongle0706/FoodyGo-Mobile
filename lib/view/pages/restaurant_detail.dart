@@ -416,7 +416,13 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                           maxChildSize: 0.9,
                           builder: (context, scrollController) {
                             return Container(
-                              padding: EdgeInsets.all(16),
+                              padding: EdgeInsets.only(
+                                  left: 16,
+                                  right: 16,
+                                  top: 16,
+                                  bottom: MediaQuery.of(context)
+                                      .viewPadding
+                                      .bottom),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
