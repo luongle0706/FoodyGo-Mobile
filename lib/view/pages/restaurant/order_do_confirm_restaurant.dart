@@ -168,7 +168,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
               children: [
                 const Text("Tổng tiền món",
                     style: TextStyle(fontWeight: FontWeight.bold)),
-                Text("${widget.order['totalPrice'].toStringAsFixed(0)}đ",
+                Text("${widget.order['totalPrice'].toStringAsFixed(0)} xu",
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.bold)),
               ],
@@ -246,7 +246,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text("$quantity x $name", style: const TextStyle(fontSize: 14)),
-          Text("${price.toStringAsFixed(0)}đ",
+          Text("${price.toStringAsFixed(0)} xu",
               style: const TextStyle(fontSize: 14)),
         ],
       ),
