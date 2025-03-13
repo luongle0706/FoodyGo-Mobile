@@ -217,7 +217,11 @@ class Main extends StatelessWidget {
                   name: 'order_success',
                   path: '/order-success',
                   pageBuilder: (context, state) {
-                    return MaterialPage(child: OrderSuccessPage());
+                    final orderId = state.extra as int;
+                    return MaterialPage(
+                        child: OrderSuccessPage(
+                      orderId: orderId,
+                    ));
                   },
                 ),
                 GoRoute(
@@ -280,8 +284,7 @@ class Main extends StatelessWidget {
                   name: 'detail_order', // S-014
                   path: '/protected/detail-order',
                   pageBuilder: (context, state) {
-                    // final orderId = state.extra as int;
-                    final orderId = 1;
+                    final orderId = state.extra as int;
                     return MaterialPage(child: DetailOrder(orderId: orderId));
                   },
                 ),

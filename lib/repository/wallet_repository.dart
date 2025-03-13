@@ -12,13 +12,11 @@ class WalletRepository {
   final AppLogger logger = AppLogger.instance;
 
   Future<WalletDto?> loadWalletBalance(SavedUser savedUser) async {
-    int userId = savedUser.userId;
     String accessToken = savedUser.token;
     String url = savedUser.role == 'ROLE_SELLER'
-        ? '$globalURL/api/v1/wallets/restaurant/$userId'
-        : '$globalURL/api/v1/wallets/customer/$userId';
+        ? '$globalURL/api/v1/wallets/restaurant/${savedUser.restaurantId}'
+        : '$globalURL/api/v1/wallets/customer/${savedUser.customerId}';
 
-    logger.info("Fetching wallet balance for user ID: $userId");
     final response = await http.get(
       Uri.parse(url),
       headers: {
@@ -44,11 +42,14 @@ class WalletRepository {
   // Add this method to your existing WalletRepository class
   Future<List<TransactionDto>?> getTransactionHistory(
       SavedUser savedUser) async {
-    int userId = savedUser.userId;
+    int? walletId = savedUser.walletId;
+    if (walletId == null) {
+      return null;
+    }
     String accessToken = savedUser.token;
-    String url = '$globalURL/api/v1/wallets/$userId/transactions';
+    String url = '$globalURL/api/v1/wallets/$walletId/transactions';
 
-    logger.info("Fetching transaction history for wallet ID: $userId");
+    logger.info("Fetching transaction history for wallet ID: $walletId");
     final response = await http.get(
       Uri.parse(url),
       headers: {
@@ -72,11 +73,16 @@ class WalletRepository {
   }
 
   Future<List<TransactionDto>?> getPaymentHistory(SavedUser savedUser) async {
-    int userId = savedUser.userId;
-    String accessToken = savedUser.token;
-    String url = '$globalURL/api/v1/wallets/$userId/payments';
+    int? walletId = savedUser.walletId;
 
-    logger.info("Fetching payment history for wallet ID: $userId");
+    if (walletId == null) {
+      return null;
+    }
+
+    String accessToken = savedUser.token;
+    String url = '$globalURL/api/v1/wallets/$walletId/payments';
+
+    logger.info("Fetching payment history for wallet ID: $walletId");
     final response = await http.get(
       Uri.parse(url),
       headers: {
@@ -107,7 +113,10 @@ class WalletRepository {
 
   // Add this method to your existing WalletRepository class
   Future<bool> withdrawFromWallet(SavedUser savedUser, double amount) async {
-    int walletId = savedUser.userId;
+    int? walletId = savedUser.walletId;
+    if (walletId == null) {
+      return false;
+    }
     String accessToken = savedUser.token;
     String url = '$globalURL/api/v1/wallets/$walletId/withdraw';
 
@@ -143,7 +152,10 @@ class WalletRepository {
   // Add this method to your existing WalletRepository class
   Future<bool> transferPoints(SavedUser savedUser, String receiverPhone,
       double amount, String note) async {
-    int walletId = savedUser.userId;
+    int? walletId = savedUser.walletId;
+    if (walletId == null) {
+      return false;
+    }
     String accessToken = savedUser.token;
     String url = '$globalURL/api/v1/wallets/$walletId/transfer';
 
@@ -182,15 +194,18 @@ class WalletRepository {
   // Add this method to the WalletRepository class
   Future<Map<String, dynamic>?> topUpWallet(
       SavedUser savedUser, double amount, String method) async {
-    int userId = savedUser.userId;
+    int? walletId = savedUser.walletId;
+    if (walletId == null) {
+      return null;
+    }
     String accessToken = savedUser.token;
-    String url = '$globalURL/api/v1/wallets/$userId/topup';
+    String url = '$globalURL/api/v1/wallets/$walletId/topup';
 
     // Convert FoodyXu amount to VND (1 FoodyXu = 1000 VND)
     final amountInVND = (amount * 1000).toInt();
 
     logger.info(
-        "Processing top-up for wallet ID: $userId, amount: $amount FoodyXu, method: $method");
+        "Processing top-up for wallet ID: $walletId, amount: $amount FoodyXu, method: $method");
 
     try {
       final response = await http.post(
