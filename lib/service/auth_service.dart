@@ -136,11 +136,15 @@ class AuthService {
   }
 
   void signOut(BuildContext context) async {
-    String? fcmToken = await storage.get(key: 'fcm_token');
-    await authRepository.optOut(fcmToken: fcmToken!);
     storage.delete(key: 'user');
     if (context.mounted) {
       GoRouter.of(context).go('/login');
+    }
+    String? fcmToken = await storage.get(key: 'fcm_token');
+    try {
+      await authRepository.optOut(fcmToken: fcmToken!);
+    } catch (e) {
+      logger.error("Cant opt out");
     }
   }
 }
