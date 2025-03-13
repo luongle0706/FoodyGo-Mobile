@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class OrderSuccessPage extends StatelessWidget {
-  const OrderSuccessPage({super.key});
+  final int orderId;
+  const OrderSuccessPage({super.key, required this.orderId});
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +52,8 @@ class OrderSuccessPage extends StatelessWidget {
                 backgroundColor: Color.fromARGB(255, 189, 75, 3),
               ),
               onPressed: () {
-                GoRouter.of(context).go("/protected/detail-order");
+                GoRouter.of(context)
+                    .go("/protected/detail-order", extra: orderId);
               },
               child: Text(
                 "Xem đơn mua",

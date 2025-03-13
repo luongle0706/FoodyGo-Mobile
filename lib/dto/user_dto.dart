@@ -7,6 +7,7 @@ class SavedUser {
   int? customerId;
   int? restaurantId;
   int? hubId;
+  int? walletId;
 
   SavedUser(
       {required this.email,
@@ -16,7 +17,8 @@ class SavedUser {
       required this.userId,
       required this.customerId,
       required this.restaurantId,
-      required this.hubId});
+      required this.hubId,
+      required this.walletId});
 
   toJson() {
     return {
@@ -27,7 +29,8 @@ class SavedUser {
       'userId': userId,
       'customerId': customerId,
       'restaurantId': restaurantId,
-      'hubId': hubId
+      'hubId': hubId,
+      'walletId': walletId
     };
   }
 
@@ -40,6 +43,7 @@ class SavedUser {
         userId: json['userId'],
         customerId: json['customerId'],
         restaurantId: json['restaurantId'],
-        hubId: json['hubId']);
+        hubId: json['hubId'],
+        walletId: json['walletId']);
   }
 }

@@ -266,8 +266,7 @@ class _DetailOrderState extends State<DetailOrder> {
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             Text(
-                                              orderDetail.addonItems
-                                                      ?.toString() ??
+                                              orderDetail.addonItems ??
                                                   'Không có món thêm',
                                               style:
                                                   TextStyle(color: Colors.grey),

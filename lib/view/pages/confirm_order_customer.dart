@@ -127,6 +127,12 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
   }
 
   Future<void> placeOrder(BuildContext context) async {
+    if (chosenHubId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Vui lòng chọn Hub trước khi đặt hàng!")),
+      );
+      return;
+    }
     int? result = await _orderRepository.pay(
         accessToken: _user!.token,
         shippingFee: _shippingFee * 1.0,
@@ -138,12 +144,12 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
         notes: _notes,
         customerId: _user!.customerId!,
         restaurantId: widget.restaurantId,
-        hubId: chosenHubId ?? -1,
+        hubId: chosenHubId!,
         cartLists: _cartItems!);
     if (result != null) {
       _logger.info("Successfully ordered: Order ID=$result");
       if (context.mounted) {
-        GoRouter.of(context).go('/order-success');
+        GoRouter.of(context).go('/order-success', extra: result);
         return;
       }
     }
@@ -259,7 +265,8 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.network(
-                              'https://via.placeholder.com/60', // Placeholder image
+                              item['image'] ??
+                                  'https://via.placeholder.com/60', // Placeholder image
                               loadingBuilder: (context, child, progress) {
                                 if (progress == null) {
                                   return child;
@@ -306,7 +313,8 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Tổng giá món"),
-                Text("${NumberFormat("#,###", "vi_VN").format(_totalPrice)} xu"),
+                Text(
+                    "${NumberFormat("#,###", "vi_VN").format(_totalPrice)} xu"),
               ],
             ),
             SizedBox(height: 10),

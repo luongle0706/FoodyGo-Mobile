@@ -26,6 +26,7 @@ class LoginResponseDTO {
   final int? customerId;
   final int? restaurantId;
   final int? hubId;
+  final int? walletId;
 
   LoginResponseDTO(
       {required this.code,
@@ -38,5 +39,6 @@ class LoginResponseDTO {
       required this.userId,
       required this.customerId,
       required this.restaurantId,
-      required this.hubId});
+      required this.hubId,
+      required this.walletId});
 }
