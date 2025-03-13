@@ -21,7 +21,6 @@ class CartRepository {
     if (response.statusCode == 200) {
       Map<String, dynamic> responseBody = json.decode(response.body);
       List<dynamic> data = responseBody['data'];
-      _logger.info("Cart $data");
       return data;
     }
     return null;
@@ -51,6 +50,7 @@ class CartRepository {
       required productName,
       required price,
       required quantity,
+      required image,
       cartAddonItems}) async {
     Map<String, dynamic> body = {
       'restaurantId': restaurantId,
@@ -58,6 +58,7 @@ class CartRepository {
       'productName': productName,
       'price': price,
       'quantity': quantity,
+      'image': image,
       'cartAddOnItems': cartAddonItems ?? []
     };
 

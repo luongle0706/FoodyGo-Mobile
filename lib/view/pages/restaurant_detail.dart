@@ -112,6 +112,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
         productId: product.id,
         productName: product.name,
         price: product.price,
+        image: product.image,
         quantity: 1);
     if (result) {
       await fetchItemsInCart(user: _user!);
@@ -431,6 +432,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                             final item = _cartItems![index];
                                             final product = ProductDto(
                                                 id: item['productId'],
+                                                image: item['image'],
                                                 code: item['productId']
                                                     .toString(),
                                                 name: item['productName'],

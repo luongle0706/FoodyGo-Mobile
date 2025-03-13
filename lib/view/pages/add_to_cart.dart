@@ -25,6 +25,7 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
   final CartRepository _cartRepository = CartRepository.instance;
   SavedUser? _user;
   Map<int, bool> _selectedAddonsMap = {};
+  Map<int, List<int>> _selectedAddonsBySection = {};
   bool _isLoading = true;
   final _storage = SecureStorage.instance;
   final AppLogger _logger = AppLogger.instance;
@@ -55,14 +56,12 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
     }
   }
 
-  // In add_to_cart.dart, update the addToCart() method:
   Future<void> addToCart() async {
     if (_user == null) {
       widget._logger.info("User not found! Please log in.");
       return;
     }
 
-    // Get selected addons
     List<Map<String, dynamic>> selectedAddons = [];
     for (var section in widget.product.addonSections ?? []) {
       for (var item in section.items) {
@@ -77,7 +76,6 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
       }
     }
 
-    // Call API to add to cart
     bool result = await _cartRepository.addToCart(
       accessToken: _user!.token,
       userId: _user!.userId,
@@ -85,16 +83,14 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
       productId: widget.product.id,
       productName: widget.product.name,
       price: widget.product.price,
-      quantity: 1, // Default is 1
-      cartAddonItems: selectedAddons, // Send addon list
+      quantity: 1,
+      image: widget.product.image,
+      cartAddonItems: selectedAddons,
     );
 
     if (result) {
       widget._logger.info("Add to cart successfully!");
-
-      // Call the callback to notify parent widget
       widget.onCartUpdated();
-
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Đã thêm vào giỏ hàng!"),
@@ -102,28 +98,40 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
           backgroundColor: Colors.green,
         ),
       );
-
       Navigator.pop(context);
     }
   }
 
-  Widget _buildToppingItem(String name, String price, int itemId) {
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return ListTile(
-          title: Text(name),
-          subtitle: Text(price,
-              style: const TextStyle(fontSize: 12, color: Colors.grey)),
-          trailing: Checkbox(
-            value: _selectedAddonsMap[itemId] ?? false,
-            onChanged: (bool? value) {
-              setState(() {
-                _selectedAddonsMap[itemId] = value ?? false;
-              });
-            },
-          ),
-        );
-      },
+  Widget _buildToppingItem(
+      String name, String price, int itemId, int maxChoice) {
+    return ListTile(
+      title: Text(name),
+      subtitle:
+          Text(price, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+      trailing: Checkbox(
+        value: _selectedAddonsMap[itemId] ?? false,
+        onChanged: (bool? value) {
+          setState(() {
+            if (value == true) {
+              if (_selectedAddonsMap.values.where((v) => v).length >=
+                  maxChoice) {
+                // Lấy ID của phần tử đầu tiên đang được chọn
+                int firstSelectedKey = _selectedAddonsMap.entries
+                    .firstWhere((entry) => entry.value,
+                        orElse: () => const MapEntry(-1, false))
+                    .key;
+
+                if (firstSelectedKey != -1) {
+                  _selectedAddonsMap[firstSelectedKey] = false;
+                }
+              }
+              _selectedAddonsMap[itemId] = true;
+            } else {
+              _selectedAddonsMap[itemId] = false;
+            }
+          });
+        },
+      ),
     );
   }
 
@@ -155,42 +163,10 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                     IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context),
-                    ),
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context)),
                   ],
                 ),
-
-                Row(
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      color: Colors.grey[300],
-                      alignment: Alignment.center,
-                      child: const Text("Ảnh sản phẩm"),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(widget.product.name ?? "Tên sản phẩm",
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text(widget.product.description ?? "Mô tả"),
-                          const SizedBox(height: 5),
-                          Text(
-                            "${widget.product.price ?? '0'}đ",
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
                 const SizedBox(height: 10),
                 if (widget.product.addonSections != null &&
                     widget.product.addonSections!.isNotEmpty)
@@ -202,36 +178,22 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 8),
                                 child: Text(
-                                  "${section.name} (Tối đa ${section.maxChoice})",
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold),
-                                ),
+                                    "${section.name} (Tối đa ${section.maxChoice})",
+                                    style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold)),
                               ),
                               const SizedBox(height: 10),
                               ...section.items
                                   .map((item) => _buildToppingItem(
-                                        item.name,
-                                        "${item.price.toInt()}đ",
-                                        item.id, // Truyền ID để lưu trạng thái
-                                      ))
+                                      item.name,
+                                      "${item.price.toInt()}đ",
+                                      item.id,
+                                      section.maxChoice))
                                   .toList(),
                             ],
                           ))
                       .toList(),
-
-                // Ghi chú
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                      hintText: "Ghi chú cho quán",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                    ),
-                  ),
-                ),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: ElevatedButton(
@@ -244,13 +206,11 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
                     onPressed: () {
                       addToCart();
                     },
-                    child: const Text(
-                      "Thêm vào giỏ hàng",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
-                    ),
+                    child: const Text("Thêm vào giỏ hàng",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],

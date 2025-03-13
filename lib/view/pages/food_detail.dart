@@ -118,6 +118,7 @@ class _FoodDetailPageState extends State<FoodDetailPage> {
         productId: product.id,
         productName: product.name,
         price: product.price,
+        image: product.image,
         quantity: 1);
     if (result) {
       fetchItemsInCart(user: _user!);
