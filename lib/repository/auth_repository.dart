@@ -80,19 +80,29 @@ class AuthRepository {
 
   Future<RegisterResponseDTO> register(RegisterRequestDTO request) async {
     final response = await http.post(
-      Uri.parse('$globalURL/api/v1/authentications/register'),
+      Uri.parse('http://192.168.1.4:8080/api/v1/authentications/register'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode(request.toJson()),
     );
     if (response.statusCode == 200) {
+      logger.info(request.toJson().toString());
+
       final Map<String, dynamic> jsonResponse = json.decode(response.body);
       logger.info(jsonResponse.toString());
       return RegisterResponseDTO(
-          message: jsonResponse['message'],
-          email: jsonResponse['data']['email'],
-          roleName: jsonResponse['data']['roleName'],
-          userId: jsonResponse['data']['userID'] as int?);
+        message: jsonResponse['message'],
+        email: jsonResponse['data']['email'],
+        roleName: jsonResponse['data']['roleName'],
+        fullname: jsonResponse['data']['fullName'],
+        phoneNumber: jsonResponse['data']['phone'],
+        buildingId: jsonResponse['data']['buildingID'] as int,
+        buildingName: jsonResponse['data']['buildingName'],
+        userId: jsonResponse['data']['userID'] as int?,
+        dob: DateTime.parse(jsonResponse['data']['dob']),
+      );
     } else {
+      logger.info(request.toJson().toString());
+      logger.info(response.body.toString());
       throw Exception('Failed to load data in register!');
     }
   }
@@ -101,8 +111,12 @@ class AuthRepository {
     Map<String, dynamic> body = {'email': email};
     logger.info("request body$body");
 
-    final response = await http.post(Uri.parse('$globalURL/api/v1/send-otp'),
-        headers: {'Content-Type': 'application/json'}, body: json.encode(body));
+    final response = await http
+        .post(Uri.parse('http://192.168.1.4:8080/api/v1/send-otp'),
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode(body))
+        .timeout(const Duration(seconds: 10));
+    ;
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonResponse = json.decode(response.body);
       logger.info("jsonResponse$jsonResponse");

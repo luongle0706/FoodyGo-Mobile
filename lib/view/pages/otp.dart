@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:foodygo/dto/OTP_dto.dart';
 import 'package:foodygo/repository/auth_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
+import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pinput/pinput.dart';
 
@@ -19,7 +20,9 @@ class _OtpPageState extends State<OtpPage> {
   bool _isResendDisabled = true;
   late String otp;
   late String email;
+  late String password;
   bool _isInitialized = false;
+  final logger = AppLogger.instance;
 
   @override
   void initState() {
@@ -47,9 +50,12 @@ class _OtpPageState extends State<OtpPage> {
     super.didChangeDependencies();
     if (!_isInitialized) {
       final extra = GoRouterState.of(context).extra as Map<String, dynamic>?;
-      otp = extra?['otp'] ?? "khong co otp";
+      otp = extra?['otp'] ?? "Không có otp";
       email = extra?['email'] ?? "Không có email";
+      password = extra?['password'] ?? "Không có password";
       _isInitialized = true;
+      logger.info("Email otp: $email");
+      logger.info("Password otp: $password");
     }
   }
 
@@ -58,7 +64,7 @@ class _OtpPageState extends State<OtpPage> {
     final logger = AppLogger.instance;
 
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: AppColors.background,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
@@ -91,7 +97,10 @@ class _OtpPageState extends State<OtpPage> {
                 const SizedBox(width: 10),
                 TextButton(
                   onPressed: () {},
-                  child: const Text("Đổi email xác nhận?"),
+                  child: const Text(
+                    "Đổi email xác nhận?",
+                    style: TextStyle(color: AppColors.primary),
+                  ),
                 ),
               ],
             ),
@@ -109,7 +118,7 @@ class _OtpPageState extends State<OtpPage> {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
+                    border: Border.all(color: AppColors.primary),
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
@@ -150,12 +159,12 @@ class _OtpPageState extends State<OtpPage> {
                             _startTimer();
                           },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
+                      backgroundColor: AppColors.primary,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                     child: const Text(
                       "Gửi lại",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                     ),
                   ),
                 ),
@@ -166,7 +175,11 @@ class _OtpPageState extends State<OtpPage> {
                         ? () {
                             logger.info("xacsnhan otp: $otp");
                             if (_otpController.text == otp) {
-                              GoRouter.of(context).push('/register-info');
+                              GoRouter.of(context).push('/register-info',
+                                  extra: {
+                                    'email': email,
+                                    'password': password
+                                  });
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text("OTP không hợp lệ!")),
@@ -175,12 +188,12 @@ class _OtpPageState extends State<OtpPage> {
                           }
                         : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
+                      backgroundColor: AppColors.primary,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                     child: Text(
                       "Xác nhận",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                     ),
                   ),
                 ),

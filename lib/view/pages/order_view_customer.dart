@@ -28,11 +28,17 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
 
   // String status = 'ordered';
 
-  List<String> filterStatuses = ["ORDERED", "RESTAURANT_ACCEPTED", "SHIPPING", "HUB_ARRIVED"];
+  List<String> filterStatuses = [
+    "ORDERED",
+    "RESTAURANT_ACCEPTED",
+    "SHIPPING",
+    "HUB_ARRIVED"
+  ];
 
   List<OrderDto>? filteredOrders;
 
   bool _isLoading = true;
+  int selectedSubTab = 0;
 
   @override
   void initState() {
@@ -50,14 +56,17 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
   //       .toList();
   // }
 
-  List<OrderDto> filterOrdersByStatus(List<OrderDto>? orders, List<String> statuses) {
+  List<OrderDto> filterOrdersByStatus(
+      List<OrderDto>? orders, List<String> statuses) {
     if (orders == null || statuses.isEmpty) {
       return [];
     }
 
     Set<String> statusSet = statuses.map((s) => s.toLowerCase()).toSet();
 
-    return orders.where((order) => statusSet.contains(order.status.toLowerCase())).toList();
+    return orders
+        .where((order) => statusSet.contains(order.status.toLowerCase()))
+        .toList();
   }
 
   Future<bool> fetchOrder(String accessToken) async {
@@ -109,12 +118,43 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-      ),
       body: Column(
         children: [
-          if (filteredOrders != null) ...[
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.orange.shade100,
+              borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(20),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.orange.withOpacity(0.3),
+                  blurRadius: 6,
+                  spreadRadius: 2,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            height: 100,
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 10,
+              bottom: 10,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _tabSelector("Đang đến", 0),
+                    _tabSelector("Lịch sử", 1),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          if (filteredOrders != null)
             Expanded(
               child: ListView.builder(
                 itemCount: filteredOrders!.length,
@@ -125,13 +165,13 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                     margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
-                          blurRadius: 5,
+                          color: Colors.orange.withOpacity(0.2),
+                          blurRadius: 6,
                           spreadRadius: 2,
-                          offset: Offset(0, 2),
+                          offset: Offset(0, 3),
                         ),
                       ],
                     ),
@@ -144,31 +184,36 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                             Text(
                               "Đồ ăn #P${order.id}",
                               style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange.shade900),
                             ),
                             Text(
-                              "${order.expectedDeliveryTime.day}/${order.expectedDeliveryTime.month}/${order.expectedDeliveryTime.year} ${order.expectedDeliveryTime.hour}:${order.expectedDeliveryTime.minute}",
+                              "${order.expectedDeliveryTime.hour.toString().padLeft(2, '0')}:" +
+                                  "${order.expectedDeliveryTime.minute.toString().padLeft(2, '0')} - " +
+                                  "${order.expectedDeliveryTime.day}/${order.expectedDeliveryTime.month}",
                               style:
                                   TextStyle(color: Colors.grey, fontSize: 14),
                             ),
                           ],
                         ),
                         SizedBox(height: 8),
+
                         GestureDetector(
                           onTap: () {
                             GoRouter.of(context).go("/restaurant");
                           },
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Expanded(
-                                child: Text(
-                                  order.restaurantName,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              Text(
+                                order.restaurantName,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange.shade900,
                                 ),
                               ),
                               SizedBox(width: 4),
@@ -178,6 +223,8 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                           ),
                         ),
                         SizedBox(height: 12),
+
+                        // Chi tiết đơn hàng
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -195,24 +242,13 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                                 height: 60,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
-                                  color: Colors.grey[300],
+                                  color: Colors.orange.shade50,
                                 ),
                                 alignment: Alignment.center,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: Image.network(
-                                    'https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chorizo-mozarella-gnocchi-bake-cropped-9ab73a3.jpg?resize=768,574',
-                                    loadingBuilder: (context, child, progress) {
-                                      if (progress == null) {
-                                        return child;
-                                      } else {
-                                        return Center(
-                                            child: CircularProgressIndicator());
-                                      }
-                                    },
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Icon(Icons.error);
-                                    },
+                                    order.image,
                                     fit: BoxFit.cover,
                                     width: 60,
                                     height: 60,
@@ -230,10 +266,12 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                                     ),
                                     SizedBox(height: 4),
                                     Text(
-                                      "${order.totalPrice.toStringAsFixed(2)} xu - ${order.orderDetails.length} món",
+                                      "${order.totalPrice.toStringAsFixed(0)} xu - ${order.orderDetails.length} món",
                                       style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.orange.shade900,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -242,6 +280,8 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                           ),
                         ),
                         SizedBox(height: 12),
+
+                        // Trạng thái đơn hàng
                         Container(
                           padding: EdgeInsets.symmetric(vertical: 8),
                           width: double.infinity,
@@ -254,9 +294,11 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                order.status,
+                                translateStatus(order.status),
                                 style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orange.shade900),
                               ),
                               Text(
                                 "Đơn sẽ được giao đến bạn",
@@ -274,34 +316,88 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                 },
               ),
             ),
-          ] else if (_orderDto == null) ...[
-            Center(
-              child: CircularProgressIndicator(),
-            ),
-          ],
+
+          // Footer với trạng thái đơn hàng
           Container(
             padding: EdgeInsets.all(16),
             width: double.infinity,
             decoration: BoxDecoration(
-              border:
-                  Border(top: BorderSide(color: Colors.grey[300]!, width: 1)),
+              border: Border(
+                  top: BorderSide(color: Colors.orange.shade200, width: 1)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Đã đặt",
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(
+                  "Đã đặt",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange.shade900,
+                  ),
+                ),
                 Text(
                   "Đơn sẽ được giao đến bạn",
                   style: TextStyle(
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey),
+                    fontSize: 14,
+                    fontStyle: FontStyle.italic,
+                    color: Colors.grey,
+                  ),
                 ),
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  String translateStatus(String status) {
+    switch (status.toUpperCase()) {
+      case "ORDERED":
+        return "Chờ xác nhận";
+      case "RESTAURANT_ACCEPTED":
+        return "Nhà hàng đã xác nhận";
+      case "SHIPPING":
+        return "Đang giao hàng";
+      case "HUB_ARRIVED":
+        return "Đã đến hub";
+      default:
+        return "Không xác định";
+    }
+  }
+
+  Widget _tabSelector(String text, int index) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedSubTab = index;
+        });
+        if (index == 0) {
+          GoRouter.of(context).push('/protected/order-list-customer');
+        }
+        if (index == 1) {
+          GoRouter.of(context).push('/protected/order-history');
+        }
+      },
+      child: Column(
+        children: [
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight:
+                  selectedSubTab == index ? FontWeight.bold : FontWeight.normal,
+              color: selectedSubTab == index ? Colors.black : Colors.grey,
+            ),
+          ),
+          if (selectedSubTab == index)
+            Container(
+              margin: EdgeInsets.only(top: 5),
+              height: 3,
+              width: 40,
+              color: Colors.black,
+            ),
         ],
       ),
     );

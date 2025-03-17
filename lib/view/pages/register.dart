@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:foodygo/dto/OTP_dto.dart';
-import 'package:foodygo/dto/register_dto.dart';
 import 'package:foodygo/repository/auth_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
-import 'package:foodygo/view/components/register/checkbox.dart';
 import 'package:foodygo/view/components/register/input_text.dart';
 import 'package:foodygo/view/components/register/register_button.dart';
+import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -22,88 +21,52 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool acceptedTerms = false;
   bool isLoading = false;
+  bool isValidEmail(String email) {
+    final RegExp regex =
+        RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+    return regex.hasMatch(email);
+  }
 
   void sendOTP() async {
-    if (!acceptedTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text("Bạn cần đồng ý với Điều khoản & Dịch vụ.")),
-      );
-      return;
-    }
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Vui lòng nhập đầy đủ thông tin.")),
-      );
-      return;
-    }
+    final String email = emailController.text.trim();
+    final String password = passwordController.text.trim();
 
-    setState(() => isLoading = true);
+    logger.info("🔍 Gửi OTP cho email: $email");
+
+    setState(() => isLoading = true); // Bật trạng thái xử lý
 
     try {
+      logger.info("📡 Đang gọi API sendOTP...");
+
       OTPResponseDTO otpResponseDTO =
-          await AuthRepository.instance.sendOTP(email: emailController.text);
+          await AuthRepository.instance.sendOTP(email: email);
+
+      logger.info("✅ API trả về kết quả: ${otpResponseDTO.otp}");
+
       if (otpResponseDTO.existedEmail) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text(
-                  "Email của bạn đã được đăng ký. Vui lòng nhập email mới")),
+              content:
+                  Text("Email đã được đăng ký. Vui lòng nhập email khác.")),
         );
         return;
       }
+
       if (mounted) {
-        GoRouter.of(context).push('/otp',
-            extra: {'otp': otpResponseDTO.otp, 'email': emailController.text});
+        GoRouter.of(context).push('/otp', extra: {
+          'otp': otpResponseDTO.otp,
+          'email': email,
+          'password': password
+        });
       }
     } catch (e) {
-      logger.info("Registration error: $e");
+      logger.info("❌ Lỗi khi gửi OTP: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Đăng ký thất bại. Vui lòng thử lại!")),
+        SnackBar(content: Text("Lỗi: ${e.toString()}")),
       );
     } finally {
       if (mounted) {
-        setState(() => isLoading = false);
-      }
-    }
-  }
-
-  void registerUser() async {
-    if (!acceptedTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text("Bạn cần đồng ý với Điều khoản & Dịch vụ.")),
-      );
-      return;
-    }
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Vui lòng nhập đầy đủ thông tin.")),
-      );
-      return;
-    }
-
-    setState(() => isLoading = true);
-
-    try {
-      RegisterRequestDTO requestDTO = RegisterRequestDTO(
-          email: emailController.text, password: passwordController.text);
-
-      RegisterResponseDTO responseDTO =
-          await AuthRepository.instance.register(requestDTO);
-
-      logger.info("API register from page register: ${responseDTO.toString()}");
-
-      if (mounted) {
-        GoRouter.of(context).push('/register-info');
-      }
-    } catch (e) {
-      logger.info("Registration error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Đăng ký thất bại. Vui lòng thử lại!")),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => isLoading = false);
+        setState(() => isLoading = false); // Đảm bảo trạng thái được cập nhật
       }
     }
   }
@@ -112,7 +75,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background, // ShopeeFood cam chủ đạo
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -122,57 +85,43 @@ class _RegisterPageState extends State<RegisterPage> {
             const SizedBox(height: 20),
             const Text(
               'Hãy bắt đầu nào!',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30,
+                  color: Colors.black),
             ),
             Text(
               'Nhập thông tin của bạn để tạo tài khoản',
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 20),
+              style: TextStyle(color: Colors.black, fontSize: 18),
             ),
             const SizedBox(height: 20),
             RegisterInput(
               controller: emailController,
               hintText: "Địa chỉ email",
-              icon: SizedBox(
-                width: 50,
-                height: 50,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  child: Image.asset('assets/icons/emailIcon.png'),
-                ),
-              ),
+              icon: Icon(Icons.email),
+              obscureText: false,
             ),
             const SizedBox(height: 30),
             RegisterInput(
               controller: passwordController,
               hintText: "Mật khẩu",
-              icon: SizedBox(
-                width: 50,
-                height: 50,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  child: Image.asset('assets/icons/passwordIcon.png'),
-                ),
-              ),
+              icon: Icon(Icons.lock),
+              obscureText: true,
             ),
             const SizedBox(height: 10),
             Row(
               children: [
-                CheckboxIcon(
+                Checkbox(
                   value: acceptedTerms,
-                  checkbox: Checkbox(
-                    value: acceptedTerms,
-                    activeColor: Colors.black,
-                    onChanged: (value) {
-                      setState(() {
-                        acceptedTerms = value ?? false;
-                      });
-                    },
-                  ),
+                  activeColor: Colors.black,
+                  onChanged: (value) {
+                    setState(() {
+                      acceptedTerms = value ?? false;
+                    });
+                  },
                 ),
                 const Text("Tôi đồng ý với Điều khoản & Dịch vụ",
-                    style: TextStyle(fontSize: 16)),
+                    style: TextStyle(fontSize: 16, color: Colors.black)),
               ],
             ),
             const SizedBox(height: 20),
@@ -184,13 +133,9 @@ class _RegisterPageState extends State<RegisterPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("Bạn đã có tài khoản?"),
+                const Text("Bạn đã có tài khoản?",
+                    style: TextStyle(color: Colors.black)),
                 TextButton(
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    minimumSize: const Size(0, 0),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
                   onPressed: () {
                     GoRouter.of(context).go('/login');
                   },
