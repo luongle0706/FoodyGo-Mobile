@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/register_dto.dart';
+import 'package:foodygo/repository/auth_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/view/components/button.dart';
-import 'package:foodygo/view/components/date_picker_field.dart';
 import 'package:foodygo/view/components/input_field_w_icon.dart';
 import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterInfo extends StatefulWidget {
   final int? chosenBuildingId;
@@ -21,11 +24,18 @@ class _RegisterInfoState extends State<RegisterInfo> {
   int? chosenBuildingId;
   String? _chosenBuildingName;
   final logger = AppLogger.instance;
+  final _registerRepo = AuthRepository.instance;
 
   final fullNameController = TextEditingController();
   final dobController = TextEditingController();
   final mobileController = TextEditingController();
   final buildingController = TextEditingController();
+  late String _email = "";
+  late String _password = "";
+  bool isValidVietnamesePhoneNumber(String phoneNumber) {
+    final RegExp regex = RegExp(r'^(03|05|07|08|09)[0-9]{8,9}$');
+    return regex.hasMatch(phoneNumber);
+  }
 
   @override
   void initState() {
@@ -33,16 +43,95 @@ class _RegisterInfoState extends State<RegisterInfo> {
     chosenBuildingId = widget.chosenBuildingId;
     _chosenBuildingName = widget.chosenBuildingName;
     buildingController.text = _chosenBuildingName ?? ''; // Set initial text
+    _loadAuthData();
+  }
+
+  Future<void> _loadAuthData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Gán trực tiếp giá trị vào biến thay vì dùng setState
+    _email = prefs.getString('email') ?? "";
+    _password = prefs.getString('password') ?? "";
+    logger.info("Email loaded: $_email");
+    logger.info("Password loaded: $_password");
+  }
+
+  Future<void> _saveAuthData(String email, String password) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('email', email);
+    await prefs.setString('password', password);
+    logger.info("Saved Email: ${prefs.getString('email')}");
+    logger.info("Saved Password: ${prefs.getString('password')}");
+  }
+
+  Future<void> _registerUser() async {
+    final String fullName = fullNameController.text.trim();
+    final String phoneNumber = mobileController.text.trim();
+    final String dobString = dobController.text.trim();
+
+    if (fullName.isEmpty ||
+        phoneNumber.isEmpty ||
+        dobString.isEmpty ||
+        chosenBuildingId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Vui lòng điền đầy đủ thông tin!")),
+      );
+      return;
+    }
+
+    if (!isValidVietnamesePhoneNumber(phoneNumber)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Số điện thoại không hợp lệ!")),
+      );
+      return;
+    }
+
+    try {
+      DateTime dob = DateFormat('dd/MM/yyyy').parse(dobString);
+
+      RegisterRequestDTO request = RegisterRequestDTO(
+          email: _email,
+          password: _password,
+          fullname: fullName,
+          phoneNumber: phoneNumber,
+          buildingID: chosenBuildingId!,
+          dob: dob);
+
+      RegisterResponseDTO response = await _registerRepo.register(request);
+      logger.info(response.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Đăng ký thành công!")),
+      );
+
+      GoRouter.of(context).push('/home');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Đăng ký thất bại: $e")),
+      );
+    }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    setState(() {
-      chosenBuildingId = widget.chosenBuildingId;
-      _chosenBuildingName = widget.chosenBuildingName;
-      buildingController.text = _chosenBuildingName ?? ''; // Update UI
-    });
+    final extra = GoRouterState.of(context).extra;
+
+    if (extra is Map<String, dynamic>) {
+      if (extra.containsKey('email') && extra['email'] != null) {
+        _email = extra['email'];
+      }
+      if (extra.containsKey('password') && extra['password'] != null) {
+        _password = extra['password'];
+      }
+
+      logger.info("Email didChangeDependencies: $_email");
+      logger.info("Password didChangeDependencies: $_password");
+
+      if (_email.isNotEmpty && _password.isNotEmpty) {
+        _saveAuthData(_email, _password);
+        _loadAuthData();
+      }
+    }
   }
 
   @override
@@ -99,40 +188,65 @@ class _RegisterInfoState extends State<RegisterInfo> {
             IconTextField(
               controller: fullNameController,
               hintText: "Họ và tên",
-              obscureText: true,
+              obscureText: false,
               iconPath: 'assets/icons/profile-icon.png',
-            ),
-            SizedBox(height: 20),
-            DatePickerField(
-              controller: dobController,
-              hintText: "Ngày sinh",
-              iconPath: 'assets/icons/calendar-icon.png',
             ),
             SizedBox(height: 20.0),
             IconTextField(
               controller: mobileController,
               hintText: "Số điện thoại",
-              obscureText: true,
+              obscureText: false,
               iconPath: 'assets/icons/phone-icon.png',
             ),
             SizedBox(height: 20),
-            IconTextField(
-              controller: buildingController,
-              hintText: "Chọn tòa bạn đang ở",
-              obscureText: false,
-              iconPath: 'assets/icons/location-icon.png',
-            ),
-            TextButton(
-              onPressed: () {
-                GoRouter.of(context).go('/map/building',
-                    extra: {'callOfOrigin': '/register-info'});
+            InkWell(
+              onTap: () async {
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime.now(),
+                );
+
+                if (pickedDate != null) {
+                  String formattedDate =
+                      "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+                  setState(() {
+                    dobController.text = formattedDate;
+                  });
+                }
               },
-              child: Text('Chọn tòa'),
+              child: IgnorePointer(
+                child: IconTextField(
+                  controller: dobController,
+                  hintText: "Ngày sinh (DD/MM/YYYY)",
+                  obscureText: false,
+                  iconPath: 'assets/icons/calendar-icon.png',
+                ),
+              ),
             ),
 
+            SizedBox(height: 20.0),
+
+            InkWell(
+              onTap: () {
+                GoRouter.of(context).push('/map/building',
+                    extra: {'callOfOrigin': '/register-info'});
+              },
+              child: IgnorePointer(
+                child: IconTextField(
+                  controller: buildingController,
+                  hintText: "Chọn tòa bạn đang ở",
+                  obscureText: false,
+                  iconPath: 'assets/icons/location-icon.png',
+                ),
+              ),
+            ),
             SizedBox(height: 50),
             MyButton(
-              onTap: () => {GoRouter.of(context).push('/otp')},
+              onTap: () async {
+                await _registerUser();
+              },
               text: 'Đăng ký',
               color: AppColors.primary,
             ),

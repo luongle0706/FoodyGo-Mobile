@@ -13,6 +13,7 @@ class OrderDto {
   final String employeeName;
   final String customerName;
   final String restaurantName;
+  final String image;
   final String hubName;
   final List<OrderDetail> orderDetails;
 
@@ -31,6 +32,7 @@ class OrderDto {
     required this.employeeName,
     required this.customerName,
     required this.restaurantName,
+    required this.image,
     required this.hubName,
     required this.orderDetails,
   });
@@ -52,6 +54,8 @@ class OrderDto {
       employeeName: json['employeeName'] ?? 'Unknown Employee',
       customerName: json['customerName'] ?? 'Unknown Customer',
       restaurantName: json['restaurantName'] ?? 'Unknown Restaurant',
+      image: json['image'] ??
+          'https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chorizo-mozarella-gnocchi-bake-cropped-9ab73a3.jpg?resize=768,574',
       hubName: json['hubName'] ?? 'Unknown Hub',
       orderDetails: (json['orderDetails'] as List<dynamic>)
           .map((item) => OrderDetail.fromJson(item))
@@ -66,6 +70,7 @@ class OrderDetail {
   final int quantity;
   final double price;
   final String productName;
+  final String image;
   final dynamic addonItems;
 
   OrderDetail({
@@ -74,6 +79,7 @@ class OrderDetail {
     required this.quantity,
     required this.price,
     required this.productName,
+    required this.image,
     this.addonItems,
   });
 
@@ -84,6 +90,8 @@ class OrderDetail {
       quantity: json['quantity'] as int,
       price: (json['price'] ?? 0.0).toDouble(),
       productName: json['productName'] ?? 'Unknown Product',
+      image: json['image'] ??
+          'https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chorizo-mozarella-gnocchi-bake-cropped-9ab73a3.jpg?resize=768,574',
       addonItems: json['addonItems'],
     );
   }
