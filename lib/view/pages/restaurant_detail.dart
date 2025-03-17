@@ -314,7 +314,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                       "⏳ Thời gian chuẩn bị: ${item.prepareTime.round()} phút"),
                                   SizedBox(height: 4),
                                   Text(
-                                      "Giá: ${NumberFormat("#,###", "vi_VN").format(item.price)} xu",
+                                      "Giá: ${(item.price).toStringAsFixed(0)} xu",
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold)),
@@ -464,7 +464,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                                 title:
                                                     Text(item['productName']),
                                                 subtitle: Text(
-                                                    "Giá: ${NumberFormat("#,###", "vi_VN").format(item['price'])}xu"),
+                                                    "Giá: ${(item.price).toStringAsFixed(0)} xu"),
                                                 trailing: Row(
                                                   mainAxisSize:
                                                       MainAxisSize.min,

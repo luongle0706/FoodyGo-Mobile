@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:foodygo/dto/category_dto.dart';
@@ -11,6 +12,7 @@ import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProductDetailRestaurant extends StatefulWidget {
   final int productId;
@@ -38,6 +40,7 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
   bool isAvailable = true;
   int? selectedCategoryId;
   List<String>? selectedAddonSections;
+  File? _selectedImage;
 
   @override
   void initState() {
@@ -123,6 +126,18 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
     }
   }
 
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image =
+        await picker.pickImage(source: ImageSource.gallery); // Mở thư viện ảnh
+
+    if (image != null) {
+      setState(() {
+        _selectedImage = File(image.path);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -189,22 +204,30 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
             SizedBox(height: 8),
             Row(
               children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(Icons.image, color: Colors.grey[600]),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: _selectedImage == null
+                      ? Image.network(
+                          _productDto!.image, // Ảnh mặc định từ server
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.file(
+                          _selectedImage!,
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                        ),
                 ),
                 SizedBox(width: 12),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _pickImage, // Gọi hàm chọn ảnh
                   child: Text("Sửa"),
                 ),
               ],
             ),
+
             SizedBox(height: 16),
 
             // Nhập tên món
