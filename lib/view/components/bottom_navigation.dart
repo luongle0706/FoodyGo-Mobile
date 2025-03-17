@@ -129,8 +129,8 @@ class _FoodyGoNavigationBarState extends State<FoodyGoNavigationBar> {
                   : [
                       _getNavComp(
                           context, '/protected/home', 'fork', 'Trang chủ'),
-                      _getNavComp(
-                          context, '/protected/order', 'paper', 'Đơn hàng'),
+                      _getNavComp(context, '/protected/order-list-customer',
+                          'paper', 'Đơn hàng'),
                       _getNavComp(context, '/protected/notification', 'bell',
                           'Thông báo'),
                       _getNavComp(
