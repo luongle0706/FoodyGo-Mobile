@@ -404,7 +404,10 @@ class Main extends StatelessWidget {
             name: 'protected_topping_selection', // S-043
             path: '/protected/topping-selection',
             pageBuilder: (context, state) {
-              return MaterialPage(child: ToppingSelectionPage());
+              final extra = state.extra as Map<String, dynamic>?;
+              int productId = extra != null ? extra['productId'] : null;
+              return MaterialPage(
+                  child: ToppingSelectionPage(productId: productId));
             },
           ),
           GoRoute(

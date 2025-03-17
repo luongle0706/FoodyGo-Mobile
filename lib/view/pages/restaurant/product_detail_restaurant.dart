@@ -250,7 +250,10 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
               title: Text("Nhóm topping"),
               subtitle: Text(selectedAddonSections?.join(", ") ?? ""),
               trailing: Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {},
+              onTap: () {
+                GoRouter.of(context).push('/protected/topping-selection',
+                    extra: {"productId": widget.productId});
+              },
             ),
             SizedBox(height: 12),
 
