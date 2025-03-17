@@ -83,4 +83,21 @@ class ProductRepository {
       throw Exception('Failed to load data!');
     }
   }
+
+  Future<bool> deleteProduct(int productId, String accessToken) async {
+
+    try {
+      final response = await http.delete(
+        Uri.parse('$globalURL/api/v1/products/$productId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken'
+        },
+      );
+
+      return response.statusCode == 200;
+    } catch (error) {
+      return false;
+    }
+  }
 }

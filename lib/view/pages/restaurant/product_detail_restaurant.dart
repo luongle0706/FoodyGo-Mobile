@@ -31,7 +31,7 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
   final AddonSectionRepository _addonSectionRepository =
       AddonSectionRepository.instance;
   final AppLogger _logger = AppLogger.instance;
-  //SavedUser? _user;
+  SavedUser? _user;
   bool _isLoading = true;
   ProductDto? _productDto;
   List<CategoryDto>? _categoryDtoList;
@@ -101,7 +101,7 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
         userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
     if (user != null) {
       setState(() {
-        //_user = user;
+        _user = user;
       });
       bool fetchProductData = await fetchProduct(user.token, widget.productId);
       bool fetchCategoryData =
@@ -136,6 +136,27 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
         _selectedImage = File(image.path);
       });
     }
+  }
+
+  Future<void> _deleteProduct() async {
+  try {
+    bool isDeleted = await _productRepository.deleteProduct(_productDto!.id, _user!.token);
+    if (isDeleted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Món ăn đã được xóa thành công!")),
+      );
+      // Quay về trang menu và reload dữ liệu
+      GoRouter.of(context).go('/protected/restaurant_menu', extra: _user!.restaurantId);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Xóa món ăn thất bại!")),
+      );
+    }
+  } catch (error) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Lỗi mạng, vui lòng thử lại!")),
+    );
+  }
   }
 
   @override
@@ -358,7 +379,7 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
             ),
             TextButton(
               onPressed: () {
-                // Xử lý xóa món tại đây
+                _deleteProduct();
                 GoRouter.of(context).pop(); // Đóng hộp thoại sau khi xác nhận
               },
               child: Text("Xóa", style: TextStyle(color: AppColors.primary)),
