@@ -12,7 +12,7 @@ class HubHomeWrapper extends StatelessWidget {
     return Scaffold(
       appBar: PreferredSize(
           preferredSize: Size.fromHeight(500), child: HubAppBar()),
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.background,
       body: child,
     );

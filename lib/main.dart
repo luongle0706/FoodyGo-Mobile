@@ -4,7 +4,6 @@ import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/service/notification_service.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/hub/hub_home_wrapper.dart';
-import 'package:foodygo/view/pages/add_to_cart.dart';
 import 'package:foodygo/view/pages/confirm_order_customer.dart';
 import 'package:foodygo/view/pages/default_order.dart';
 import 'package:foodygo/view/pages/map_page.dart';

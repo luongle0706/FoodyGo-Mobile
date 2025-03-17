@@ -9,10 +9,12 @@ class ProtectedRoutes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        bottomNavigationBar: FoodyGoNavigationBar(),
-        resizeToAvoidBottomInset: true,
-        backgroundColor: AppColors.background,
-        body: child);
+    return SafeArea(
+      child: Scaffold(
+          bottomNavigationBar: FoodyGoNavigationBar(),
+          resizeToAvoidBottomInset: false,
+          backgroundColor: AppColors.background,
+          body: child),
+    );
   }
 }

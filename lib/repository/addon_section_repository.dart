@@ -9,7 +9,7 @@ class AddonSectionRepository {
   static final AddonSectionRepository instance = AddonSectionRepository._();
   final AppLogger _logger = AppLogger.instance;
 
-  Future<List<AddonSectionDto>?> getAddonSectionByRestaurantId(
+  Future<List<dynamic>?> getAddonSectionByRestaurantId(
       {required accessToken, required restaurantId}) async {
     _logger.info("ProductId: $restaurantId, accessToken: $accessToken");
     final response = await http.get(
@@ -21,9 +21,9 @@ class AddonSectionRepository {
     );
     if (response.statusCode == 200 || response.statusCode == 400) {
       final jsonResponse = json.decode(response.body);
-      dynamic list = jsonResponse['data'];
+      List<dynamic> list = jsonResponse['data'];
       _logger.info(list.toString());
-      return list.map((item) => AddonSectionDto.fromJson(item)).toList();
+      return list;
     } else {
       throw Exception('Failed to load data!');
     }

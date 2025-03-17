@@ -33,11 +33,11 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
   bool _isLoading = true;
   ProductDto? _productDto;
   List<CategoryDto>? _categoryDtoList;
-  List<AddonSectionDto>? addonSectionList;
+  List<dynamic>? addonSectionList;
 
   bool isAvailable = true;
   int? selectedCategoryId;
-  List<int>? selectedAddonSectionId;
+  List<String>? selectedAddonSections;
 
   @override
   void initState() {
@@ -54,7 +54,7 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
         selectedCategoryId = fetchData.category?.id;
         if (fetchData.addonSections != null) {
           for (var addonSection in fetchData.addonSections!) {
-            selectedAddonSectionId?.add(addonSection.id);
+            selectedAddonSections?.add(addonSection.name);
           }
         }
         _productDto = fetchData;
@@ -79,7 +79,7 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
   }
 
   Future<bool> fetchAddonSection(String accessToken, int restaurantId) async {
-    List<AddonSectionDto>? fetchData =
+    List<dynamic>? fetchData =
         await _addonSectionRepository.getAddonSectionByRestaurantId(
             accessToken: accessToken, restaurantId: restaurantId);
 
@@ -248,7 +248,7 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
             // Nhóm topping
             ListTile(
               title: Text("Nhóm topping"),
-              subtitle: Text("Size nhỏ, Size lớn, ..."),
+              subtitle: Text(selectedAddonSections?.join(", ") ?? ""),
               trailing: Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {},
             ),
