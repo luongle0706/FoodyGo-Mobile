@@ -9,6 +9,24 @@ class ProductRepository {
   static final ProductRepository instance = ProductRepository._();
   final AppLogger logger = AppLogger.instance;
 
+  Future<bool>? linkProduct(
+      {required int productId,
+      required int addonSectionId,
+      required String accessToken}) async {
+    final response = await http.put(
+      Uri.parse(
+          '$globalURL/api/v1/products/$productId/addon-sections/$addonSectionId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      },
+    );
+    if (response.statusCode == 200) {
+      return true;
+    }
+    return false;
+  }
+
   Future<ProductDto>? getProductById(int productId, String accessToken) async {
     logger.info("ProductId: $productId, accessToken: $accessToken");
     final response = await http.get(

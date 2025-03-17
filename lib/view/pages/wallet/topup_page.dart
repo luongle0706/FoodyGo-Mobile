@@ -8,6 +8,7 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/wallet_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:foodygo/view/theme.dart';
 
 class TopupPage extends StatefulWidget {
   const TopupPage({super.key});
@@ -27,112 +28,199 @@ class _TopupPageState extends State<TopupPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Build method remains unchanged
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Mua điểm'),
+        backgroundColor: AppColors.primary,
+        title: const Text(
+          'Mua điểm',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
         ),
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(color: AppColors.primary))
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Nhập số FoodyXu cần mua',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 10),
+                  const Text(
+                    'Nhập số FoodyXu cần mua',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   Container(
-                    padding: EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white,
+                      border: Border.all(
+                          color: AppColors.secondary.withOpacity(0.5)),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Column(
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(_points.toInt().toString(),
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold)),
-                            Text('FoodyXu', style: TextStyle(fontSize: 16)),
+                            Text(
+                              _points.toInt().toString(),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            const Text(
+                              'FoodyXu',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: AppColors.text,
+                              ),
+                            ),
                           ],
                         ),
-                        Slider(
-                          value: _points,
-                          min: 0,
-                          max: 1000,
-                          divisions: 1000,
-                          label: _points.toInt().toString(),
+                        SliderTheme(
+                          data: SliderThemeData(
+                            activeTrackColor: AppColors.primary,
+                            thumbColor: AppColors.primary,
+                            overlayColor: AppColors.primary.withOpacity(0.2),
+                            valueIndicatorColor: AppColors.primary,
+                          ),
+                          child: Slider(
+                            value: _points,
+                            min: 0,
+                            max: 1000,
+                            divisions: 1000,
+                            label: _points.toInt().toString(),
+                            onChanged: (value) {
+                              setState(() {
+                                _points = value;
+                              });
+                            },
+                          ),
+                        ),
+                        Text(
+                          'Tổng tiền: ${(1000 * _points).toInt()} đ',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.text,
+                          ),
+                        ),
+                        Text(
+                          '(1.000đ = 1 FoodyXu)',
+                          style: TextStyle(color: Colors.grey.shade600),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'PHƯƠNG THỨC THANH TOÁN',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: AppColors.secondary.withOpacity(0.5)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        RadioListTile(
+                          title: Row(
+                            children: [
+                              Image.asset('assets/images/vnpay_logo.png',
+                                  height: 24),
+                              const SizedBox(width: 10),
+                              const Text('VNPAY'),
+                            ],
+                          ),
+                          value: 'VNPAY',
+                          groupValue: _selectedPaymentMethod,
+                          activeColor: AppColors.primary,
                           onChanged: (value) {
                             setState(() {
-                              _points = value;
+                              _selectedPaymentMethod = value.toString();
                             });
                           },
                         ),
-                        Text('Tổng tiền: ${(1000 * _points).toInt()} đ',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
-                        Text('(1.000đ = 1 FoodyXu)',
-                            style: TextStyle(color: Colors.grey)),
+                        const Divider(height: 1, indent: 16, endIndent: 16),
+                        RadioListTile(
+                          title: Row(
+                            children: [
+                              Image.asset('assets/images/momo_logo.png',
+                                  height: 24),
+                              const SizedBox(width: 10),
+                              const Text('Momo'),
+                            ],
+                          ),
+                          value: 'MOMO',
+                          groupValue: _selectedPaymentMethod,
+                          activeColor: AppColors.primary,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedPaymentMethod = value.toString();
+                            });
+                          },
+                        ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 20),
-                  Text('PHƯƠNG THỨC THANH TOÁN',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 10),
-                  RadioListTile(
-                    title: Row(
-                      children: [
-                        Image.asset('assets/images/vnpay_logo.png', height: 24),
-                        SizedBox(width: 10),
-                        Text('VNPAY'),
-                      ],
-                    ),
-                    value: 'VNPAY',
-                    groupValue: _selectedPaymentMethod,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedPaymentMethod = value.toString();
-                      });
-                    },
-                  ),
-                  RadioListTile(
-                    title: Row(
-                      children: [
-                        Image.asset('assets/images/momo_logo.png', height: 24),
-                        SizedBox(width: 10),
-                        Text('Momo'),
-                      ],
-                    ),
-                    value: 'MOMO',
-                    groupValue: _selectedPaymentMethod,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedPaymentMethod = value.toString();
-                      });
-                    },
-                  ),
-                  Spacer(),
+                  const Spacer(),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 14),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
+                            borderRadius: BorderRadius.circular(12)),
+                        elevation: 2,
                       ),
                       onPressed: _processTopUp,
-                      child: Text('Thực hiện mua điểm',
-                          style: TextStyle(fontSize: 16)),
+                      child: const Text(
+                        'Thực hiện mua điểm',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -143,7 +231,11 @@ class _TopupPageState extends State<TopupPage> {
 
   void _showErrorMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red[700],
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 
@@ -340,14 +432,15 @@ class _PaymentWebViewState extends State<PaymentWebView> {
 
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Thanh toán thành công! Ví của bạn đã được cập nhật.'),
         duration: Duration(seconds: 2),
+        backgroundColor: Colors.green,
       ),
     );
 
     // Return to wallet page after a short delay
-    Future.delayed(Duration(seconds: 0), () {
+    Future.delayed(const Duration(seconds: 0), () {
       if (widget.onPaymentComplete != null) {
         widget.onPaymentComplete!(true);
       } else {
@@ -366,11 +459,12 @@ class _PaymentWebViewState extends State<PaymentWebView> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(errorMsg),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
+        backgroundColor: Colors.red[700],
       ),
     );
 
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () {
       if (widget.onPaymentComplete != null) {
         widget.onPaymentComplete!(false);
       } else {
@@ -386,20 +480,27 @@ class _PaymentWebViewState extends State<PaymentWebView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Thanh toán'),
+        backgroundColor: AppColors.primary,
+        title: const Text(
+          'Thanh toán',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: IconButton(
-          icon: Icon(Icons.close),
+          icon: const Icon(Icons.close, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
         // Add a refresh button to reload the WebView
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: () => _controller.reload(),
           ),
           // Update the open-in-browser button to use _handleCallbackUrl
           IconButton(
-            icon: Icon(Icons.open_in_browser),
+            icon: const Icon(Icons.open_in_browser, color: Colors.white),
             onPressed: () async {
               final currentUrl = await _controller.currentUrl();
               if (currentUrl != null) {
@@ -413,8 +514,8 @@ class _PaymentWebViewState extends State<PaymentWebView> {
         children: [
           WebViewWidget(controller: _controller),
           if (isLoading)
-            Center(
-              child: CircularProgressIndicator(),
+            const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
             ),
         ],
       ),

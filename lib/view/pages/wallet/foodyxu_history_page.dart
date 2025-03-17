@@ -9,6 +9,7 @@ import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/transaction_card.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:foodygo/view/theme.dart';
 
 class FoodyXuHistoryPage extends StatefulWidget {
   const FoodyXuHistoryPage({super.key});
@@ -201,27 +202,73 @@ class _FoodyXuHistoryPageState extends State<FoodyXuHistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Lịch sử điểm FoodyXu"),
+        title: const Text(
+          "Lịch sử điểm FoodyXu",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: AppColors.primary,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => GoRouter.of(context).pop(),
         ),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : transactionItems.isEmpty
-              ? const Center(child: Text('Không có giao dịch nào'))
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: transactionItems.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () => _navigateToTransactionDetail(index),
-                      child:
-                          TransactionCard(transaction: transactionItems[index]),
-                    );
-                  },
+      body: Container(
+        color: AppColors.background,
+        child: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.primary,
                 ),
+              )
+            : transactionItems.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.history,
+                          size: 64,
+                          color: AppColors.secondary.withOpacity(0.7),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Không có giao dịch nào',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: AppColors.text,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Các giao dịch của bạn sẽ xuất hiện ở đây',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.black54.withOpacity(0.7),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: transactionItems.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: GestureDetector(
+                          onTap: () => _navigateToTransactionDetail(index),
+                          child: TransactionCard(
+                            transaction: transactionItems[index],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+      ),
     );
   }
 }
