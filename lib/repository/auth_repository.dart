@@ -80,7 +80,7 @@ class AuthRepository {
 
   Future<RegisterResponseDTO> register(RegisterRequestDTO request) async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.4:8080/api/v1/authentications/register'),
+      Uri.parse('$globalURL/api/v1/authentications/register'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode(request.toJson()),
     );
@@ -112,7 +112,7 @@ class AuthRepository {
     logger.info("request body$body");
 
     final response = await http
-        .post(Uri.parse('http://192.168.1.4:8080/api/v1/send-otp'),
+        .post(Uri.parse('$globalURL/api/v1/send-otp'),
             headers: {'Content-Type': 'application/json'},
             body: json.encode(body))
         .timeout(const Duration(seconds: 10));
