@@ -1,4 +1,3 @@
-import 'package:foodygo/dto/product_dto.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/constants.dart';
 import 'package:http/http.dart' as http;
