@@ -6,12 +6,12 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/wallet_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
-import 'package:foodygo/view/components/transaction_card.dart';
+import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class PaymentHistoryPage extends StatefulWidget {
-  const PaymentHistoryPage({Key? key}) : super(key: key);
+  const PaymentHistoryPage({super.key});
 
   @override
   State<PaymentHistoryPage> createState() => _PaymentHistoryPageState();
@@ -19,10 +19,15 @@ class PaymentHistoryPage extends StatefulWidget {
 
 class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   List<TransactionItem> transactionItems = [];
-  List<TransactionDto> rawTransactions = []; // Store the raw transaction data
+
+  List<TransactionDto> rawTransactions = [];
+  // Store the raw transaction data
   bool isLoading = true;
+
   final walletRepository = WalletRepository.instance;
+
   final AppLogger logger = AppLogger.instance;
+
   final storage = SecureStorage.instance;
 
   @override
@@ -165,27 +170,139 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Lịch sử thanh toán"),
+        title: const Text(
+          "Lịch sử thanh toán",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: AppColors.primary,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => GoRouter.of(context).pop(),
         ),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : transactionItems.isEmpty
-              ? const Center(child: Text('Không có giao dịch thanh toán nào'))
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: transactionItems.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () => _navigateToTransactionDetail(index),
-                      child:
-                          TransactionCard(transaction: transactionItems[index]),
-                    );
-                  },
+      body: Container(
+        color: AppColors.background,
+        child: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.primary,
                 ),
+              )
+            : transactionItems.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.receipt_long,
+                          size: 64,
+                          color: AppColors.secondary.withOpacity(0.7),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Không có giao dịch thanh toán nào',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: AppColors.text,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Các thanh toán của bạn sẽ xuất hiện ở đây',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.black54.withOpacity(0.7),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: transactionItems.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: GestureDetector(
+                          onTap: () => _navigateToTransactionDetail(index),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppColors.secondary.withOpacity(0.5),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withOpacity(0.1),
+                                  spreadRadius: 1,
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.secondary.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    transactionItems[index].icon,
+                                    color: AppColors.primary,
+                                    size: 24,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        transactionItems[index].title,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        transactionItems[index].date,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color:
+                                              Colors.black54.withOpacity(0.7),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Text(
+                                  transactionItems[index].amount,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+      ),
     );
   }
 }

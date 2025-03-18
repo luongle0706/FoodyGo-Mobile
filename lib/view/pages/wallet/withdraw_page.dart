@@ -4,6 +4,7 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/wallet_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class WithdrawPage extends StatefulWidget {
@@ -27,17 +28,17 @@ class _WithdrawPageState extends State<WithdrawPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300], // Background color
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.grey[400], // App bar color
+        backgroundColor: AppColors.primary,
         title: const Text(
           'Rút tiền',
           style: TextStyle(
-              color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => GoRouter.of(context).pop(),
         ),
         elevation: 0,
@@ -49,15 +50,28 @@ class _WithdrawPageState extends State<WithdrawPage> {
           children: [
             const Text(
               'Nhập số tiền cần rút',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
             ),
             const SizedBox(height: 10),
             Container(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.black, width: 1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                    color: AppColors.secondary.withOpacity(0.5), width: 1),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,6 +86,8 @@ class _WithdrawPageState extends State<WithdrawPage> {
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             isDense: true,
+                            hintText: 'Nhập số tiền',
+                            hintStyle: TextStyle(color: Colors.black38),
                           ),
                           onChanged: (value) {
                             setState(() {
@@ -83,11 +99,15 @@ class _WithdrawPageState extends State<WithdrawPage> {
                       const Text(
                         'đ',
                         style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.text),
                       ),
                     ],
                   ),
-                  const Divider(thickness: 1, color: Colors.black),
+                  Divider(
+                      thickness: 1,
+                      color: AppColors.secondary.withOpacity(0.5)),
                   const SizedBox(height: 4),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -95,19 +115,24 @@ class _WithdrawPageState extends State<WithdrawPage> {
                       const Text(
                         'Tổng xu sẽ trừ',
                         style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold),
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87),
                       ),
                       Text(
                         '${_foodyXuAmount.toStringAsFixed(0)} FoodyXu',
                         style: const TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold),
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.text),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     '(1.000đ = 1 FoodyXu)',
-                    style: TextStyle(fontSize: 12, color: Colors.black54),
+                    style: TextStyle(
+                        fontSize: 12, color: Colors.black54.withOpacity(0.7)),
                   ),
                 ],
               ),
@@ -116,14 +141,16 @@ class _WithdrawPageState extends State<WithdrawPage> {
             SizedBox(
               width: double.infinity,
               child: _isProcessing
-                  ? const Center(child: CircularProgressIndicator())
-                  : OutlinedButton(
-                      style: OutlinedButton.styleFrom(
+                  ? const Center(
+                      child:
+                          CircularProgressIndicator(color: AppColors.primary))
+                  : ElevatedButton(
+                      style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: const BorderSide(color: Colors.black, width: 1),
+                        backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                        backgroundColor: Colors.white,
+                            borderRadius: BorderRadius.circular(12)),
+                        elevation: 2,
                       ),
                       onPressed: () {
                         if (_amount < 1000) {
@@ -141,7 +168,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black),
+                            color: Colors.white),
                       ),
                     ),
             ),
@@ -153,7 +180,11 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
   void _showErrorMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red[700],
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 
@@ -202,21 +233,38 @@ class _WithdrawPageState extends State<WithdrawPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Thành công'),
+        title: const Text(
+          'Thành công',
+          style: TextStyle(
+            color: AppColors.primary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.check_circle,
-              color: Colors.green,
-              size: 64,
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.green[50],
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.check_circle,
+                color: Colors.green,
+                size: 64,
+              ),
             ),
             const SizedBox(height: 16),
             Text(
               'Bạn đã rút thành công ${_foodyXuAmount.toStringAsFixed(0)} FoodyXu (${_amount.toStringAsFixed(0)}đ)',
               textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 15),
             ),
           ],
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
         ),
         actions: [
           TextButton(
@@ -228,7 +276,13 @@ class _WithdrawPageState extends State<WithdrawPage> {
               GoRouter.of(context)
                   .pop(true); // Pass true to indicate a refresh is needed
             },
-            child: const Text('Đóng'),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.primary,
+            ),
+            child: const Text(
+              'Đóng',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),

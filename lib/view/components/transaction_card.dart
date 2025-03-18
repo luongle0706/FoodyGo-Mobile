@@ -1,24 +1,25 @@
 // transaction_card.dart
 import 'package:flutter/material.dart';
 import 'package:foodygo/dto/transaction_item.dart';
+import 'package:foodygo/view/theme.dart';
 
 class TransactionCard extends StatelessWidget {
   final TransactionItem transaction;
 
-  const TransactionCard({Key? key, required this.transaction})
-      : super(key: key);
+  const TransactionCard({super.key, required this.transaction});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
+        border:
+            Border.all(color: AppColors.secondary.withOpacity(0.5), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: AppColors.primary.withOpacity(0.1),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -27,7 +28,18 @@ class TransactionCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(transaction.icon, size: 30, color: Colors.black54),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.secondary.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              transaction.icon,
+              color: AppColors.primary,
+              size: 24,
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -38,12 +50,16 @@ class TransactionCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   transaction.date,
-                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.black54.withOpacity(0.7),
+                  ),
                 ),
               ],
             ),
@@ -53,8 +69,9 @@ class TransactionCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color:
-                  transaction.amount.contains('+') ? Colors.green : Colors.red,
+              color: transaction.amount.contains('+')
+                  ? Colors.green[700]
+                  : AppColors.primary,
             ),
           ),
         ],

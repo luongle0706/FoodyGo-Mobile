@@ -5,6 +5,7 @@ import 'package:foodygo/dto/wallet_dto.dart';
 import 'package:foodygo/repository/wallet_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class TransferPointsPage extends StatefulWidget {
@@ -74,68 +75,98 @@ class _TransferPointsPageState extends State<TransferPointsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.grey[400],
+        backgroundColor: AppColors.primary,
         title: const Text(
           'Chuyển điểm',
           style: TextStyle(
-              color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => GoRouter.of(context).pop(),
         ),
         elevation: 0,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(color: AppColors.primary))
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('CHỌN NGƯỜI NHẬN',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      )),
                   const SizedBox(height: 10),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.black, width: 1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: AppColors.secondary.withOpacity(0.5),
+                          width: 1),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: TextField(
                       controller: _phoneController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         border: InputBorder.none,
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 12),
                         hintText: 'Số điện thoại người nhận',
-                        suffixIcon: Icon(Icons.contacts),
+                        suffixIcon:
+                            Icon(Icons.contacts, color: AppColors.primary),
                       ),
                       keyboardType: TextInputType.phone,
                     ),
                   ),
                   const SizedBox(height: 20),
                   const Text('SỐ FOODYXU CẦN CHUYỂN',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      )),
                   const SizedBox(height: 10),
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      border: Border.all(color: Colors.black, width: 1),
-                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                          color: AppColors.secondary.withOpacity(0.5),
+                          width: 1),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Column(
                       children: [
                         Text(
                             'Số dư: ${_balance.toInt()} FoodyXu', // Display balance as integer
                             style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.text)),
                         const SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -143,46 +174,71 @@ class _TransferPointsPageState extends State<TransferPointsPage> {
                             Text(
                                 '$_points FoodyXu', // Already displaying as integer
                                 style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold)),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary)),
                             Text(
                                 '${_points * 1000} đ', // No need for toInt() since _points is already int
                                 style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold)),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.text)),
                           ],
                         ),
-                        Slider(
-                          value: _points
-                              .toDouble(), // Convert int to double for Slider
-                          min: 0,
-                          max: _balance,
-                          divisions: _balance > 100 ? 100 : _balance.toInt(),
-                          label: _points
-                              .toString(), // Display integer value in label
-                          onChanged: (value) {
-                            setState(() {
-                              _points =
-                                  value.toInt(); // Convert slider value to int
-                            });
-                          },
+                        SliderTheme(
+                          data: SliderThemeData(
+                            activeTrackColor: AppColors.primary,
+                            thumbColor: AppColors.primary,
+                            overlayColor: AppColors.primary.withOpacity(0.2),
+                            valueIndicatorColor: AppColors.primary,
+                          ),
+                          child: Slider(
+                            value: _points
+                                .toDouble(), // Convert int to double for Slider
+                            min: 0,
+                            max: _balance,
+                            divisions: _balance > 100 ? 100 : _balance.toInt(),
+                            label: _points
+                                .toString(), // Display integer value in label
+                            onChanged: (value) {
+                              setState(() {
+                                _points = value
+                                    .toInt(); // Convert slider value to int
+                              });
+                            },
+                          ),
                         ),
-                        const Text(
+                        Text(
                             'Số FoodyXu cần chuyển không được vượt quá số hiện có.',
-                            style: TextStyle(color: Colors.grey)),
-                        const Text('(1.000đ = 1 FoodyXu)',
-                            style: TextStyle(color: Colors.grey)),
+                            style: TextStyle(color: Colors.grey.shade600)),
+                        Text('(1.000đ = 1 FoodyXu)',
+                            style: TextStyle(color: Colors.grey.shade600)),
                       ],
                     ),
                   ),
                   const SizedBox(height: 20),
                   const Text('Lời nhắn',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      )),
                   const SizedBox(height: 10),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.black, width: 1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: AppColors.secondary.withOpacity(0.5),
+                          width: 1),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: TextField(
                       controller: _messageController,
@@ -199,15 +255,16 @@ class _TransferPointsPageState extends State<TransferPointsPage> {
                   SizedBox(
                     width: double.infinity,
                     child: _isProcessing
-                        ? const Center(child: CircularProgressIndicator())
-                        : OutlinedButton(
-                            style: OutlinedButton.styleFrom(
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                                color: AppColors.primary))
+                        : ElevatedButton(
+                            style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 14),
-                              side: const BorderSide(
-                                  color: Colors.black, width: 1),
+                              backgroundColor: AppColors.primary,
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
-                              backgroundColor: Colors.white,
+                                  borderRadius: BorderRadius.circular(12)),
+                              elevation: 2,
                             ),
                             onPressed: () {
                               if (_phoneController.text.isEmpty) {
@@ -225,7 +282,7 @@ class _TransferPointsPageState extends State<TransferPointsPage> {
                               style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black),
+                                  color: Colors.white),
                             ),
                           ),
                   ),
@@ -237,7 +294,11 @@ class _TransferPointsPageState extends State<TransferPointsPage> {
 
   void _showErrorMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red[700],
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 
@@ -289,21 +350,38 @@ class _TransferPointsPageState extends State<TransferPointsPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Thành công'),
+        title: const Text(
+          'Thành công',
+          style: TextStyle(
+            color: AppColors.primary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.check_circle,
-              color: Colors.green,
-              size: 64,
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.green[50],
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.check_circle,
+                color: Colors.green,
+                size: 64,
+              ),
             ),
             const SizedBox(height: 16),
             Text(
               'Bạn đã chuyển thành công $_points FoodyXu (${_points * 1000}đ) đến ${_phoneController.text}',
               textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 15),
             ),
           ],
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
         ),
         actions: [
           TextButton(
@@ -315,7 +393,13 @@ class _TransferPointsPageState extends State<TransferPointsPage> {
               GoRouter.of(context)
                   .pop(true); // Pass true to indicate a refresh is needed
             },
-            child: const Text('Đóng'),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.primary,
+            ),
+            child: const Text(
+              'Đóng',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),

@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:foodygo/dto/category_dto.dart';
+import 'package:foodygo/dto/edit_product_dto.dart';
 import 'package:foodygo/dto/product_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/addon_section_repository.dart';
@@ -31,16 +33,22 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
   final AddonSectionRepository _addonSectionRepository =
       AddonSectionRepository.instance;
   final AppLogger _logger = AppLogger.instance;
-  //SavedUser? _user;
+  SavedUser? _user;
   bool _isLoading = true;
   ProductDto? _productDto;
   List<CategoryDto>? _categoryDtoList;
   List<dynamic>? addonSectionList;
 
-  bool isAvailable = true;
-  int? selectedCategoryId;
   List<String>? selectedAddonSections;
+
+  int? selectedCategoryId;
   File? _selectedImage;
+  final name = TextEditingController();
+  final price = TextEditingController();
+  final description = TextEditingController();
+  final prepareTime = TextEditingController();
+  final code = TextEditingController();
+  bool isAvailable = true;
 
   @override
   void initState() {
@@ -61,6 +69,12 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
           }
         }
         _productDto = fetchData;
+        name.text = fetchData.name;
+        price.text = fetchData.price.toString();
+        description.text = fetchData.description;
+        prepareTime.text = fetchData.prepareTime.toString();
+        code.text = fetchData.code;
+        isAvailable = fetchData.available;
       });
       return true;
     }
@@ -101,7 +115,7 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
         userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
     if (user != null) {
       setState(() {
-        //_user = user;
+        _user = user;
       });
       bool fetchProductData = await fetchProduct(user.token, widget.productId);
       bool fetchCategoryData =
@@ -135,6 +149,69 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
       setState(() {
         _selectedImage = File(image.path);
       });
+    }
+  }
+
+  Future<void> _deleteProduct() async {
+    try {
+      bool isDeleted =
+          await _productRepository.deleteProduct(_productDto!.id, _user!.token);
+      if (isDeleted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Món ăn đã được xóa thành công!")),
+        );
+        // Quay về trang menu và reload dữ liệu
+        GoRouter.of(context)
+            .go('/protected/restaurant_menu', extra: _user!.restaurantId);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Xóa món ăn thất bại!")),
+        );
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Lỗi mạng, vui lòng thử lại!")),
+      );
+    }
+  }
+
+  Future<void> _saveEditProduct() async {
+    if (_productDto == null || _user == null) return;
+
+    try {
+      final editProduct = EditProductDto(
+          code: code.text,
+          name: name.text,
+          price: double.tryParse(price.text) ?? 0.0,
+          description: description.text,
+          prepareTime: prepareTime.text.isNotEmpty
+              ? double.tryParse(prepareTime.text)
+              : null,
+          available: isAvailable,
+          categoryId: selectedCategoryId);
+      
+      bool success = await _productRepository.updateProduct(
+        _productDto!.id,
+        _selectedImage!,
+        editProduct,
+        _user!.token,
+      );
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Cập nhật thành công!")),
+        );
+        GoRouter.of(context)
+            .go('/protected/restaurant_menu', extra: _user!.restaurantId);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Cập nhật thất bại!")),
+        );
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Lỗi mạng, vui lòng thử lại!")),
+      );
     }
   }
 
@@ -230,14 +307,31 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
 
             SizedBox(height: 16),
 
+            // Nhập code món
+            _buildInputField(
+                label: "Code *", hintText: "Nhập code món", controller: code),
+            SizedBox(height: 12),
+
             // Nhập tên món
             _buildInputField(
-                label: "Tên *", hintText: "${_productDto?.name}", expand: true),
+                label: "Tên *",
+                hintText: "Nhập tên món",
+                controller: name,
+                expand: true),
             SizedBox(height: 12),
 
             // Nhập giá
-            _buildInputField(
-                label: "Giá *", hintText: "${_productDto?.price.round()} xu"),
+            _buildNumberInputField(
+                label: "Giá * (Xu)",
+                hintText: "Nhập giá món",
+                controller: price),
+            SizedBox(height: 12),
+
+            // Nhập thời gian chuẩn bị
+            _buildNumberInputField(
+                label: "Thời gian chuẩn bị * (Phút)",
+                hintText: "Nhập thời gian chuẩn bị món",
+                controller: prepareTime),
             SizedBox(height: 12),
 
             // Danh mục (Dropdown)
@@ -264,7 +358,8 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
             // Mô tả
             _buildInputField(
                 label: "Mô tả",
-                hintText: "${_productDto?.description}",
+                hintText: "Nhập mô tả",
+                controller: description,
                 expand: true),
             SizedBox(height: 12),
 
@@ -273,7 +368,10 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
               title: Text("Nhóm topping"),
               subtitle: Text(selectedAddonSections?.join(", ") ?? ""),
               trailing: Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {},
+              onTap: () {
+                GoRouter.of(context).push('/protected/topping-selection',
+                    extra: {"productId": widget.productId});
+              },
             ),
             SizedBox(height: 12),
 
@@ -284,7 +382,7 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
                 Text("Còn món *",
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 Switch(
-                  value: _productDto!.available,
+                  value: isAvailable,
                   onChanged: (value) => setState(() => isAvailable = value),
                 ),
               ],
@@ -305,7 +403,7 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
 
             // Nút Lưu
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () => _saveEditProduct(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
@@ -320,8 +418,12 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
   }
 
   // Widget tạo ô nhập liệu
-  Widget _buildInputField(
-      {required String label, required String hintText, bool expand = false}) {
+  Widget _buildInputField({
+    required String label,
+    required TextEditingController controller,
+    String hintText = '',
+    bool expand = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -330,12 +432,43 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
         Container(
           constraints: BoxConstraints(minHeight: 50),
           child: TextField(
+            controller: controller,
             maxLines: expand ? null : 1,
-            keyboardType: TextInputType.multiline,
+            keyboardType: expand ? TextInputType.multiline : TextInputType.text,
             decoration: InputDecoration(
               hintText: hintText,
               border: OutlineInputBorder(),
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNumberInputField({
+    required String label,
+    required TextEditingController controller,
+    String hintText = '',
+    bool expand = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
+        SizedBox(height: 8),
+        Container(
+          constraints: BoxConstraints(minHeight: 50),
+          child: TextField(
+            controller: controller,
+            maxLines: expand ? null : 1,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              hintText: hintText,
+              border: OutlineInputBorder(),
+            ),
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly,
+            ],
           ),
         ),
       ],
@@ -358,7 +491,7 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
             ),
             TextButton(
               onPressed: () {
-                // Xử lý xóa món tại đây
+                _deleteProduct();
                 GoRouter.of(context).pop(); // Đóng hộp thoại sau khi xác nhận
               },
               child: Text("Xóa", style: TextStyle(color: AppColors.primary)),
