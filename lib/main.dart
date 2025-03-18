@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/category_dto.dart';
 import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/service/notification_service.dart';
 import 'package:foodygo/utils/secure_storage.dart';
@@ -9,7 +10,7 @@ import 'package:foodygo/view/pages/default_order.dart';
 import 'package:foodygo/view/pages/map_page.dart';
 import 'package:foodygo/view/pages/notification_page.dart';
 import 'package:foodygo/view/pages/restaurant/add_dish_page.dart';
-import 'package:foodygo/view/pages/restaurant/add_edit_category.dart';
+import 'package:foodygo/view/pages/restaurant/edit_category.dart';
 import 'package:foodygo/view/pages/restaurant/add_topping_item.dart';
 import 'package:foodygo/view/pages/restaurant/add_topping_section.dart';
 import 'package:foodygo/view/pages/detail_order.dart';
@@ -397,7 +398,8 @@ class Main extends StatelessWidget {
             name: 'protected_add_edit_category', // S-039
             path: '/protected/add-edit-category',
             pageBuilder: (context, state) {
-              return MaterialPage(child: AddEditCategory());
+              final categoryDto = state.extra as CategoryDto;
+              return MaterialPage(child: EditCategory(categoryDto: categoryDto));
             },
           ),
           GoRoute(

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/category_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/category_repostory.dart';
 import 'package:foodygo/utils/app_logger.dart';
@@ -107,7 +108,9 @@ class _CategoryPageState extends State<CategoryPage> {
             ),
             subtitle: Text(_categories?[index]['description']),
             trailing: Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {},
+            onTap: () {
+              GoRouter.of(context).push("/protected/add-edit-category", extra: CategoryDto.fromJson(_categories?[index]));
+            },
           );
         },
       ),
