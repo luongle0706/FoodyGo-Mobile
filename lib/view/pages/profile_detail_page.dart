@@ -1,8 +1,37 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/repository/user_repository.dart';
+import 'package:foodygo/utils/secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
-class ProfileDetailPage extends StatelessWidget {
+class ProfileDetailPage extends StatefulWidget {
   const ProfileDetailPage({super.key});
+
+  @override
+  State<ProfileDetailPage> createState() => _ProfileDetailPageState();
+}
+
+class _ProfileDetailPageState extends State<ProfileDetailPage> {
+  SavedUser? user;
+  final UserRepository userRepository = UserRepository.instance;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void init() async {
+    String? userString = await SecureStorage.instance.get(key: 'user');
+    SavedUser? userData =
+        userString != null ? SavedUser.fromJson(json.decode(userString)) : null;
+    if (userData != null) {
+      setState(() {
+        user = userData;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
