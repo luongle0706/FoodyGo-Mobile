@@ -193,6 +193,8 @@ class _MenuScreenState extends State<MenuScreen> {
   int selectedTab = 0; // 0: Món, 1: Nhóm Topping
   String searchQuery = "";
 
+  final AppLogger logger = AppLogger.instance;
+
   @override
   Widget build(BuildContext context) {
     List<ProductDto> filteredProducts = widget.productDto!
@@ -323,9 +325,15 @@ class _MenuScreenState extends State<MenuScreen> {
                 );
               } else {
                 var item = widget.toppingGroups[categoryIndex];
-                return ListTile(
-                  title: Text(item["name"]),
-                  subtitle: Text("Số lượng topping: ${item["count"]}"),
+                return GestureDetector(
+                  onTap: () {
+                    GoRouter.of(context).push('/protected/food-link',
+                        extra: {'addonSectionId': 1});
+                  },
+                  child: ListTile(
+                    title: Text(item["name"]),
+                    subtitle: Text("Số lượng topping: ${item["count"]}"),
+                  ),
                 );
               }
             },
