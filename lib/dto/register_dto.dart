@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:intl/intl.dart';
 
@@ -29,7 +28,6 @@ class RegisterRequestDTO {
       "phone": phoneNumber,
       "buildingID": buildingID,
       "dob": DateFormat('yyyy-MM-dd').format(dob),
-      "image": image != null ? base64Encode(image!.readAsBytesSync()) : null,
     };
   }
 }
@@ -40,8 +38,8 @@ class RegisterResponseDTO {
   final String roleName;
   final String fullname;
   final String phoneNumber;
-  final int buildingId;
-  final String buildingName;
+  final int? buildingId;
+  final String? buildingName;
   final int? userId;
   final DateTime dob;
   final String? image;
@@ -52,8 +50,8 @@ class RegisterResponseDTO {
       required this.roleName,
       required this.fullname,
       required this.phoneNumber,
-      required this.buildingId,
-      required this.buildingName,
+      this.buildingId,
+      this.buildingName,
       this.userId,
       required this.dob,
       this.image});
@@ -65,8 +63,8 @@ class RegisterResponseDTO {
       roleName: json['data']['roleName'],
       fullname: json['data']['fullName'],
       phoneNumber: json['data']['phone'],
-      buildingId: json['data']['buildingID'] as int,
-      buildingName: json['data']['buildingName'],
+      buildingId: json['data']['buildingID'] as int? ?? 0,
+      buildingName: json['data']['buildingName'] ?? "No Name",
       userId: json['data']['userID'] as int?,
       dob: DateTime.parse(json['data']['dob']),
       image: json['data']['image'],

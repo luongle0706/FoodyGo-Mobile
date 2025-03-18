@@ -6,8 +6,7 @@ import 'package:foodygo/utils/constants.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:http_parser/http_parser.dart';
-import 'package:mime/mime.dart';
-import 'package:intl/intl.dart';
+import 'package:path/path.dart';
 
 class AuthRepository {
   AuthRepository._();
@@ -83,34 +82,37 @@ class AuthRepository {
 
   Future<RegisterResponseDTO> register(RegisterRequestDTO request) async {
     try {
-      var uri =
-          Uri.parse('http://192.168.1.6:8080/api/v1/authentications/register');
+      var uri = Uri.parse('$globalURL/api/v1/authentications/register');
 
       var requestMultipart = http.MultipartRequest("POST", uri);
+      requestMultipart.headers['Content-Type'] = 'multipart/form-data';
+      String jsonData = jsonEncode(request.toJson());
 
-      requestMultipart.fields['userRegisterRequest'] = jsonEncode({
-        "email": request.email,
-        "password": request.password,
-        "fullName": request.fullname,
-        "phone": request.phoneNumber,
-        "buildingID": request.buildingID?.toString() ?? "",
-        "dob": DateFormat('yyyy-MM-dd').format(request.dob),
-      });
+      requestMultipart.files.add(
+        http.MultipartFile.fromString(
+          'userRegisterRequest',
+          jsonData,
+          contentType: MediaType('application', 'json'),
+        ),
+      );
 
       // Kiểm tra nếu có ảnh thì thêm vào request
       if (request.image != null) {
-        String? mimeType =
-            lookupMimeType(request.image!.path); // Tự động lấy MIME type
-
         requestMultipart.files.add(await http.MultipartFile.fromPath(
           'image',
           request.image!.path,
+          filename: basename(request.image!.path),
         ));
       }
 
       var streamedResponse = await requestMultipart.send();
       var response = await http.Response.fromStream(streamedResponse);
+      logger.info("stream$streamedResponse");
+      logger.info("response$response");
+
       final responseBody = jsonDecode(response.body);
+      logger.info("responseBody$responseBody");
+
       if (response.statusCode == 200) {
         return RegisterResponseDTO.fromJson(responseBody);
       } else {
@@ -128,7 +130,7 @@ class AuthRepository {
     logger.info("request body$body");
 
     final response = await http
-        .post(Uri.parse('http://192.168.1.6:8080/api/v1/send-otp'),
+        .post(Uri.parse('$globalURL/api/v1/send-otp'),
             headers: {'Content-Type': 'application/json'},
             body: json.encode(body))
         .timeout(const Duration(seconds: 10));

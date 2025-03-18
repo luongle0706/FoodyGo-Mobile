@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:foodygo/dto/product_dto.dart';
 import 'package:foodygo/dto/restaurant_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/repository/addon_section_repository.dart';
 import 'package:foodygo/repository/restaurant_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
@@ -24,9 +25,11 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
   final AppLogger _logger = AppLogger.instance;
   final RestaurantRepository _restaurantRepository =
       RestaurantRepository.instance;
+  final AddonSectionRepository _addonSectionRepository =
+      AddonSectionRepository.instance;
   RestaurantDto? _restaurantDto;
   List<ProductDto>? _productDto;
-
+  List<dynamic>? _addonSection;
   bool _isLoading = true;
 
   @override
@@ -59,9 +62,14 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
         userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
     if (user != null) {
       bool fetchOrderData = await fetchRestaurant(user.token);
+      List<dynamic>? fetchAddonSection =
+          await _addonSectionRepository.getAddonSectionByRestaurantId(
+              accessToken: user.token, restaurantId: 1);
+      _logger.info("addonSection: $fetchAddonSection");
 
       if (fetchOrderData) {
         setState(() {
+          _addonSection = fetchAddonSection;
           _isLoading = false;
         });
       } else {

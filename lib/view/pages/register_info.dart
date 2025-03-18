@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'package:flutter/services.dart';
-import 'package:image/image.dart' as img;
 import 'package:flutter/material.dart';
 import 'package:foodygo/dto/register_dto.dart';
 import 'package:foodygo/repository/auth_repository.dart';
@@ -57,25 +55,9 @@ class _RegisterInfoState extends State<RegisterInfo> {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
-      File file = File(image.path);
-
-      // Đọc ảnh thành bytes
-      List<int> imageBytes = await file.readAsBytes();
-      img.Image? originalImage =
-          img.decodeImage(Uint8List.fromList(imageBytes));
-
-      if (originalImage != null) {
-        // Resize ảnh (giữ tỷ lệ, giảm xuống 50% kích thước)
-        img.Image resizedImage = img.copyResize(originalImage, width: 600);
-
-        // Chuyển về file
-        File compressedFile = File(file.path)
-          ..writeAsBytesSync(img.encodeJpg(resizedImage, quality: 85));
-
-        setState(() {
-          _selectedImage = compressedFile;
-        });
-      }
+      setState(() {
+        _selectedImage = File(image.path);
+      });
     }
   }
 
@@ -102,10 +84,7 @@ class _RegisterInfoState extends State<RegisterInfo> {
     final String phoneNumber = mobileController.text.trim();
     final String dobString = dobController.text.trim();
 
-    if (fullName.isEmpty ||
-        phoneNumber.isEmpty ||
-        dobString.isEmpty ||
-        chosenBuildingId == null) {
+    if (fullName.isEmpty || phoneNumber.isEmpty || dobString.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Vui lòng điền đầy đủ thông tin!")),
       );
@@ -127,7 +106,7 @@ class _RegisterInfoState extends State<RegisterInfo> {
           password: _password,
           fullname: fullName,
           phoneNumber: phoneNumber,
-          buildingID: chosenBuildingId!,
+          buildingID: chosenBuildingId,
           image: _selectedImage,
           dob: dob);
       RegisterResponseDTO response = await _registerRepo.register(request);
@@ -220,12 +199,6 @@ class _RegisterInfoState extends State<RegisterInfo> {
                     : null,
               ),
             ),
-            SizedBox(height: 10),
-            Text(
-              'Tải ảnh đại diện',
-              style: TextStyle(fontSize: 16),
-            ),
-
             SizedBox(height: 10),
             Text(
               'Tải ảnh đại diện',
