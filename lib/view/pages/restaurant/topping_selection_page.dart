@@ -95,7 +95,6 @@ class _ToppingSelectionPageState extends State<ToppingSelectionPage> {
     }
   }
 
-  // Function to link an addon section to the product
   Future<void> linkAddonSection(
       int addonSectionId, BuildContext context) async {
     if (currentUser == null) return;
@@ -105,14 +104,10 @@ class _ToppingSelectionPageState extends State<ToppingSelectionPage> {
     });
 
     try {
-      // Call the link product API
       await productRepository.linkProduct(
           productId: widget.productId,
           addonSectionId: addonSectionId,
           accessToken: currentUser!.token);
-
-      // Update local state directly instead of fetching all data again
-      // Move addon section from unlinked to linked
       setState(() {
         final sectionIndex = unlinkedAddonSections
             .indexWhere((section) => section.id == addonSectionId);
@@ -135,7 +130,6 @@ class _ToppingSelectionPageState extends State<ToppingSelectionPage> {
     }
   }
 
-// Function to unlink an addon section from the product
   Future<void> unlinkAddonSection(
       int addonSectionId, BuildContext context) async {
     if (currentUser == null) return;
@@ -145,15 +139,10 @@ class _ToppingSelectionPageState extends State<ToppingSelectionPage> {
     });
 
     try {
-      // Call the unlink product API - this should be different from linkProduct!
-      // If your repository doesn't have an unlinkProduct method, you'll need to add one
       await productRepository.linkProduct(
           productId: widget.productId,
           addonSectionId: addonSectionId,
           accessToken: currentUser!.token);
-
-      // Update local state directly instead of fetching all data again
-      // Move addon section from linked to unlinked
       setState(() {
         final sectionIndex = linkedAddonSections
             .indexWhere((section) => section.id == addonSectionId);
@@ -217,7 +206,6 @@ class _ToppingSelectionPageState extends State<ToppingSelectionPage> {
           _buildSection('Đã liên kết', linkedAddonSections, isLinked: true),
           _buildSection('Chưa liên kết', unlinkedAddonSections,
               isLinked: false),
-          _buildCompleteButton(),
         ],
       ),
     );
@@ -288,23 +276,6 @@ class _ToppingSelectionPageState extends State<ToppingSelectionPage> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildCompleteButton() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: ElevatedButton(
-        onPressed: () {
-          GoRouter.of(context).pop();
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.grey[600],
-          minimumSize: const Size(double.infinity, 50),
-        ),
-        child: const Text('Hoàn tất',
-            style: TextStyle(color: Colors.white, fontSize: 16)),
-      ),
     );
   }
 }

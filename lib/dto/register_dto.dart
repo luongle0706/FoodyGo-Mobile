@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:intl/intl.dart';
 
 class RegisterRequestDTO {
@@ -5,25 +7,29 @@ class RegisterRequestDTO {
   String password;
   String fullname;
   String phoneNumber;
-  int buildingID;
+  int? buildingID;
   DateTime dob;
+  File? image;
 
-  RegisterRequestDTO(
-      {required this.email,
-      required this.password,
-      required this.fullname,
-      required this.phoneNumber,
-      required this.buildingID,
-      required this.dob});
+  RegisterRequestDTO({
+    required this.email,
+    required this.password,
+    required this.fullname,
+    required this.phoneNumber,
+    this.buildingID,
+    required this.dob,
+    this.image,
+  });
 
   Map<String, dynamic> toJson() {
     return {
-      'email': email.trim(),
-      'password': password.trim(),
-      'fullName': fullname.trim(),
-      'phone': phoneNumber.trim(),
-      'buildingID': buildingID,
-      'dob': DateFormat('yyyy-MM-dd').format(dob)
+      "email": email,
+      "password": password,
+      "fullName": fullname,
+      "phone": phoneNumber,
+      "buildingID": buildingID,
+      "dob": DateFormat('yyyy-MM-dd').format(dob),
+      "image": image != null ? base64Encode(image!.readAsBytesSync()) : null,
     };
   }
 }
@@ -38,16 +44,32 @@ class RegisterResponseDTO {
   final String buildingName;
   final int? userId;
   final DateTime dob;
+  final String? image;
 
-  RegisterResponseDTO({
-    required this.message,
-    required this.email,
-    required this.roleName,
-    required this.fullname,
-    required this.phoneNumber,
-    required this.buildingId,
-    required this.buildingName,
-    this.userId,
-    required this.dob,
-  });
+  RegisterResponseDTO(
+      {required this.message,
+      required this.email,
+      required this.roleName,
+      required this.fullname,
+      required this.phoneNumber,
+      required this.buildingId,
+      required this.buildingName,
+      this.userId,
+      required this.dob,
+      this.image});
+
+  factory RegisterResponseDTO.fromJson(Map<String, dynamic> json) {
+    return RegisterResponseDTO(
+      message: json['message'],
+      email: json['data']['email'],
+      roleName: json['data']['roleName'],
+      fullname: json['data']['fullName'],
+      phoneNumber: json['data']['phone'],
+      buildingId: json['data']['buildingID'] as int,
+      buildingName: json['data']['buildingName'],
+      userId: json['data']['userID'] as int?,
+      dob: DateTime.parse(json['data']['dob']),
+      image: json['data']['image'],
+    );
+  }
 }

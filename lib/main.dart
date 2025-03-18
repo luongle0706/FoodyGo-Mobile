@@ -246,13 +246,6 @@ class Main extends StatelessWidget {
                   },
                 ),
                 GoRoute(
-                  name: 'protected_notification',
-                  path: '/protected/notification',
-                  pageBuilder: (context, state) {
-                    return MaterialPage(child: EmptyPage());
-                  },
-                ),
-                GoRoute(
                   name: 'order-tabs', // tab chung for S-013 và S-015
                   path: '/order_tabs',
                   pageBuilder: (context, state) {
@@ -428,7 +421,10 @@ class Main extends StatelessWidget {
             name: 'food_link', // S-034
             path: '/protected/food-link',
             pageBuilder: (context, state) {
-              return MaterialPage(child: FoodLinkPage());
+              final extra = state.extra as Map<String, dynamic>;
+              int addonSectionId = extra['addonSectionId'];
+              return MaterialPage(
+                  child: FoodLinkPage(addonSectionId: addonSectionId));
             },
           ),
           GoRoute(

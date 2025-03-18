@@ -114,7 +114,7 @@ class _FoodyGoNavigationBarState extends State<FoodyGoNavigationBar> {
                   _getNavComp(context, '/protected/restaurant-foodygo', 'fork',
                       'FoodyGo'),
                   _getNavComp(
-                      context, '/protected/notification', 'bell', 'Thông báo'),
+                      context, '/protected/notifications', 'bell', 'Thông báo'),
                   _getNavComp(context, '/protected/user', 'user', 'Tài khoản'),
                 ]
               : user?.role == 'ROLE_STAFF'

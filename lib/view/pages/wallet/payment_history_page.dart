@@ -6,13 +6,12 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/wallet_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
-import 'package:foodygo/view/components/transaction_card.dart';
 import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class PaymentHistoryPage extends StatefulWidget {
-  const PaymentHistoryPage({Key? key}) : super(key: key);
+  const PaymentHistoryPage({super.key});
 
   @override
   State<PaymentHistoryPage> createState() => _PaymentHistoryPageState();
@@ -20,10 +19,15 @@ class PaymentHistoryPage extends StatefulWidget {
 
 class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   List<TransactionItem> transactionItems = [];
-  List<TransactionDto> rawTransactions = []; // Store the raw transaction data
+
+  List<TransactionDto> rawTransactions = [];
+  // Store the raw transaction data
   bool isLoading = true;
+
   final walletRepository = WalletRepository.instance;
+
   final AppLogger logger = AppLogger.instance;
+
   final storage = SecureStorage.instance;
 
   @override

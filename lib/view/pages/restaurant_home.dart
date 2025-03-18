@@ -6,8 +6,7 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/restaurant_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
-import 'package:foodygo/view/pages/restaurant/order_view_restaurant.dart';
-import 'package:foodygo/view/pages/welcome_screen.dart';
+import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class RestaurantHome extends StatefulWidget {
@@ -82,15 +81,19 @@ class _RestaurantHomeState extends State<RestaurantHome> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
+        backgroundColor: AppColors.background,
         body: Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.background),
+          ),
         ),
       );
     }
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.grey.shade700,
+        backgroundColor: AppColors.primary,
         toolbarHeight: 80,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -98,7 +101,11 @@ class _RestaurantHomeState extends State<RestaurantHome> {
             _restaurantDto != null
                 ? Text(
                     _restaurantDto!.name,
-                    style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 21,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   )
                 : SizedBox(),
             GestureDetector(
@@ -126,22 +133,24 @@ class _RestaurantHomeState extends State<RestaurantHome> {
                           ),
                         ),
                         Icon(Icons.arrow_forward_ios,
-                            size: 15, color: Colors.grey),
+                            size: 15, color: Colors.white),
                       ],
                     )
-                  : SizedBox(), // Tránh lỗi khi _restaurantDto chưa có giá trị
+                  : SizedBox(),
             )
           ],
         ),
       ),
       body: _restaurantDto == null
           ? Center(
-              child:
-                  CircularProgressIndicator()) // Hiển thị vòng loading khi dữ liệu chưa sẵn sàng
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.background),
+              ),
+            )
           : Padding(
               padding: EdgeInsets.only(top: 0),
               child: Container(
-                color: Colors.grey.shade300,
+                color: AppColors.background,
                 padding: EdgeInsets.all(35),
                 child: GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -165,28 +174,12 @@ class _RestaurantHomeState extends State<RestaurantHome> {
     return GestureDetector(
       onTap: () {
         if (title == "Thực đơn") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => WelcomeScreen()),
-          );
+          GoRouter.of(context).go('/protected/restaurant_menu');
         } else if (title == "Đơn hàng") {
-          Navigator.push(
-            context,
-            // MaterialPageRoute(builder: (context) => OrderListRestaurantPage()),
-            MaterialPageRoute(builder: (context) => OrderListRestaurantPage()),
-          );
+          GoRouter.of(context).push('/protected/restaurant-foodygo');
         } else if (title == "Báo cáo") {
-          Navigator.push(
-            context,
-            // MaterialPageRoute(builder: (context) => OrderListRestaurantPage()),
-            MaterialPageRoute(builder: (context) => WelcomeScreen()),
-          );
         } else if (title == "Thông tin") {
-          Navigator.push(
-            context,
-            // MaterialPageRoute(builder: (context) => OrderListRestaurantPage()),
-            MaterialPageRoute(builder: (context) => WelcomeScreen()),
-          );
+          GoRouter.of(context).push('/protected/notifications');
         }
       },
       child: Container(
@@ -195,16 +188,29 @@ class _RestaurantHomeState extends State<RestaurantHome> {
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
-                color: Colors.grey.shade400, blurRadius: 3, spreadRadius: 1),
+              color: Colors.grey.shade400,
+              blurRadius: 3,
+              spreadRadius: 1,
+            ),
           ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 40, color: Colors.black),
+            Icon(
+              icon,
+              size: 40,
+              color: AppColors.primary,
+            ),
             SizedBox(height: 10),
-            Text(title,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppColors.text,
+              ),
+            ),
           ],
         ),
       ),
