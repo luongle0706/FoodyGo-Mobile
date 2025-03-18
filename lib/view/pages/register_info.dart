@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:flutter/services.dart';
+import 'package:image/image.dart' as img;
 import 'package:flutter/material.dart';
 import 'package:foodygo/dto/register_dto.dart';
 import 'package:foodygo/repository/auth_repository.dart';
@@ -6,6 +9,7 @@ import 'package:foodygo/view/components/button.dart';
 import 'package:foodygo/view/components/input_field_w_icon.dart';
 import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,6 +36,8 @@ class _RegisterInfoState extends State<RegisterInfo> {
   final buildingController = TextEditingController();
   late String _email = "";
   late String _password = "";
+  File? _selectedImage;
+
   bool isValidVietnamesePhoneNumber(String phoneNumber) {
     final RegExp regex = RegExp(r'^(03|05|07|08|09)[0-9]{8,9}$');
     return regex.hasMatch(phoneNumber);
@@ -44,6 +50,33 @@ class _RegisterInfoState extends State<RegisterInfo> {
     _chosenBuildingName = widget.chosenBuildingName;
     buildingController.text = _chosenBuildingName ?? ''; // Set initial text
     _loadAuthData();
+  }
+
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      File file = File(image.path);
+
+      // Đọc ảnh thành bytes
+      List<int> imageBytes = await file.readAsBytes();
+      img.Image? originalImage =
+          img.decodeImage(Uint8List.fromList(imageBytes));
+
+      if (originalImage != null) {
+        // Resize ảnh (giữ tỷ lệ, giảm xuống 50% kích thước)
+        img.Image resizedImage = img.copyResize(originalImage, width: 600);
+
+        // Chuyển về file
+        File compressedFile = File(file.path)
+          ..writeAsBytesSync(img.encodeJpg(resizedImage, quality: 85));
+
+        setState(() {
+          _selectedImage = compressedFile;
+        });
+      }
+    }
   }
 
   Future<void> _loadAuthData() async {
@@ -95,8 +128,8 @@ class _RegisterInfoState extends State<RegisterInfo> {
           fullname: fullName,
           phoneNumber: phoneNumber,
           buildingID: chosenBuildingId!,
+          image: _selectedImage,
           dob: dob);
-
       RegisterResponseDTO response = await _registerRepo.register(request);
       logger.info(response.toString());
       ScaffoldMessenger.of(context).showSnackBar(
@@ -172,11 +205,27 @@ class _RegisterInfoState extends State<RegisterInfo> {
               ],
             ),
 
-            // Profile image
-            SizedBox(
-              height: 120,
-              child: Image.asset('assets/icons/ellispe-icon.png'),
+            // Profile image section
+            InkWell(
+              onTap: _pickImage,
+              child: CircleAvatar(
+                radius: 60,
+                backgroundColor: Colors.grey[300],
+                backgroundImage: _selectedImage != null
+                    ? FileImage(_selectedImage!) // Hiển thị ảnh đã chọn
+                    : AssetImage('assets/icons/ellispe-icon.png')
+                        as ImageProvider,
+                child: _selectedImage == null
+                    ? Icon(Icons.camera_alt, size: 40, color: Colors.white)
+                    : null,
+              ),
             ),
+            SizedBox(height: 10),
+            Text(
+              'Tải ảnh đại diện',
+              style: TextStyle(fontSize: 16),
+            ),
+
             SizedBox(height: 10),
             Text(
               'Tải ảnh đại diện',
