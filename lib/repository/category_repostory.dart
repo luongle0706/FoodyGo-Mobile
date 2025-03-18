@@ -52,4 +52,27 @@ class CategoryRepostory {
     }
     return null;
   }
+
+  Future<bool> updateCategory(String accessToken, CategoryDto categoryDto) async {
+    try {
+      var uri = Uri.parse("$globalURL/api/v1/categories");
+
+      var response = await http.put(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $accessToken",
+        },
+        body: jsonEncode(categoryDto.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
 }
