@@ -51,6 +51,26 @@ class ProductRepository {
     }
   }
 
+  Future<bool> switchAvailabilityProduct(String accessToken, int productId) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$globalURL/api/v1/products/$productId/availability'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        throw Exception('Failed to switch availability: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error switching availability: $e');
+    }
+  }
+
   Future<List<ProductDto>?> getProductsByRestaurantId(
       int restaurantId, String accessToken) async {
     logger.info("RestaurantId: $restaurantId, accessToken: $accessToken");

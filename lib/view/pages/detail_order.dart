@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:foodygo/dto/order_dto_v2.dart';
 import 'package:foodygo/dto/order_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/order_repository.dart';
@@ -24,7 +25,7 @@ class _DetailOrderState extends State<DetailOrder> {
 
   final OrderRepository _orderRepository = OrderRepository.instance;
 
-  OrderDto? _orderDto;
+  OrderDtoV2? _orderDto;
 
   bool _isLoading = true;
 
@@ -37,8 +38,8 @@ class _DetailOrderState extends State<DetailOrder> {
   }
 
   Future<bool> fetchOrder(String accessToken) async {
-    OrderDto? fetchOrder =
-        await _orderRepository.loadOrderById(accessToken, widget.orderId);
+    OrderDtoV2? fetchOrder =
+    await _orderRepository.loadOrderByIdV2(accessToken, widget.orderId);
 
     if (fetchOrder != null) {
       setState(() {
@@ -63,7 +64,7 @@ class _DetailOrderState extends State<DetailOrder> {
   Future<void> loadUser() async {
     String? userData = await _storage.get(key: 'user');
     SavedUser? user =
-        userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
+    userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
     if (user != null) {
       bool fetchOrderData = await fetchOrder(user.token);
 
@@ -182,10 +183,10 @@ class _DetailOrderState extends State<DetailOrder> {
                             children: [
                               Text('Từ',
                                   style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
+                                  TextStyle(fontWeight: FontWeight.bold)),
                               SizedBox(height: 4),
                               Text(
-                                'Xoài non mắm ruốc - Cửa hàng Gì Lê\nNhà văn hóa sinh viên, Quận 9, TP.Thủ Đức',
+                                '${_orderDto?.restaurantName}\n${_orderDto?.restaurantAddress}',
                                 style: TextStyle(color: Colors.black87),
                               ),
                             ],
@@ -213,10 +214,10 @@ class _DetailOrderState extends State<DetailOrder> {
                             children: [
                               Text('Đến',
                                   style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
+                                  TextStyle(fontWeight: FontWeight.bold)),
                               SizedBox(height: 4),
                               Text(
-                                'Lưu Hữu Phước, Đông Hòa, Dĩ An, Bình Dương, Việt Nam, TP.HCM\n${_orderDto?.customerName} - ${_orderDto?.customerPhone}',
+                                '${_orderDto?.customerAddress}\n${_orderDto?.customerName} - ${_orderDto?.customerPhone}',
                                 style: TextStyle(color: Colors.black87),
                               ),
                             ],
@@ -237,56 +238,56 @@ class _DetailOrderState extends State<DetailOrder> {
               ),
               Column(
                 children: _orderDto?.orderDetails
-                        .map((orderDetail) => Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 80,
-                                    height: 80,
-                                    color: Colors.grey[300],
-                                    child: Center(
-                                      child: Text('Ảnh ${orderDetail.id}'),
-                                    ),
-                                  ),
-                                  SizedBox(width: 16),
-                                  Expanded(
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              '${orderDetail.quantity} x ${orderDetail.productName}',
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              orderDetail.addonItems ??
-                                                  'Không có món thêm',
-                                              style:
-                                                  TextStyle(color: Colors.grey),
-                                            ),
-                                          ],
-                                        ),
-                                        Spacer(),
-                                        Text(
-                                          '${orderDetail.price.toStringAsFixed(0)} xu', // Hiển thị giá
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                          textAlign: TextAlign.right,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ))
-                        .toList() ??
+                    .map((orderDetail) => Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        color: Colors.grey[300],
+                        child: Center(
+                          child: Text('Ảnh ${orderDetail.id}'),
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Row(
+                          crossAxisAlignment:
+                          CrossAxisAlignment.center,
+                          children: [
+                            Column(
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${orderDetail.quantity} x ${orderDetail.productName}',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  orderDetail.addonItems ??
+                                      'Không có món thêm',
+                                  style:
+                                  TextStyle(color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                            Spacer(),
+                            Text(
+                              '${orderDetail.price.toStringAsFixed(0)} xu',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.right,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ))
+                    .toList() ??
                     [],
               ),
               Divider(),

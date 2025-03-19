@@ -23,6 +23,32 @@ class ProductDto {
     this.category,
   });
 
+  ProductDto copyWith({
+    int? id,
+    String? code,
+    String? name,
+    double? price,
+    String? description,
+    String? image,
+    double? prepareTime,
+    bool? available,
+    List<AddonSectionDto>? addonSections,
+    CategoryDTO? category,
+  }) {
+    return ProductDto(
+      id: id ?? this.id,
+      code: code ?? this.code,
+      name: name ?? this.name,
+      price: price ?? this.price,
+      description: description ?? this.description,
+      image: image ?? this.image,
+      prepareTime: prepareTime ?? this.prepareTime,
+      available: available ?? this.available,
+      addonSections: addonSections ?? this.addonSections,
+      category: category ?? this.category
+    );
+  }
+
   factory ProductDto.fromJson(Map<String, dynamic> json) {
     return ProductDto(
       id: json['id'] as int,

@@ -3,9 +3,9 @@ import 'package:foodygo/view/pages/order_history.dart';
 import 'package:foodygo/view/pages/order_view_customer.dart';
 
 class OrderTabsPage extends StatelessWidget {
-  final int orderId;
+  final int customerId;
 
-  const OrderTabsPage({super.key, required this.orderId});
+  const OrderTabsPage({super.key, required this.customerId});
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +22,8 @@ class OrderTabsPage extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            OrderListCustomerPage(orderId: orderId),
-            OrderHistory(orderId: orderId),
+            OrderListCustomerPage(customerId: customerId),
+            OrderHistory(customerId: customerId),
           ],
         ),
       ),
