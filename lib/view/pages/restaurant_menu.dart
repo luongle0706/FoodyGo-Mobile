@@ -5,13 +5,10 @@ import 'package:foodygo/dto/product_dto.dart';
 import 'package:foodygo/dto/restaurant_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/addon_section_repository.dart';
-import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/repository/product_repository.dart';
-import 'package:foodygo/repository/restaurant_repository.dart';
 import 'package:foodygo/repository/restaurant_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
-import 'package:foodygo/view/pages/restaurant/custome_appbar_order_restaurant_list.dart';
 import 'package:go_router/go_router.dart';
 
 class RestaurantMenu extends StatefulWidget {
@@ -26,8 +23,10 @@ class RestaurantMenu extends StatefulWidget {
 class _RestaurantMenuState extends State<RestaurantMenu> {
   final _storage = SecureStorage.instance;
   final AppLogger _logger = AppLogger.instance;
-  final RestaurantRepository _restaurantRepository = RestaurantRepository.instance;
-  final AddonSectionRepository _addonSectionRepository = AddonSectionRepository.instance;
+  final RestaurantRepository _restaurantRepository =
+      RestaurantRepository.instance;
+  final AddonSectionRepository _addonSectionRepository =
+      AddonSectionRepository.instance;
   RestaurantDto? _restaurantDto;
   List<ProductDto>? _productDto;
   List<dynamic>? _addonSection;
@@ -104,7 +103,10 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
             _restaurantDto != null
                 ? Text(
                     _restaurantDto!.name,
-                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(
+                        fontSize: 21,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   )
                 : SizedBox(),
             GestureDetector(
@@ -219,20 +221,21 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     List<ProductDto> filteredProducts = widget.productDto!
         .where((product) =>
-        product.name.toLowerCase().contains(searchQuery.toLowerCase()))
+            product.name.toLowerCase().contains(searchQuery.toLowerCase()))
         .toList();
 
     Future<void> switchAvailability(int productId) async {
       try {
-
         String? userData = await _storage.get(key: 'user');
         SavedUser? user =
-        userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
+            userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
         if (user != null) {
-          final success = await _productRepository.switchAvailabilityProduct(user.token, productId);
+          final success = await _productRepository.switchAvailabilityProduct(
+              user.token, productId);
 
           if (success) {
-            final productIndex = widget.productDto!.indexWhere((p) => p.id == productId);
+            final productIndex =
+                widget.productDto!.indexWhere((p) => p.id == productId);
             if (productIndex != -1) {
               final updatedProduct = widget.productDto![productIndex].copyWith(
                 available: !widget.productDto![productIndex].available,
@@ -266,20 +269,20 @@ class _MenuScreenState extends State<MenuScreen> {
             decoration: InputDecoration(
               hintText: "Nhập tên món ăn",
               prefixIcon: Icon(Icons.search),
-              border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.orange),),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.orange),
+              ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide(color: Colors.orange),
               ),
               isDense: true,
               contentPadding:
-              EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                  EdgeInsets.symmetric(vertical: 10, horizontal: 12),
             ),
           ),
         ),
-
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           child: Row(
@@ -311,7 +314,6 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
         ),
         Divider(),
-
         Container(
           margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
           // padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -341,12 +343,12 @@ class _MenuScreenState extends State<MenuScreen> {
                   GoRouter.of(context).push('/protected/manage-categories');
                 },
                 icon: Icon(Icons.edit, color: Colors.orange),
-                label: Text("Chỉnh sửa danh mục", style: TextStyle(color: Colors.orange)),
+                label: Text("Chỉnh sửa danh mục",
+                    style: TextStyle(color: Colors.orange)),
               ),
             ],
           ),
         ),
-
         Expanded(
           child: ListView.builder(
             itemCount: selectedTab == 0

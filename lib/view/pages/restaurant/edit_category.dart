@@ -15,17 +15,22 @@ class EditCategory extends StatefulWidget {
   const EditCategory({super.key, required this.categoryDto});
 
   @override
-  _EditCategoryState createState() => _EditCategoryState();
+  State<EditCategory> createState() => _EditCategoryState();
 }
 
 class _EditCategoryState extends State<EditCategory> {
-  bool _isLoading = true;
+  bool isLoading = true;
+
   final AppLogger _logger = AppLogger.instance;
+
   final SecureStorage storage = SecureStorage.instance;
+
   SavedUser? _user;
+
   final CategoryRepostory _categoryRepostory = CategoryRepostory.instance;
 
   final nameController = TextEditingController();
+
   final descriptionController = TextEditingController();
 
   @override
@@ -50,7 +55,7 @@ class _EditCategoryState extends State<EditCategory> {
     } else {
       _logger.info('Failed to load user');
       setState(() {
-        _isLoading = false;
+        isLoading = false;
       });
     }
   }
@@ -83,65 +88,90 @@ class _EditCategoryState extends State<EditCategory> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          "Sửa danh mục",
-          style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        backgroundColor: AppColors.primary,
-        elevation: 1,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Ô nhập tên danh mục
-            InputField(
-                label: "Tên danh mục *",
-                controller: nameController,
-                hintText: "Nhập tên danh mục",
-                expand: true),
-            const SizedBox(height: 20),
-
-            // Ô nhập mô tả danh mục
-            InputField(
-                label: "Mô tả *",
-                controller: descriptionController,
-                hintText: "Nhập mô tả",
-                expand: true),
-            const Spacer(),
-
-            // Nút Lưu
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  _updateCategory();
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
+    if (isLoading) {
+      return SafeArea(
+          child: Scaffold(
+              appBar: AppBar(
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
                 ),
-                child: const Text(
-                  "Lưu",
+                title: const Text(
+                  "Sửa danh mục",
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.white),
                 ),
+                backgroundColor: AppColors.primary,
+                elevation: 1,
               ),
-            ),
-          ],
+              body: Center(
+                child: CircularProgressIndicator(),
+              )));
+    }
+
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: const Text(
+            "Sửa danh mục",
+            style: TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          backgroundColor: AppColors.primary,
+          elevation: 1,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Ô nhập tên danh mục
+              InputField(
+                  label: "Tên danh mục *",
+                  controller: nameController,
+                  hintText: "Nhập tên danh mục",
+                  expand: true),
+              const SizedBox(height: 20),
+
+              // Ô nhập mô tả danh mục
+              InputField(
+                  label: "Mô tả *",
+                  controller: descriptionController,
+                  hintText: "Nhập mô tả",
+                  expand: true),
+              const Spacer(),
+
+              // Nút Lưu
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    _updateCategory();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                  child: const Text(
+                    "Lưu",
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

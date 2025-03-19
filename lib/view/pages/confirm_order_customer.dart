@@ -43,9 +43,9 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
   // Need to dynamically change (TODO)
   final int _shippingFee = 5;
   final DateTime _expectedDeliveryTime = DateTime.now().add(Duration(hours: 1));
-  String _customerPhone = "";
-  String _fullName = "";
-  final String _notes = "";
+  String customerPhone = "";
+  String fullName = "";
+  final String notes = "";
 
   @override
   void initState() {
@@ -71,16 +71,12 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
 
     if (userData != null) {
       setState(() {
-        _customerPhone = userData['phoneNumber'];
+        customerPhone = userData['phoneNumber'];
         chosenHubName = userData['buildingName'];
-        _fullName = userData['fullName'];
+        fullName = userData['fullName'];
       });
-      print("Phone: ${userData['phoneNumber']}");
-      print("Full Name: ${userData['fullName']}");
-      print("Building Name: ${userData['buildingName']}");
       return true;
     } else {
-      print("Failed to fetch user data");
       return false;
     }
   }
@@ -163,8 +159,8 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
         time: DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now()),
         expectedDeliveryTime:
             DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(_expectedDeliveryTime),
-        customerPhone: _customerPhone,
-        notes: _notes,
+        customerPhone: customerPhone,
+        notes: notes,
         customerId: _user!.customerId!,
         restaurantId: widget.restaurantId,
         hubId: chosenHubId!,
