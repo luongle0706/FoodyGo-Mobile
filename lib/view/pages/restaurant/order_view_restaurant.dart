@@ -43,7 +43,6 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
             status: status);
 
     if (fetchOrders != null) {
-      _logger.info(fetchOrders.toString());
       setState(() {
         _newOrders = fetchOrders;
       });

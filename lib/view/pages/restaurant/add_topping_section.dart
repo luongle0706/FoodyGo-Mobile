@@ -64,17 +64,17 @@ class _AddToppingSectionState extends State<AddToppingSection> {
     SavedUser? user =
         userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
 
-    setState(() {});
     if (user != null) {
       setState(() {
         _user = user;
-      });
-    } else {
-      _logger.info('Failed to load user');
-      setState(() {
         isLoading = false;
       });
+      return;
     }
+    _logger.info('Failed to load user');
+    setState(() {
+      isLoading = false;
+    });
   }
 
   Widget buildToppingList() {

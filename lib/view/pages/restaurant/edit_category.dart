@@ -51,16 +51,17 @@ class _EditCategoryState extends State<EditCategory> {
     if (user != null) {
       setState(() {
         _user = user;
-      });
-    } else {
-      _logger.info('Failed to load user');
-      setState(() {
         isLoading = false;
       });
+      return;
     }
+    _logger.info('Failed to load user');
+    setState(() {
+      isLoading = false;
+    });
   }
 
-  Future<void> _updateCategory() async {
+  Future<void> _updateCategory(BuildContext context) async {
     try {
       CategoryDto updateCategory = CategoryDto(
           id: widget.categoryDto.id,
@@ -70,19 +71,27 @@ class _EditCategoryState extends State<EditCategory> {
       bool isUpdated =
           await _categoryRepostory.updateCategory(_user!.token, updateCategory);
       if (isUpdated) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Danh mục đã được cập nhật thành công!")),
-        );
-        GoRouter.of(context).go('/protected/manage-categories');
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Danh mục đã được cập nhật thành công!")),
+          );
+        }
+        if (context.mounted) {
+          GoRouter.of(context).go('/protected/manage-categories');
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Cập nhật danh mục thất bại!")),
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Cập nhật danh mục thất bại!")),
+          );
+        }
       }
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Lỗi mạng, vui lòng thử lại!")),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Lỗi mạng, vui lòng thử lại!")),
+        );
+      }
     }
   }
 
@@ -152,7 +161,7 @@ class _EditCategoryState extends State<EditCategory> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    _updateCategory();
+                    _updateCategory(context);
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),

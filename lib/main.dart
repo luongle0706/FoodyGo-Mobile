@@ -250,7 +250,8 @@ class Main extends StatelessWidget {
                   path: '/order_tabs',
                   pageBuilder: (context, state) {
                     final customerId = state.extra as int;
-                    return MaterialPage(child: OrderTabsPage(customerId: customerId));
+                    return MaterialPage(
+                        child: OrderTabsPage(customerId: customerId));
                   },
                 ),
                 GoRoute(
@@ -267,7 +268,8 @@ class Main extends StatelessWidget {
                   path: '/protected/order-history',
                   pageBuilder: (context, state) {
                     final customerId = state.extra as int;
-                    return MaterialPage(child: OrderHistory(customerId: customerId));
+                    return MaterialPage(
+                        child: OrderHistory(customerId: customerId));
                   },
                 ),
                 GoRoute(
@@ -282,18 +284,14 @@ class Main extends StatelessWidget {
                   name: 'protected_restaurant_home', // S-033
                   path: '/protected/restaurant-home',
                   pageBuilder: (context, state) {
-                    final restaurantId = state.extra as int;
-                    return MaterialPage(
-                        child: RestaurantHome(restaurantId: restaurantId));
+                    return MaterialPage(child: RestaurantHome());
                   },
                 ),
                 GoRoute(
                   name: 'restaurant_menu', // S-016
                   path: '/protected/restaurant_menu',
                   pageBuilder: (context, state) {
-                    final restaurantId = state.extra as int;
-                    return MaterialPage(
-                        child: RestaurantMenu(restaurantId: restaurantId));
+                    return MaterialPage(child: RestaurantMenu());
                   },
                 ),
                 GoRoute(
@@ -387,7 +385,8 @@ class Main extends StatelessWidget {
             path: '/protected/add-edit-category',
             pageBuilder: (context, state) {
               final categoryDto = state.extra as CategoryDto;
-              return MaterialPage(child: EditCategory(categoryDto: categoryDto));
+              return MaterialPage(
+                  child: EditCategory(categoryDto: categoryDto));
             },
           ),
           GoRoute(

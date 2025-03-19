@@ -12,9 +12,7 @@ import 'package:foodygo/utils/secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
 class RestaurantMenu extends StatefulWidget {
-  final int restaurantId;
-
-  const RestaurantMenu({super.key, required this.restaurantId});
+  const RestaurantMenu({super.key});
 
   @override
   State<RestaurantMenu> createState() => _RestaurantMenuState();
@@ -38,12 +36,12 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
     loadUser();
   }
 
-  Future<bool> fetchRestaurant(String accessToken) async {
+  Future<bool> fetchRestaurant({required SavedUser user}) async {
     RestaurantDto? fetchOrder = await _restaurantRepository.loadRestaurantById(
-        accessToken, widget.restaurantId);
+        user.token, user.restaurantId!);
 
     List<ProductDto>? fetchProduct = await _restaurantRepository
-        .getProductsByRestaurantId(accessToken, widget.restaurantId);
+        .getProductsByRestaurantId(user.token, user.restaurantId!);
 
     if (fetchOrder != null) {
       setState(() {
@@ -60,10 +58,10 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
     SavedUser? user =
         userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
     if (user != null) {
-      bool fetchOrderData = await fetchRestaurant(user.token);
+      bool fetchOrderData = await fetchRestaurant(user: user);
       List<dynamic>? fetchAddonSection =
           await _addonSectionRepository.getAddonSectionByRestaurantId(
-              accessToken: user.token, restaurantId: 1);
+              accessToken: user.token, restaurantId: user.restaurantId);
       _logger.info("addonSection: $fetchAddonSection");
 
       if (fetchOrderData) {
@@ -333,7 +331,11 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
               TextButton.icon(
                 onPressed: () {
-                  GoRouter.of(context).push('/protected/add-dish');
+                  if (selectedTab == 0) {
+                    GoRouter.of(context).push('/protected/add-dish');
+                  } else {
+                    GoRouter.of(context).push('/protected/add-topping-section');
+                  }
                 },
                 icon: Icon(Icons.add, color: Colors.orange),
                 label: Text("Thêm", style: TextStyle(color: Colors.orange)),
