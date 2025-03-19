@@ -7,6 +7,7 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/restaurant_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:foodygo/view/components/register/register_button.dart';
 // import 'package:foodygo/view/pages/restaurant/custome_appbar_order_restaurant_list.dart';
 import 'package:go_router/go_router.dart';
 
@@ -254,6 +255,12 @@ class _MenuScreenState extends State<MenuScreen> {
             ],
           ),
         ),
+
+        RegisterButton(
+            text: "Test add topping",
+            onTap: () {
+              GoRouter.of(context).push('/protected/add-topping-section');
+            }),
         Divider(),
 
         Container(
