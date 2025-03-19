@@ -6,6 +6,7 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/cart_repository.dart';
 import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/repository/restaurant_repository.dart';
+import 'package:foodygo/repository/user_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:go_router/go_router.dart';
@@ -31,6 +32,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
   final _cartRepository = CartRepository.instance;
   final _restaurantRepository = RestaurantRepository.instance;
   final _orderRepository = OrderRepository.instance;
+  final _userRepository = UserRepository.instance;
   List<dynamic>? _cartItems;
   SavedUser? _user;
   RestaurantDto? _restaurant;
@@ -41,8 +43,9 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
   // Need to dynamically change (TODO)
   final int _shippingFee = 5;
   final DateTime _expectedDeliveryTime = DateTime.now().add(Duration(hours: 1));
-  final String _customerPhone = '+84938762971';
-  final String _notes = 'Not implemented';
+  String _customerPhone = "";
+  String _fullName = "";
+  final String _notes = "";
 
   @override
   void initState() {
@@ -63,6 +66,25 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
     });
   }
 
+  Future<bool> fetchCustomerDataById(int userId, String accessToken) async {
+    final userData = await _userRepository.getUserInfo(userId, accessToken);
+
+    if (userData != null) {
+      setState(() {
+        _customerPhone = userData['phoneNumber'];
+        chosenHubName = userData['buildingName'];
+        _fullName = userData['fullName'];
+      });
+      print("Phone: ${userData['phoneNumber']}");
+      print("Full Name: ${userData['fullName']}");
+      print("Building Name: ${userData['buildingName']}");
+      return true;
+    } else {
+      print("Failed to fetch user data");
+      return false;
+    }
+  }
+
   Future<void> loadUser() async {
     String? userData = await _storage.get(key: 'user');
     SavedUser? user =
@@ -73,8 +95,9 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
       });
       bool fetchedCartItems = await fetchItemsInCart(user: user);
       bool fetchedRestaurant = await fetchRestaurantById(user: user);
-
-      if (fetchedCartItems && fetchedRestaurant) {
+      bool fetchCustomerData =
+          await fetchCustomerDataById(user.userId, user.token);
+      if (fetchedCartItems && fetchedRestaurant && fetchCustomerData) {
         setState(() {
           _isLoading = false;
         });

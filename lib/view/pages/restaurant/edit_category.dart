@@ -23,7 +23,7 @@ class _EditCategoryState extends State<EditCategory> {
   final AppLogger _logger = AppLogger.instance;
   final SecureStorage storage = SecureStorage.instance;
   SavedUser? _user;
-  final CategoryRepostory _categoryRepostory = CategoryRepostory.instance; 
+  final CategoryRepostory _categoryRepostory = CategoryRepostory.instance;
 
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -58,9 +58,9 @@ class _EditCategoryState extends State<EditCategory> {
   Future<void> _updateCategory() async {
     try {
       CategoryDto updateCategory = CategoryDto(
-        id: widget.categoryDto.id, 
-        name: nameController.text, 
-        description: descriptionController.text);
+          id: widget.categoryDto.id,
+          name: nameController.text,
+          description: descriptionController.text);
 
       bool isUpdated =
           await _categoryRepostory.updateCategory(_user!.token, updateCategory);
@@ -68,8 +68,7 @@ class _EditCategoryState extends State<EditCategory> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Danh mục đã được cập nhật thành công!")),
         );
-        GoRouter.of(context)
-            .go('/protected/manage-categories');
+        GoRouter.of(context).go('/protected/manage-categories');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Cập nhật danh mục thất bại!")),
@@ -92,7 +91,8 @@ class _EditCategoryState extends State<EditCategory> {
         ),
         title: const Text(
           "Sửa danh mục",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(
+              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: AppColors.primary,
         elevation: 1,
@@ -103,11 +103,19 @@ class _EditCategoryState extends State<EditCategory> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Ô nhập tên danh mục
-            InputField(label: "Tên danh mục *", controller: nameController, hintText: "Nhập tên danh mục", expand: true),
+            InputField(
+                label: "Tên danh mục *",
+                controller: nameController,
+                hintText: "Nhập tên danh mục",
+                expand: true),
             const SizedBox(height: 20),
 
             // Ô nhập mô tả danh mục
-            InputField(label: "Mô tả *", controller: descriptionController, hintText: "Nhập mô tả", expand: true),
+            InputField(
+                label: "Mô tả *",
+                controller: descriptionController,
+                hintText: "Nhập mô tả",
+                expand: true),
             const Spacer(),
 
             // Nút Lưu
@@ -126,7 +134,10 @@ class _EditCategoryState extends State<EditCategory> {
                 ),
                 child: const Text(
                   "Lưu",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
               ),
             ),

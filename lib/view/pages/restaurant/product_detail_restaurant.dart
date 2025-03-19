@@ -189,7 +189,7 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
               : null,
           available: isAvailable,
           categoryId: selectedCategoryId);
-      
+
       bool success = await _productRepository.updateProduct(
         _productDto!.id,
         _selectedImage!,

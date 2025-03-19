@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:foodygo/dto/product_dto.dart';
 import 'package:foodygo/dto/restaurant_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/repository/addon_section_repository.dart';
 import 'package:foodygo/repository/restaurant_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
@@ -25,9 +26,11 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
   final AppLogger _logger = AppLogger.instance;
   final RestaurantRepository _restaurantRepository =
       RestaurantRepository.instance;
+  final AddonSectionRepository _addonSectionRepository =
+      AddonSectionRepository.instance;
   RestaurantDto? _restaurantDto;
   List<ProductDto>? _productDto;
-
+  List<dynamic>? _addonSection;
   bool _isLoading = true;
 
   @override
@@ -60,9 +63,14 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
         userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
     if (user != null) {
       bool fetchOrderData = await fetchRestaurant(user.token);
+      List<dynamic>? fetchAddonSection =
+          await _addonSectionRepository.getAddonSectionByRestaurantId(
+              accessToken: user.token, restaurantId: 1);
+      _logger.info("addonSection: $fetchAddonSection");
 
       if (fetchOrderData) {
         setState(() {
+          _addonSection = fetchAddonSection;
           _isLoading = false;
         });
       } else {
@@ -139,7 +147,10 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
               children: [
                 Expanded(
                   child: MenuScreen(
-                      toppingGroups: toppingGroups, productDto: _productDto),
+                    toppingGroups: toppingGroups,
+                    productDto: _productDto,
+                    addonSections: _addonSection,
+                  ),
                 ),
               ],
             ),
@@ -183,8 +194,13 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
 class MenuScreen extends StatefulWidget {
   final List<Map<String, dynamic>> toppingGroups;
   final List<ProductDto>? productDto;
-  const MenuScreen(
-      {super.key, required this.toppingGroups, required this.productDto});
+  final List<dynamic>? addonSections;
+  const MenuScreen({
+    super.key,
+    required this.toppingGroups,
+    required this.productDto,
+    this.addonSections, // Add this parameter
+  });
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -331,17 +347,70 @@ class _MenuScreenState extends State<MenuScreen> {
                   ),
                 );
               } else {
-                var item = widget.toppingGroups[categoryIndex];
-                return GestureDetector(
-                  onTap: () {
-                    GoRouter.of(context).push('/protected/food-link',
-                        extra: {'addonSectionId': 1});
-                  },
-                  child: ListTile(
-                    title: Text(item["name"]),
-                    subtitle: Text("Số lượng topping: ${item["count"]}"),
-                  ),
-                );
+                if (widget.addonSections != null &&
+                    widget.addonSections!.isNotEmpty) {
+                  final addonSection = widget.addonSections![categoryIndex];
+                  final itemsList = addonSection['items'] as List<dynamic>;
+
+                  return GestureDetector(
+                    onTap: () {
+                      GoRouter.of(context).push('/protected/food-link',
+                          extra: {'addonSectionId': addonSection['id']});
+                    },
+                    child: Card(
+                      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      child: Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    addonSection['name'],
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text("Số lượng topping: ${itemsList.length}"),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    itemsList
+                                        .map((item) => item['name'])
+                                        .join(', '),
+                                    style: TextStyle(fontSize: 14),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right,
+                              color: Colors.grey,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                } else {
+                  // Fall back to toppingGroups if addonSections is null or empty
+                  var item = widget.toppingGroups[categoryIndex];
+                  return GestureDetector(
+                    onTap: () {
+                      GoRouter.of(context).push('/protected/food-link',
+                          extra: {'addonSectionId': 1});
+                    },
+                    child: ListTile(
+                      title: Text(item["name"]),
+                      subtitle: Text("Số lượng topping: ${item["count"]}"),
+                    ),
+                  );
+                }
               }
             },
           ),
