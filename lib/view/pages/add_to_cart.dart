@@ -5,6 +5,7 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/cart_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:go_router/go_router.dart';
 
 class AddToCartPopup extends StatefulWidget {
   final dynamic product;
@@ -94,7 +95,7 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
           backgroundColor: Colors.green,
         ),
       );
-      Navigator.pop(context);
+      GoRouter.of(context).pop();
     }
   }
 

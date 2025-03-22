@@ -1,14 +1,13 @@
 import 'dart:convert';
+import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/constants.dart';
 import 'package:http/http.dart' as http;
-import 'package:foodygo/utils/secure_storage.dart';
 
 class UserRepository {
   UserRepository._();
   static final UserRepository instance = UserRepository._();
 
-  final SecureStorage _storage = SecureStorage.instance;
-  final String _baseUrl = "https://your-api.com/api/customer";
+  final AppLogger logger = AppLogger.instance;
 
   Future<Map<String, dynamic>?> getUserInfo(
       int userId, String accessToken) async {
@@ -33,12 +32,11 @@ class UserRepository {
             "buildingName": building != null ? building["name"] : null,
           };
         }
-      } else {
-        throw Exception("Failed to load user data");
+        logger.error('An error occurred: ${response.body}');
       }
     } catch (e) {
-      print("Error: $e");
-      return null;
+      logger.error(e.toString());
     }
+    return null;
   }
 }

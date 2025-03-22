@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:foodygo/dto/order_dto.dart';
+import 'package:foodygo/dto/order_dto_v2.dart';
 import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
@@ -24,7 +24,7 @@ class _DetailOrderState extends State<DetailOrder> {
 
   final OrderRepository _orderRepository = OrderRepository.instance;
 
-  OrderDto? _orderDto;
+  OrderDtoV2? _orderDto;
 
   bool _isLoading = true;
 
@@ -37,8 +37,8 @@ class _DetailOrderState extends State<DetailOrder> {
   }
 
   Future<bool> fetchOrder(String accessToken) async {
-    OrderDto? fetchOrder =
-        await _orderRepository.loadOrderById(accessToken, widget.orderId);
+    OrderDtoV2? fetchOrder =
+        await _orderRepository.loadOrderByIdV2(accessToken, widget.orderId);
 
     if (fetchOrder != null) {
       setState(() {
@@ -185,7 +185,7 @@ class _DetailOrderState extends State<DetailOrder> {
                                       TextStyle(fontWeight: FontWeight.bold)),
                               SizedBox(height: 4),
                               Text(
-                                'Xoài non mắm ruốc - Cửa hàng Gì Lê\nNhà văn hóa sinh viên, Quận 9, TP.Thủ Đức',
+                                '${_orderDto?.restaurantName}\n${_orderDto?.restaurantAddress}',
                                 style: TextStyle(color: Colors.black87),
                               ),
                             ],
@@ -216,7 +216,7 @@ class _DetailOrderState extends State<DetailOrder> {
                                       TextStyle(fontWeight: FontWeight.bold)),
                               SizedBox(height: 4),
                               Text(
-                                'Lưu Hữu Phước, Đông Hòa, Dĩ An, Bình Dương, Việt Nam, TP.HCM\n${_orderDto?.customerName} - ${_orderDto?.customerPhone}',
+                                '${_orderDto?.customerAddress}\n${_orderDto?.customerName} - ${_orderDto?.customerPhone}',
                                 style: TextStyle(color: Colors.black87),
                               ),
                             ],
@@ -275,7 +275,7 @@ class _DetailOrderState extends State<DetailOrder> {
                                         ),
                                         Spacer(),
                                         Text(
-                                          '${orderDetail.price.toStringAsFixed(0)} xu', // Hiển thị giá
+                                          '${orderDetail.price.toStringAsFixed(0)} xu',
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold),
                                           textAlign: TextAlign.right,

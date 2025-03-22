@@ -249,28 +249,27 @@ class Main extends StatelessWidget {
                   name: 'order-tabs', // tab chung for S-013 và S-015
                   path: '/order_tabs',
                   pageBuilder: (context, state) {
-                    // final orderId = state.extra as int;
-                    final orderId = 1;
-                    return MaterialPage(child: OrderTabsPage(orderId: orderId));
+                    final customerId = state.extra as int;
+                    return MaterialPage(
+                        child: OrderTabsPage(customerId: customerId));
                   },
                 ),
                 GoRoute(
                   name: 'order_list_customer', //S-013
                   path: '/protected/order-list-customer',
                   pageBuilder: (context, state) {
-                    // final orderId = state.extra as int;
-                    final orderId = 1;
+                    final customerId = state.extra as int;
                     return MaterialPage(
-                        child: OrderListCustomerPage(orderId: orderId));
+                        child: OrderListCustomerPage(customerId: customerId));
                   },
                 ),
                 GoRoute(
                   name: 'order_history', // S-015
                   path: '/protected/order-history',
                   pageBuilder: (context, state) {
-                    // final orderId = state.extra as int;
-                    final orderId = 1;
-                    return MaterialPage(child: OrderHistory(orderId: orderId));
+                    final customerId = state.extra as int;
+                    return MaterialPage(
+                        child: OrderHistory(customerId: customerId));
                   },
                 ),
                 GoRoute(
@@ -285,20 +284,14 @@ class Main extends StatelessWidget {
                   name: 'protected_restaurant_home', // S-033
                   path: '/protected/restaurant-home',
                   pageBuilder: (context, state) {
-                    // final restaurantId = state.extra as int;
-                    final restaurantId = 1;
-                    return MaterialPage(
-                        child: RestaurantHome(restaurantId: restaurantId));
+                    return MaterialPage(child: RestaurantHome());
                   },
                 ),
                 GoRoute(
                   name: 'restaurant_menu', // S-016
                   path: '/protected/restaurant_menu',
                   pageBuilder: (context, state) {
-                    // final restaurantId = state.extra as int;
-                    final restaurantId = 1;
-                    return MaterialPage(
-                        child: RestaurantMenu(restaurantId: restaurantId));
+                    return MaterialPage(child: RestaurantMenu());
                   },
                 ),
                 GoRoute(

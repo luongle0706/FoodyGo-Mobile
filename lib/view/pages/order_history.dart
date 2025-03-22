@@ -11,8 +11,8 @@ import 'package:intl/intl.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
 
 class OrderHistory extends StatefulWidget {
-  final int orderId;
-  const OrderHistory({super.key, required this.orderId});
+  final int customerId;
+  const OrderHistory({super.key, required this.customerId});
 
   @override
   State<OrderHistory> createState() => _OrderHistoryState();
@@ -76,7 +76,7 @@ class _OrderHistoryState extends State<OrderHistory> {
 
   Future<bool> fetchOrder(String accessToken) async {
     List<OrderDto>? fetchOrder = await _orderRepository.getOrdersByCustomerId(
-        accessToken, widget.orderId);
+        accessToken, widget.customerId);
 
     if (fetchOrder != null) {
       setState(() {

@@ -51,6 +51,28 @@ class ProductRepository {
     }
   }
 
+  Future<bool> switchAvailabilityProduct(
+      String accessToken, int productId) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$globalURL/api/v1/products/$productId/availability'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        throw Exception(
+            'Failed to switch availability: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error switching availability: $e');
+    }
+  }
+
   Future<List<ProductDto>?> getProductsByRestaurantId(
       int restaurantId, String accessToken) async {
     logger.info("RestaurantId: $restaurantId, accessToken: $accessToken");
@@ -108,7 +130,6 @@ class ProductRepository {
   }
 
   Future<bool> deleteProduct(int productId, String accessToken) async {
-
     try {
       final response = await http.delete(
         Uri.parse('$globalURL/api/v1/products/$productId'),
@@ -124,11 +145,12 @@ class ProductRepository {
     }
   }
 
-  Future<bool> updateProduct(int productId, File? image, EditProductDto editProduct, String accessToken) async {
+  Future<bool> updateProduct(int productId, File? image,
+      EditProductDto editProduct, String accessToken) async {
     try {
       var uri = Uri.parse('$globalURL/api/v1/products/$productId');
       var request = http.MultipartRequest("PUT", uri);
-      
+
       // Thêm token vào headers
       request.headers['Authorization'] = 'Bearer $accessToken';
       request.headers['Content-Type'] = 'multipart/form-data';
@@ -138,8 +160,8 @@ class ProductRepository {
       // Thêm JSON data vào request dưới dạng MultipartFile với Content-Type là application/json
       request.files.add(
         http.MultipartFile.fromString(
-          'data', 
-          jsonData, 
+          'data',
+          jsonData,
           contentType: MediaType('application', 'json'),
         ),
       );
@@ -148,7 +170,7 @@ class ProductRepository {
       if (image != null) {
         request.files.add(
           await http.MultipartFile.fromPath(
-            'image', 
+            'image',
             image.path,
             filename: basename(image.path),
           ),
@@ -164,7 +186,73 @@ class ProductRepository {
       } else {
         return false;
       }
-    
+    } catch (error) {
+      return false;
+    }
+  }
+
+  Future<bool> createProduct({
+    required String accessToken,
+    required File? image,
+    required String productCode,
+    required String productName,
+    required double price,
+    required String description,
+    required double prepareTime,
+    required int restaurantId,
+    required int categoryId,
+    required List<int> addonSectionIds,
+  }) async {
+    try {
+      var uri = Uri.parse('$globalURL/api/v1/products');
+      var request = http.MultipartRequest("POST", uri);
+
+      // Thêm token vào headers
+      request.headers['Authorization'] = 'Bearer $accessToken';
+      request.headers['Content-Type'] = 'multipart/form-data';
+
+      String jsonData = jsonEncode({
+        "code": productCode,
+        "name": productName,
+        "price": price,
+        "description": description,
+        "prepareTime": prepareTime,
+        "restaurantId": restaurantId,
+        "addonSections": addonSectionIds,
+        "categoryId": categoryId
+      });
+
+      logger.info('JSONDATA=$jsonData');
+
+      // Thêm JSON data vào request dưới dạng MultipartFile với Content-Type là application/json
+      request.files.add(
+        http.MultipartFile.fromString(
+          'data',
+          jsonData,
+          contentType: MediaType('application', 'json'),
+        ),
+      );
+
+      // Nếu có hình ảnh, thêm vào request
+      if (image != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'image',
+            image.path,
+            filename: basename(image.path),
+          ),
+        );
+      }
+
+      // Gửi request
+      var response = await request.send();
+      var responseData = await response.stream.bytesToString();
+      logger.info(responseData);
+      if (response.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
     } catch (error) {
       return false;
     }

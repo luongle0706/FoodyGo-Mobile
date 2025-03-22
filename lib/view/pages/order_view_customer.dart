@@ -11,8 +11,8 @@ import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class OrderListCustomerPage extends StatefulWidget {
-  final int orderId;
-  const OrderListCustomerPage({super.key, required this.orderId});
+  final int customerId;
+  const OrderListCustomerPage({super.key, required this.customerId});
 
   @override
   State<OrderListCustomerPage> createState() => _OrderListCustomerPageState();
@@ -26,8 +26,6 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
   final OrderRepository _orderRepository = OrderRepository.instance;
 
   List<OrderDto>? _orderDto;
-
-  // String status = 'ordered';
 
   List<String> filterStatuses = [
     "ORDERED",
@@ -47,16 +45,6 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
     loadUser();
   }
 
-  // List<OrderDto> filterOrdersByStatus(List<OrderDto>? orders, String status) {
-  //   if (orders == null || status.isEmpty) {
-  //     return [];
-  //   }
-  //
-  //   return orders
-  //       .where((order) => order.status.toLowerCase() == status.toLowerCase())
-  //       .toList();
-  // }
-
   List<OrderDto> filterOrdersByStatus(
       List<OrderDto>? orders, List<String> statuses) {
     if (orders == null || statuses.isEmpty) {
@@ -72,7 +60,8 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
 
   Future<bool> fetchOrder(String accessToken) async {
     List<OrderDto>? fetchOrder = await _orderRepository.getOrdersByCustomerId(
-        accessToken, widget.orderId);
+        accessToken, widget.customerId);
+
     if (fetchOrder != null) {
       setState(() {
         _orderDto = fetchOrder;
@@ -195,7 +184,6 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                           ],
                         ),
                         SizedBox(height: 8),
-
                         GestureDetector(
                           onTap: () {
                             GoRouter.of(context).go(
@@ -223,8 +211,6 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                           ),
                         ),
                         SizedBox(height: 12),
-
-                        // Chi tiết đơn hàng
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -280,36 +266,43 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                           ),
                         ),
                         SizedBox(height: 12),
-
-                        // Trạng thái đơn hàng
                         Container(
                           padding: EdgeInsets.symmetric(vertical: 8),
                           width: double.infinity,
                           decoration: BoxDecoration(
                             border: Border(
-                                top: BorderSide(
-                                    color: Colors.grey[300]!, width: 1)),
+                              top: BorderSide(
+                                  color: Colors.grey[300]!, width: 1),
+                            ),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 translateStatus(order.status),
                                 style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.orange.shade900),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange.shade900,
+                                ),
                               ),
-                              Text(
-                                "Đơn sẽ được giao đến bạn",
-                                style: TextStyle(
+                              Flexible(
+                                child: Text(
+                                  "Đơn sẽ được giao đến bạn",
+                                  textAlign: TextAlign.right,
+                                  softWrap: true,
+                                  overflow: TextOverflow.visible,
+                                  style: TextStyle(
                                     fontSize: 14,
                                     fontStyle: FontStyle.italic,
-                                    color: Colors.grey),
+                                    color: Colors.grey,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
-                        ),
+                        )
                       ],
                     ),
                   );
@@ -326,10 +319,12 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
             width: double.infinity,
             decoration: BoxDecoration(
               border: Border(
-                  top: BorderSide(color: Colors.orange.shade200, width: 1)),
+                top: BorderSide(color: Colors.orange.shade200, width: 1),
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "Đã đặt",
@@ -339,17 +334,21 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                     color: Colors.orange.shade900,
                   ),
                 ),
-                Text(
-                  "Đơn sẽ được giao đến bạn",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontStyle: FontStyle.italic,
-                    color: Colors.grey,
+                Flexible(
+                  child: Text(
+                    "Đơn hàng sẽ được giao đến bạn",
+                    textAlign: TextAlign.right,
+                    overflow: TextOverflow.visible,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
+          )
         ],
       ),
     );

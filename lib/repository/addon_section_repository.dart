@@ -9,10 +9,14 @@ class AddonSectionRepository {
   final AppLogger _logger = AppLogger.instance;
 
   Future<List<dynamic>?> getAddonSectionByRestaurantId(
-      {required accessToken, required restaurantId}) async {
+      {required accessToken,
+      required restaurantId,
+      int pageNo = 1,
+      int pageSize = -1}) async {
     _logger.info("ProductId: $restaurantId, accessToken: $accessToken");
     final response = await http.get(
-      Uri.parse('$globalURL/api/v1/addon-sections?restaurantId=$restaurantId'),
+      Uri.parse(
+          '$globalURL/api/v1/addon-sections?restaurantId=$restaurantId&pageNo=$pageNo&pageSize=$pageSize'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $accessToken'
@@ -25,6 +29,29 @@ class AddonSectionRepository {
       return list;
     } else {
       throw Exception('Failed to load data!');
+    }
+  }
+
+  Future<bool> createAddonSection(
+      String accessToken, Map<String, dynamic> body) async {
+    _logger.info(body.toString());
+    try {
+      final response = await http.post(
+        Uri.parse('$globalURL/api/v1/addon-sections'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $accessToken",
+        },
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
     }
   }
 }

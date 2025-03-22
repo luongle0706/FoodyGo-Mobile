@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:foodygo/dto/order_dto.dart';
+import 'package:foodygo/dto/order_dto_v2.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/constants.dart';
 import 'package:http/http.dart' as http;
@@ -94,6 +95,25 @@ class OrderRepository {
       final jsonResponse = json.decode(response.body);
       dynamic data = jsonResponse['data'];
       return OrderDto.fromJson(data);
+    } else {
+      _logger.error('Failed to load data!');
+      return null;
+    }
+  }
+
+  Future<OrderDtoV2?> loadOrderByIdV2(String accessToken, int id) async {
+    final response = await http.get(
+      Uri.parse('$globalURL/api/v1/orders/$id/v2'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken'
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 400) {
+      final jsonResponse = json.decode(response.body);
+      dynamic data = jsonResponse['data'];
+      return OrderDtoV2.fromJson(data);
     } else {
       _logger.error('Failed to load data!');
       return null;

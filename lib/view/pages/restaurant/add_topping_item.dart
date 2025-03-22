@@ -1,5 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:foodygo/view/components/input_field.dart';
+import 'package:foodygo/view/components/input_number_field.dart';
 import 'package:foodygo/view/theme.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddToppingItem extends StatefulWidget {
   const AddToppingItem({super.key});
@@ -11,6 +17,23 @@ class AddToppingItem extends StatefulWidget {
 class _AddToppingItemState extends State<AddToppingItem> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
+  final TextEditingController quantityController = TextEditingController();
+
+  Future<void> saveTopping() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> toppingList = prefs.getStringList('tempToppings') ?? [];
+
+    Map<String, dynamic> newTopping = {
+      'name': nameController.text,
+      'price': double.tryParse(priceController.text) ?? 0,
+      'quantity': int.tryParse(quantityController.text) ?? 0
+    };
+
+    toppingList.add(jsonEncode(newTopping));
+    await prefs.setStringList('tempToppings', toppingList);
+
+    GoRouter.of(context).pop(true); // Pop về và báo hiệu có thay đổi
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +45,8 @@ class _AddToppingItemState extends State<AddToppingItem> {
         ),
         title: const Text(
           "Thêm topping",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(
+              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: AppColors.primary,
         elevation: 1,
@@ -33,27 +57,29 @@ class _AddToppingItemState extends State<AddToppingItem> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Ô nhập tên topping
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                labelText: "Tên*",
-                hintText: "VD: Tương ớt",
-                border: const OutlineInputBorder(),
-                suffixIcon: const Icon(Icons.edit),
-              ),
-            ),
+            InputField(
+                label: "Tên topping: *",
+                controller: nameController,
+                hintText: "Vd: Trân châu đen",
+                expand: false),
             const SizedBox(height: 20),
 
             // Ô nhập giá topping
-            TextField(
-              controller: priceController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: "Giá*",
-                border: const OutlineInputBorder(),
-                suffixText: "đ",
-              ),
-            ),
+            InputNumberField(
+                label: "Đơn giá: *",
+                controller: priceController,
+                hintText: "Nhập giá topping",
+                expand: false),
+            const SizedBox(height: 20),
+
+            // Ô nhập số lượng topping
+            InputNumberField(
+                label: "Số lượng: *",
+                controller: quantityController,
+                hintText: "Số lượng đặt tối đa cho topping",
+                expand: false),
+            const SizedBox(height: 20),
+
             const Spacer(),
 
             // Nút Lưu
@@ -61,18 +87,21 @@ class _AddToppingItemState extends State<AddToppingItem> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Xử lý lưu dữ liệu
+                  saveTopping();
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  backgroundColor: AppColors.primary, // Chưa nhập sẽ bị disable
+                  backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5),
                   ),
                 ),
                 child: const Text(
                   "Lưu",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
               ),
             ),
