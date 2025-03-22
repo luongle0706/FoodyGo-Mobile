@@ -13,6 +13,7 @@ class OrderDto {
   final String employeeName;
   final String customerName;
   final String restaurantName;
+  final int restaurantId;
   final String image;
   final String hubName;
   final List<OrderDetail> orderDetails;
@@ -32,6 +33,7 @@ class OrderDto {
     required this.employeeName,
     required this.customerName,
     required this.restaurantName,
+    required this.restaurantId,
     required this.image,
     required this.hubName,
     required this.orderDetails,
@@ -46,20 +48,25 @@ class OrderDto {
       totalPrice: (json['totalPrice'] ?? 0.0).toDouble(),
       totalItems: int.parse((json['totalItems'] ?? '0').toString()),
       status: json['status'] ?? 'UNKNOWN',
-      expectedDeliveryTime: DateTime.parse(json['expectedDeliveryTime']),
-      time: DateTime.parse(json['time']),
+      expectedDeliveryTime: json['expectedDeliveryTime'] != null
+          ? DateTime.parse(json['expectedDeliveryTime'])
+          : DateTime.now(), // Fallback về thời gian hiện tại nếu null
+      time:
+          json['time'] != null ? DateTime.parse(json['time']) : DateTime.now(),
       customerPhone: json['customerPhone'] ?? '',
-      shipperPhone: json['shipperPhone'], // Giữ nguyên null nếu không có
-      notes: json['notes'], // Giữ nguyên null nếu không có
+      shipperPhone: json['shipperPhone'],
+      notes: json['notes'],
       employeeName: json['employeeName'] ?? 'Unknown Employee',
       customerName: json['customerName'] ?? 'Unknown Customer',
       restaurantName: json['restaurantName'] ?? 'Unknown Restaurant',
+      restaurantId: json['restaurantId'] as int,
       image: json['image'] ??
-          'https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chorizo-mozarella-gnocchi-bake-cropped-9ab73a3.jpg?resize=768,574',
+          'https://via.placeholder.com/150', // Ảnh mặc định nếu null
       hubName: json['hubName'] ?? 'Unknown Hub',
-      orderDetails: (json['orderDetails'] as List<dynamic>)
-          .map((item) => OrderDetail.fromJson(item))
-          .toList(),
+      orderDetails: (json['orderDetails'] as List<dynamic>?)
+              ?.map((item) => OrderDetail.fromJson(item))
+              .toList() ??
+          [], // Nếu `orderDetails` null, gán thành danh sách rỗng
     );
   }
 }
@@ -90,8 +97,7 @@ class OrderDetail {
       quantity: json['quantity'] as int,
       price: (json['price'] ?? 0.0).toDouble(),
       productName: json['productName'] ?? 'Unknown Product',
-      image: json['image'] ??
-          'https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chorizo-mozarella-gnocchi-bake-cropped-9ab73a3.jpg?resize=768,574',
+      image: json['image'] ?? 'https://via.placeholder.com/150', // Ảnh mặc định
       addonItems: json['addonItems'],
     );
   }

@@ -7,6 +7,7 @@ import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/pages/detail_order.dart';
+import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class OrderListCustomerPage extends StatefulWidget {
@@ -72,7 +73,6 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
   Future<bool> fetchOrder(String accessToken) async {
     List<OrderDto>? fetchOrder = await _orderRepository.getOrdersByCustomerId(
         accessToken, widget.orderId);
-
     if (fetchOrder != null) {
       setState(() {
         _orderDto = fetchOrder;
@@ -122,10 +122,7 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.orange.shade100,
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(20),
-              ),
+              color: AppColors.primary,
               boxShadow: [
                 BoxShadow(
                   color: Colors.orange.withOpacity(0.3),
@@ -201,7 +198,10 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
 
                         GestureDetector(
                           onTap: () {
-                            GoRouter.of(context).go("/restaurant");
+                            GoRouter.of(context).go(
+                              "/protected/restaurant-detail",
+                              extra: order.restaurantId,
+                            );
                           },
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -316,7 +316,10 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                 },
               ),
             ),
-
+          if (filteredOrders == null || filteredOrders!.isEmpty)
+            Expanded(
+              child: Center(child: Text("Không có đơn hàng nào")),
+            ),
           // Footer với trạng thái đơn hàng
           Container(
             padding: EdgeInsets.all(16),
@@ -388,14 +391,16 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
               fontSize: 16,
               fontWeight:
                   selectedSubTab == index ? FontWeight.bold : FontWeight.normal,
-              color: selectedSubTab == index ? Colors.black : Colors.grey,
+              color: selectedSubTab == index
+                  ? Colors.black
+                  : const Color.fromARGB(255, 245, 245, 245),
             ),
           ),
           if (selectedSubTab == index)
             Container(
               margin: EdgeInsets.only(top: 5),
               height: 3,
-              width: 40,
+              width: 150,
               color: Colors.black,
             ),
         ],

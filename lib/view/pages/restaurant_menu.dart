@@ -64,7 +64,7 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
       bool fetchOrderData = await fetchRestaurant(user.token);
       List<dynamic>? fetchAddonSection =
           await _addonSectionRepository.getAddonSectionByRestaurantId(
-              accessToken: user.token, restaurantId: 1);
+              accessToken: user.token, restaurantId: user.restaurantId);
       _logger.info("addonSection: $fetchAddonSection");
 
       if (fetchOrderData) {

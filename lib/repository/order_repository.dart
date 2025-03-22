@@ -66,7 +66,6 @@ class OrderRepository {
         'Authorization': 'Bearer $accessToken',
       },
     );
-
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonData = jsonDecode(response.body);
 
@@ -112,10 +111,8 @@ class OrderRepository {
     );
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonResponse = json.decode(response.body);
-      _logger.info("jsonResponse$jsonResponse");
 
       List<dynamic> data = jsonResponse['data'] ?? [];
-      _logger.info("data$jsonResponse");
 
       return data;
     }
@@ -133,10 +130,8 @@ class OrderRepository {
         });
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonResponse = json.decode(response.body);
-      _logger.info("jsonResponse $jsonResponse");
 
       List<dynamic> data = jsonResponse['data'] ?? [];
-      _logger.info("data $jsonResponse");
 
       return data.map((item) {
         return OrderDto.fromJson(item);
@@ -156,7 +151,6 @@ class OrderRepository {
       Map<String, dynamic> jsonResponse = json.decode(response.body);
       return jsonResponse;
     }
-    _logger.error(json.decode(response.body).toString());
     return null;
   }
 

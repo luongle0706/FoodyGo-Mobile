@@ -138,7 +138,7 @@ class Main extends StatelessWidget {
                     }),
                 GoRoute(
                     name: 'history_order_page',
-                    path: '/protected/history-order-page',
+                    path: '/protected/history-order-page', //S-025
                     pageBuilder: (context, state) {
                       return MaterialPage(
                           child: OrderHistoryRestaurantScreen());
@@ -217,7 +217,7 @@ class Main extends StatelessWidget {
                   name: 'order_success',
                   path: '/order-success',
                   pageBuilder: (context, state) {
-                    final orderId = state.extra as int;
+                    final orderId = state.extra as int; //S-012
                     return MaterialPage(
                         child: OrderSuccessPage(
                       orderId: orderId,
@@ -392,7 +392,8 @@ class Main extends StatelessWidget {
             path: '/protected/add-edit-category',
             pageBuilder: (context, state) {
               final categoryDto = state.extra as CategoryDto;
-              return MaterialPage(child: EditCategory(categoryDto: categoryDto));
+              return MaterialPage(
+                  child: EditCategory(categoryDto: categoryDto));
             },
           ),
           GoRoute(
