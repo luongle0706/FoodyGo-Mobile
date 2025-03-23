@@ -6,7 +6,10 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
-import 'package:foodygo/view/pages/restaurant/custome_appbar_order_restaurant_list.dart';
+import 'package:foodygo/view/pages/restaurant/confirmation_orders_restaurant.dart';
+import 'package:foodygo/view/pages/restaurant/order_history_restaurant.dart';
+import 'package:foodygo/view/pages/restaurant/restaurant_food_appbar.dart';
+import 'package:foodygo/view/pages/restaurant_menu.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
@@ -32,6 +35,12 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
   void initState() {
     super.initState();
     loadUser();
+  }
+
+  void selectTab({required int tabIndex}) async {
+    setState(() {
+      selectedTab = tabIndex;
+    });
   }
 
   Future<bool> fetchNewOrder(
@@ -131,8 +140,10 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
     _logger.info(_newOrders.toString());
     if (_isLoading) {
       return Scaffold(
-          appBar: CustomFootageRestaurantOrderAppBar(
+          appBar: RestaurantFoodAppbar(
             title: "Cơm tấm Ngô Quyền",
+            setTab: selectTab,
+            selectedTab: selectedTab,
           ),
           body: SizedBox(
             height: 100,
@@ -142,11 +153,16 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
           ));
     }
     return Scaffold(
-      appBar: CustomFootageRestaurantOrderAppBar(
-        title: "Cơm tấm Ngô Quyền",
-      ),
-      body: selectedTab == 0 ? _buildOrdersTab() : _buildPlaceholderTab(),
-    );
+        appBar: RestaurantFoodAppbar(
+          title: "Cơm tấm Ngô Quyền",
+          setTab: selectTab,
+          selectedTab: selectedTab,
+        ),
+        body: selectedTab == 0
+            ? _buildOrdersTab()
+            : selectedTab == 1
+                ? RestaurantMenu()
+                : _buildPlaceholderTab());
   }
 
   Widget _buildOrdersTab() {
@@ -157,11 +173,11 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 5,
                   offset: const Offset(0, 3),
                 ),
@@ -199,92 +215,98 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
             ],
           ),
         ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: _newOrders?.length,
-            itemBuilder: (context, index) {
-              final item = _newOrders?[index];
-              return Card(
-                margin: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                child: Padding(
-                  padding: EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+        if (selectedSubTab == 0) _buildNewOrders(),
+        if (selectedSubTab == 1) ConfirmedOrderRestaurantScreen(),
+        if (selectedSubTab == 2) OrderHistoryRestaurantScreen()
+      ],
+    );
+  }
+
+  Widget _buildNewOrders() {
+    return Expanded(
+      child: ListView.builder(
+        itemCount: _newOrders?.length,
+        itemBuilder: (context, index) {
+          final item = _newOrders?[index];
+          return Card(
+            margin: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            child: Padding(
+              padding: EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "#${item!.id}",
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            "Đặt vào lúc: ${formatDateTime(item.time)}",
-                            style: const TextStyle(
-                                fontSize: 14, color: Colors.grey),
-                          ),
-                        ],
+                      Text(
+                        "#${item!.id}",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 5),
-                      Row(
-                        children: [Text(item.customerName)],
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                              "${item.totalItems} Món | ${item.totalPrice.round()} xu")
-                        ],
-                      ),
-                      for (OrderDetail detail in item.orderDetails)
-                        Row(
-                          children: [
-                            Text("${detail.quantity} x ${detail.productName}")
-                          ],
-                        ),
-                      SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              GoRouter.of(context).push(
-                                  '/protected/order-detail-restaurant',
-                                  extra: item.id);
-                            },
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Color.fromARGB(255, 141, 136, 133)),
-                            child: Text("Xem thêm",
-                                style: TextStyle(color: Colors.white)),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              _confirmDelivery(item.id);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFEE4D2D),
-                            ),
-                            child: const Text(
-                              "Xác nhận",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ],
+                      Text(
+                        "Đặt vào lúc: ${formatDateTime(item.time)}",
+                        style:
+                            const TextStyle(fontSize: 14, color: Colors.grey),
                       ),
                     ],
                   ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+                  SizedBox(height: 5),
+                  Row(
+                    children: [Text(item.customerName)],
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                          "${item.totalItems} Món | ${item.totalPrice.round()} xu")
+                    ],
+                  ),
+                  for (OrderDetail detail in item.orderDetails)
+                    Row(
+                      children: [
+                        Text("${detail.quantity} x ${detail.productName}")
+                      ],
+                    ),
+                  SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          GoRouter.of(context).push(
+                              '/protected/order-detail-restaurant',
+                              extra: item.id);
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Color.fromARGB(255, 141, 136, 133)),
+                        child: Text("Xem thêm",
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          _confirmDelivery(item.id);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFEE4D2D),
+                        ),
+                        child: const Text(
+                          "Xác nhận",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -305,15 +327,15 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
         setState(() {
           selectedSubTab = index;
         });
-        if (index == 0) {
-          GoRouter.of(context).push('/protected/restaurant-foodygo');
-        }
-        if (index == 1) {
-          GoRouter.of(context).push('/protected/confirm-order');
-        }
-        if (index == 2) {
-          GoRouter.of(context).push('/protected/history-order-page');
-        }
+        // if (index == 0) {
+        //   GoRouter.of(context).push('/protected/restaurant-foodygo');
+        // }
+        // if (index == 1) {
+        //   GoRouter.of(context).push('/protected/confirm-order');
+        // }
+        // if (index == 2) {
+        //   GoRouter.of(context).push('/protected/history-order-page');
+        // }
       },
       child: Column(
         children: [

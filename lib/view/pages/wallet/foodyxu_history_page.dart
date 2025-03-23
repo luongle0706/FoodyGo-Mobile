@@ -231,7 +231,7 @@ class _FoodyXuHistoryPageState extends State<FoodyXuHistoryPage> {
                         Icon(
                           Icons.history,
                           size: 64,
-                          color: AppColors.secondary.withOpacity(0.7),
+                          color: AppColors.secondary.withValues(alpha: 0.7),
                         ),
                         const SizedBox(height: 16),
                         const Text(
@@ -247,7 +247,7 @@ class _FoodyXuHistoryPageState extends State<FoodyXuHistoryPage> {
                           'Các giao dịch của bạn sẽ xuất hiện ở đây',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.black54.withOpacity(0.7),
+                            color: Colors.black54.withValues(alpha: 0.7),
                           ),
                         ),
                       ],

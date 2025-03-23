@@ -464,7 +464,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                                 title:
                                                     Text(item['productName']),
                                                 subtitle: Text(
-                                                    "Giá: ${(item.price).toStringAsFixed(0)} xu"),
+                                                    "Giá: ${(item['price']).toStringAsFixed(0)} xu"),
                                                 trailing: Row(
                                                   mainAxisSize:
                                                       MainAxisSize.min,

@@ -49,10 +49,11 @@ class TransactionDetailScreen extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                    color: AppColors.secondary.withOpacity(0.5), width: 1),
+                    color: AppColors.secondary.withValues(alpha: 0.5),
+                    width: 1),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     blurRadius: 5,
                     spreadRadius: 2,
                   )
@@ -106,10 +107,11 @@ class TransactionDetailScreen extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                    color: AppColors.secondary.withOpacity(0.5), width: 1),
+                    color: AppColors.secondary.withValues(alpha: 0.5),
+                    width: 1),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     blurRadius: 5,
                     spreadRadius: 2,
                   )

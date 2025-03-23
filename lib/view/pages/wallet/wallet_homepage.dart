@@ -105,7 +105,7 @@ class _WalletHomepageState extends State<WalletHomepage> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         vertical: 16, horizontal: 16),
-                    color: AppColors.secondary.withOpacity(0.3),
+                    color: AppColors.secondary.withValues(alpha: 0.3),
                     child: Row(
                       children: [
                         CircleAvatar(
@@ -204,11 +204,11 @@ class _WalletHomepageState extends State<WalletHomepage> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border:
-              Border.all(color: AppColors.secondary.withOpacity(0.5), width: 1),
+          border: Border.all(
+              color: AppColors.secondary.withValues(alpha: 0.5), width: 1),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               spreadRadius: 1,
               blurRadius: 4,
               offset: const Offset(0, 2),
@@ -236,7 +236,7 @@ class _WalletHomepageState extends State<WalletHomepage> {
                     subtitle,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.black87.withOpacity(0.7),
+                      color: Colors.black87.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -245,7 +245,7 @@ class _WalletHomepageState extends State<WalletHomepage> {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: AppColors.secondary.withOpacity(0.2),
+                color: AppColors.secondary.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: const Icon(

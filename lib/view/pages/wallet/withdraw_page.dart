@@ -63,10 +63,11 @@ class _WithdrawPageState extends State<WithdrawPage> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                    color: AppColors.secondary.withOpacity(0.5), width: 1),
+                    color: AppColors.secondary.withValues(alpha: 0.5),
+                    width: 1),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     spreadRadius: 1,
                     blurRadius: 4,
                     offset: const Offset(0, 2),
@@ -107,7 +108,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   ),
                   Divider(
                       thickness: 1,
-                      color: AppColors.secondary.withOpacity(0.5)),
+                      color: AppColors.secondary.withValues(alpha: 0.5)),
                   const SizedBox(height: 4),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -132,7 +133,8 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   Text(
                     '(1.000đ = 1 FoodyXu)',
                     style: TextStyle(
-                        fontSize: 12, color: Colors.black54.withOpacity(0.7)),
+                        fontSize: 12,
+                        color: Colors.black54.withValues(alpha: 0.7)),
                   ),
                 ],
               ),

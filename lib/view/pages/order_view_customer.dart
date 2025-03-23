@@ -11,8 +11,7 @@ import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class OrderListCustomerPage extends StatefulWidget {
-  final int customerId;
-  const OrderListCustomerPage({super.key, required this.customerId});
+  const OrderListCustomerPage({super.key});
 
   @override
   State<OrderListCustomerPage> createState() => _OrderListCustomerPageState();
@@ -58,9 +57,9 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
         .toList();
   }
 
-  Future<bool> fetchOrder(String accessToken) async {
+  Future<bool> fetchOrder({required SavedUser user}) async {
     List<OrderDto>? fetchOrder = await _orderRepository.getOrdersByCustomerId(
-        accessToken, widget.customerId);
+        user.token, user.customerId!);
 
     if (fetchOrder != null) {
       setState(() {
@@ -77,7 +76,7 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
     SavedUser? user =
         userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
     if (user != null) {
-      bool fetchOrderData = await fetchOrder(user.token);
+      bool fetchOrderData = await fetchOrder(user: user);
 
       if (fetchOrderData) {
         setState(() {
@@ -114,7 +113,7 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
               color: AppColors.primary,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.orange.withOpacity(0.3),
+                  color: Colors.orange.withValues(alpha: 0.3),
                   blurRadius: 6,
                   spreadRadius: 2,
                   offset: Offset(0, 3),
@@ -154,7 +153,7 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.orange.withOpacity(0.2),
+                          color: Colors.orange.withValues(alpha: 0.2),
                           blurRadius: 6,
                           spreadRadius: 2,
                           offset: Offset(0, 3),

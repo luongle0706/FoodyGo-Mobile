@@ -5,9 +5,7 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
-import 'package:foodygo/view/pages/restaurant/custome_appbar_order_restaurant_list.dart';
 import 'package:foodygo/view/pages/restaurant/order_do_confirm_restaurant.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class ConfirmedOrderRestaurantScreen extends StatefulWidget {
@@ -76,125 +74,31 @@ class _ConfirmedOrderRestaurantScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar:
-          const CustomFootageRestaurantOrderAppBar(title: "Cơm tấm Ngô Quyền"),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 5,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: TextField(
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                  hintText: "Tìm kiếm đơn hàng...",
-                  hintStyle: TextStyle(color: Colors.grey.shade600),
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide:
-                        const BorderSide(color: Color(0xFFEE4D2D), width: 2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Container(
-            color: Colors.white,
-            padding: EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _tabSelector("Mới", 0),
-                _tabSelector("Đã xác nhận", 1),
-                _tabSelector("Lịch sử", 2),
-              ],
-            ),
-          ),
-          Expanded(
-            child: FutureBuilder<List<dynamic>?>(
-              future: _futureOrders,
-              builder: (context, snapshot) {
-                if (_isLoading ||
-                    snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return const Center(
-                      child: Text("Đã xảy ra lỗi, vui lòng thử lại!"));
-                }
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text("Không có đơn hàng nào!"));
-                }
-                return ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    return ConfirmedOrderCard(
-                      order: snapshot.data![index],
-                      onOrderConfirmed: _fetchOrders,
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _tabSelector(String text, int index) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedSubTab = index;
-        });
-        if (index == 0) {
-          GoRouter.of(context).push('/protected/restaurant-foodygo');
-        }
-        if (index == 1) {
-          GoRouter.of(context).push('/protected/confirm-order');
-        }
-        if (index == 2) {
-          GoRouter.of(context).push('/protected/history-order-page');
-        }
-      },
-      child: Column(
-        children: [
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight:
-                  selectedSubTab == index ? FontWeight.bold : FontWeight.normal,
-              color: selectedSubTab == index ? Colors.black : Colors.grey,
-            ),
-          ),
-          if (selectedSubTab == index)
-            Container(
-              margin: EdgeInsets.only(top: 5),
-              height: 3,
-              width: 40,
-              color: Colors.black,
-            ),
-        ],
+    return Expanded(
+      child: FutureBuilder<List<dynamic>?>(
+        future: _futureOrders,
+        builder: (context, snapshot) {
+          if (_isLoading ||
+              snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return const Center(
+                child: Text("Đã xảy ra lỗi, vui lòng thử lại!"));
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("Không có đơn hàng nào!"));
+          }
+          return ListView.builder(
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              return ConfirmedOrderCard(
+                order: snapshot.data![index],
+                onOrderConfirmed: _fetchOrders,
+              );
+            },
+          );
+        },
       ),
     );
   }

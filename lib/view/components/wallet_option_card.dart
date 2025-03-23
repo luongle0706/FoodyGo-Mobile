@@ -24,11 +24,11 @@ class WalletOptionCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border:
-              Border.all(color: AppColors.secondary.withOpacity(0.5), width: 1),
+          border: Border.all(
+              color: AppColors.secondary.withValues(alpha: 0.5), width: 1),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               spreadRadius: 1,
               blurRadius: 4,
               offset: const Offset(0, 2),
@@ -56,7 +56,7 @@ class WalletOptionCard extends StatelessWidget {
                     subtitle,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.black87.withOpacity(0.7),
+                      color: Colors.black87.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -65,7 +65,7 @@ class WalletOptionCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: AppColors.secondary.withOpacity(0.2),
+                color: AppColors.secondary.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: const Icon(

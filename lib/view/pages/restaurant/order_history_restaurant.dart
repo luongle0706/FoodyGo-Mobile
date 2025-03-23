@@ -5,27 +5,30 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
-import 'package:foodygo/view/pages/restaurant/custome_appbar_order_restaurant_list.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class OrderHistoryRestaurantScreen extends StatefulWidget {
   const OrderHistoryRestaurantScreen({super.key});
 
   @override
-  _OrderHistoryRestaurantScreenState createState() =>
+  State<OrderHistoryRestaurantScreen> createState() =>
       _OrderHistoryRestaurantScreenState();
 }
 
 class _OrderHistoryRestaurantScreenState
     extends State<OrderHistoryRestaurantScreen> {
   final _orderRepository = OrderRepository.instance;
+
   final _storage = SecureStorage.instance;
+
   final _logger = AppLogger.instance;
+
   int selectedSubTab = 0;
 
   SavedUser? _user;
+
   Future<List<dynamic>?>? _futureOrders;
+
   bool _isLoading = true;
 
   @override
@@ -73,87 +76,28 @@ class _OrderHistoryRestaurantScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar:
-          const CustomFootageRestaurantOrderAppBar(title: "Lịch sử đơn hàng"),
-      body: Column(
-        children: [
-          Container(
-            color: Colors.white,
-            padding: EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _tabSelector("Mới", 0),
-                _tabSelector("Đã xác nhận", 1),
-                _tabSelector("Lịch sử", 2),
-              ],
-            ),
-          ),
-          Expanded(
-            child: FutureBuilder<List<dynamic>?>(
-              future: _futureOrders,
-              builder: (context, snapshot) {
-                if (_isLoading ||
-                    snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return const Center(
-                      child: Text("Đã xảy ra lỗi, vui lòng thử lại!"));
-                }
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text("Không có đơn hàng nào!"));
-                }
-                return ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    return OrderHistoryCard(order: snapshot.data![index]);
-                  },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _tabSelector(String text, int index) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedSubTab = index;
-        });
-        if (index == 0) {
-          GoRouter.of(context).push('/protected/restaurant-foodygo');
-        }
-        if (index == 1) {
-          GoRouter.of(context).push('/protected/confirm-order');
-        }
-        if (index == 2) {
-          GoRouter.of(context).push('/protected/history-order-page');
-        }
-      },
-      child: Column(
-        children: [
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight:
-                  selectedSubTab == index ? FontWeight.bold : FontWeight.normal,
-              color: selectedSubTab == index ? Colors.black : Colors.grey,
-            ),
-          ),
-          if (selectedSubTab == index)
-            Container(
-              margin: EdgeInsets.only(top: 5),
-              height: 3,
-              width: 40,
-              color: Colors.black,
-            ),
-        ],
+    return Expanded(
+      child: FutureBuilder<List<dynamic>?>(
+        future: _futureOrders,
+        builder: (context, snapshot) {
+          if (_isLoading ||
+              snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return const Center(
+                child: Text("Đã xảy ra lỗi, vui lòng thử lại!"));
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("Không có đơn hàng nào!"));
+          }
+          return ListView.builder(
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              return OrderHistoryCard(order: snapshot.data![index]);
+            },
+          );
+        },
       ),
     );
   }

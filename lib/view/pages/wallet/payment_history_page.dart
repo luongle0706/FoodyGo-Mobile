@@ -199,7 +199,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                         Icon(
                           Icons.receipt_long,
                           size: 64,
-                          color: AppColors.secondary.withOpacity(0.7),
+                          color: AppColors.secondary.withValues(alpha: 0.7),
                         ),
                         const SizedBox(height: 16),
                         const Text(
@@ -215,7 +215,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                           'Các thanh toán của bạn sẽ xuất hiện ở đây',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.black54.withOpacity(0.7),
+                            color: Colors.black54.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -235,12 +235,14 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: AppColors.secondary.withOpacity(0.5),
+                                color:
+                                    AppColors.secondary.withValues(alpha: 0.5),
                                 width: 1,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.1),
+                                  color:
+                                      AppColors.primary.withValues(alpha: 0.1),
                                   spreadRadius: 1,
                                   blurRadius: 4,
                                   offset: const Offset(0, 2),
@@ -252,7 +254,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                                 Container(
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
-                                    color: AppColors.secondary.withOpacity(0.2),
+                                    color: AppColors.secondary
+                                        .withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Icon(
@@ -280,8 +283,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                                         transactionItems[index].date,
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color:
-                                              Colors.black54.withOpacity(0.7),
+                                          color: Colors.black54
+                                              .withValues(alpha: 0.7),
                                         ),
                                       ),
                                     ],

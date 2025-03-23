@@ -66,11 +66,11 @@ class _TopupPageState extends State<TopupPage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       border: Border.all(
-                          color: AppColors.secondary.withOpacity(0.5)),
+                          color: AppColors.secondary.withValues(alpha: 0.5)),
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: AppColors.primary.withValues(alpha: 0.1),
                           spreadRadius: 1,
                           blurRadius: 4,
                           offset: const Offset(0, 2),
@@ -103,7 +103,8 @@ class _TopupPageState extends State<TopupPage> {
                           data: SliderThemeData(
                             activeTrackColor: AppColors.primary,
                             thumbColor: AppColors.primary,
-                            overlayColor: AppColors.primary.withOpacity(0.2),
+                            overlayColor:
+                                AppColors.primary.withValues(alpha: 0.2),
                             valueIndicatorColor: AppColors.primary,
                           ),
                           child: Slider(
@@ -149,10 +150,10 @@ class _TopupPageState extends State<TopupPage> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                          color: AppColors.secondary.withOpacity(0.5)),
+                          color: AppColors.secondary.withValues(alpha: 0.5)),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: AppColors.primary.withValues(alpha: 0.1),
                           spreadRadius: 1,
                           blurRadius: 4,
                           offset: const Offset(0, 2),

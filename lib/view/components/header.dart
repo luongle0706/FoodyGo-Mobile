@@ -13,7 +13,7 @@ class Header extends StatelessWidget {
         color: AppColors.primary, // Màu nền của Header
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 5,
             spreadRadius: 2,
           ),
@@ -25,7 +25,8 @@ class Header extends StatelessWidget {
           // Logo với điều hướng về trang chủ
           GestureDetector(
             onTap: () {
-              GoRouter.of(context).go('/protected/home'); // Chuyển về trang Home
+              GoRouter.of(context)
+                  .go('/protected/home'); // Chuyển về trang Home
             },
             child: Text(
               "FoodyGo",
@@ -68,7 +69,8 @@ class Header extends StatelessWidget {
           Stack(
             children: [
               IconButton(
-                icon: const Icon(Icons.shopping_cart_outlined, size: 28, color: Colors.white),
+                icon: const Icon(Icons.shopping_cart_outlined,
+                    size: 28, color: Colors.white),
                 onPressed: () {},
               ),
               Positioned(

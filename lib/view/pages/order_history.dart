@@ -11,51 +11,25 @@ import 'package:intl/intl.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
 
 class OrderHistory extends StatefulWidget {
-  final int customerId;
-  const OrderHistory({super.key, required this.customerId});
+  const OrderHistory({super.key});
 
   @override
   State<OrderHistory> createState() => _OrderHistoryState();
 }
 
 class _OrderHistoryState extends State<OrderHistory> {
-  String selectedService = "Tất cả";
-
-  String selectedStatus = "Tất cả";
-
-  DateTime startDate = DateTime.now().subtract(Duration(days: 30));
-
-  DateTime endDate = DateTime.now();
-
-  List<String> services = ["Tất cả", "Giao hàng", "Mang đi"];
-
-  List<String> statuses = ["Tất cả", "Hoàn thành", "Đã hủy"];
-
-  Future<void> _selectDateRange(BuildContext context) async {
-    DateTimeRange? picked = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(2023, 1, 1),
-      lastDate: DateTime(2025, 12, 31),
-      initialDateRange: DateTimeRange(start: startDate, end: endDate),
-    );
-    if (picked != null) {
-      setState(() {
-        startDate = picked.start;
-        endDate = picked.end;
-      });
-    }
-  }
-
   final _storage = SecureStorage.instance;
-
   final AppLogger _logger = AppLogger.instance;
-
   final OrderRepository _orderRepository = OrderRepository.instance;
 
+  String selectedService = "Tất cả";
+  String selectedStatus = "Tất cả";
+  DateTime startDate = DateTime.now().subtract(Duration(days: 30));
+  DateTime endDate = DateTime.now();
+  List<String> services = ["Tất cả", "Giao hàng", "Mang đi"];
+  List<String> statuses = ["Tất cả", "Hoàn thành", "Đã hủy"];
   List<OrderDto>? _orderDto;
-
   List<OrderDto>? filteredOrders;
-
   bool _isLoading = true;
 
   @override
@@ -64,37 +38,12 @@ class _OrderHistoryState extends State<OrderHistory> {
     loadUser();
   }
 
-  List<OrderDto> filterOrdersByStatus(List<OrderDto>? orders, String status) {
-    if (orders == null || status.isEmpty) {
-      return [];
-    }
-
-    return orders
-        .where((order) => order.status.toLowerCase() == status.toLowerCase())
-        .toList();
-  }
-
-  Future<bool> fetchOrder(String accessToken) async {
-    List<OrderDto>? fetchOrder = await _orderRepository.getOrdersByCustomerId(
-        accessToken, widget.customerId);
-
-    if (fetchOrder != null) {
-      setState(() {
-        _orderDto = fetchOrder;
-        filteredOrders = filterOrdersByStatus(_orderDto, "COMPLETED");
-        _isLoading = false;
-      });
-      return true;
-    }
-    return false;
-  }
-
   Future<void> loadUser() async {
-    String? userData = await _storage.get(key: 'user');
-    SavedUser? user =
-        userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
-    if (user != null) {
-      bool fetchOrderData = await fetchOrder(user.token);
+    String? userString = await _storage.get(key: 'user');
+    SavedUser? userData =
+        userString != null ? SavedUser.fromJson(json.decode(userString)) : null;
+    if (userData != null) {
+      bool fetchOrderData = await fetchOrder(user: userData);
 
       if (fetchOrderData) {
         setState(() {
@@ -109,6 +58,46 @@ class _OrderHistoryState extends State<OrderHistory> {
       _logger.info('Failed to load user');
       setState(() {
         _isLoading = false;
+      });
+    }
+  }
+
+  Future<bool> fetchOrder({required SavedUser user}) async {
+    List<OrderDto>? fetchOrder = await _orderRepository.getOrdersByCustomerId(
+        user.token, user.customerId!);
+
+    if (fetchOrder != null) {
+      setState(() {
+        _orderDto = fetchOrder;
+        filteredOrders = filterOrdersByStatus(_orderDto, "COMPLETED");
+        _isLoading = false;
+      });
+      return true;
+    }
+    return false;
+  }
+
+  List<OrderDto> filterOrdersByStatus(List<OrderDto>? orders, String status) {
+    if (orders == null || status.isEmpty) {
+      return [];
+    }
+
+    return orders
+        .where((order) => order.status.toLowerCase() == status.toLowerCase())
+        .toList();
+  }
+
+  Future<void> _selectDateRange(BuildContext context) async {
+    DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2023, 1, 1),
+      lastDate: DateTime(2025, 12, 31),
+      initialDateRange: DateTimeRange(start: startDate, end: endDate),
+    );
+    if (picked != null) {
+      setState(() {
+        startDate = picked.start;
+        endDate = picked.end;
       });
     }
   }

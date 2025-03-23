@@ -25,7 +25,6 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
       RestaurantRepository.instance;
   final AddonSectionRepository _addonSectionRepository =
       AddonSectionRepository.instance;
-  RestaurantDto? _restaurantDto;
   List<ProductDto>? _productDto;
   List<dynamic>? _addonSection;
   bool _isLoading = true;
@@ -45,7 +44,6 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
 
     if (fetchOrder != null) {
       setState(() {
-        _restaurantDto = fetchOrder;
         _productDto = fetchProduct;
       });
       return true;
@@ -92,68 +90,20 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.orange,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _restaurantDto != null
-                ? Text(
-                    _restaurantDto!.name,
-                    style: TextStyle(
-                        fontSize: 21,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  )
-                : SizedBox(),
-            GestureDetector(
-              onTap: () {
-                GoRouter.of(context)
-                    .push("/protected/open-hours-setting", extra: 1);
-              },
-              child: _restaurantDto != null
-                  ? Row(
-                      children: [
-                        Icon(Icons.circle,
-                            size: 11,
-                            color: _restaurantDto!.available
-                                ? Colors.green
-                                : Colors.grey),
-                        SizedBox(width: 5),
-                        Text(
-                          _restaurantDto!.available ? "Mở cửa " : "Đóng cửa ",
-                          style: TextStyle(
-                            fontSize: 15.5,
-                            fontWeight: FontWeight.bold,
-                            color: _restaurantDto!.available
-                                ? Colors.green
-                                : Colors.grey,
-                          ),
-                        ),
-                        Icon(Icons.arrow_forward_ios,
-                            size: 15, color: Colors.grey),
-                      ],
-                    )
-                  : SizedBox(),
-            )
-          ],
+    if (_isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    return Column(
+      children: [
+        Expanded(
+          child: MenuScreen(
+            toppingGroups: toppingGroups,
+            productDto: _productDto,
+            addonSections: _addonSection,
+          ),
         ),
-      ),
-      backgroundColor: Colors.grey[100],
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Expanded(
-                  child: MenuScreen(
-                    toppingGroups: toppingGroups,
-                    productDto: _productDto,
-                    addonSections: _addonSection,
-                  ),
-                ),
-              ],
-            ),
+      ],
     );
   }
 
