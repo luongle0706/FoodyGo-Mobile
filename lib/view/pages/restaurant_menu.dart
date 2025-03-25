@@ -28,6 +28,7 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
   List<ProductDto>? _productDto;
   List<dynamic>? _addonSection;
   bool _isLoading = true;
+  SavedUser? _currentUser;
 
   @override
   void initState() {
@@ -56,6 +57,7 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
     SavedUser? user =
         userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
     if (user != null) {
+      _currentUser = user;
       bool fetchOrderData = await fetchRestaurant(user: user);
       List<dynamic>? fetchAddonSection =
           await _addonSectionRepository.getAddonSectionByRestaurantId(
@@ -80,13 +82,35 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
     }
   }
 
+  // Add this method for the refresh functionality
+  Future<void> _refreshData() async {
+    if (_currentUser != null) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      bool fetchOrderData = await fetchRestaurant(user: _currentUser!);
+      List<dynamic>? fetchAddonSection =
+          await _addonSectionRepository.getAddonSectionByRestaurantId(
+              accessToken: _currentUser!.token,
+              restaurantId: _currentUser!.restaurantId);
+
+      if (fetchOrderData) {
+        setState(() {
+          _addonSection = fetchAddonSection;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   int selectedTab = 1;
 
-  List<Map<String, dynamic>> toppingGroups = [
-    {"name": "Topping 1", "description": "Mô tả topping 1"},
-    {"name": "Topping 2", "description": "Mô tả topping 2"},
-    {"name": "Topping 3", "description": "Mô tả topping 3"},
-  ];
+  // Removed hard-coded topping groups
 
   @override
   Widget build(BuildContext context) {
@@ -98,9 +122,9 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
       children: [
         Expanded(
           child: MenuScreen(
-            toppingGroups: toppingGroups,
             productDto: _productDto,
             addonSections: _addonSection,
+            onRefresh: _refreshData,
           ),
         ),
       ],
@@ -142,14 +166,15 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
 }
 
 class MenuScreen extends StatefulWidget {
-  final List<Map<String, dynamic>> toppingGroups;
   final List<ProductDto>? productDto;
   final List<dynamic>? addonSections;
+  final Future<void> Function() onRefresh;
+
   const MenuScreen({
     super.key,
-    required this.toppingGroups,
     required this.productDto,
     this.addonSections,
+    required this.onRefresh,
   });
 
   @override
@@ -264,7 +289,7 @@ class _MenuScreenState extends State<MenuScreen> {
         Divider(),
         Container(
           margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-          // padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          // padding: EdgeInsets.symmetric(vertical: a, horizontal: 12),
           decoration: BoxDecoration(
             color: Colors.orange[100],
             borderRadius: BorderRadius.circular(8),
@@ -302,109 +327,110 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
         ),
         Expanded(
-          child: ListView.builder(
-            itemCount: selectedTab == 0
-                ? filteredProducts.length
-                : widget.toppingGroups.length,
-            itemBuilder: (context, categoryIndex) {
-              if (selectedTab == 0) {
-                var product = filteredProducts[categoryIndex];
-                return ListTile(
-                  leading: Container(
-                    width: 50,
-                    height: 50,
-                    color: Colors.grey[400],
-                    child: Center(child: Text("Ảnh")),
-                  ),
-                  onTap: () {
-                    GoRouter.of(context).push(
-                        "/protected/product-detail-restaurant",
-                        extra: product.id);
-                  },
-                  title: Text(
-                    product.name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+          // Wrap the ListView.builder with RefreshIndicator
+          child: RefreshIndicator(
+            onRefresh: widget.onRefresh,
+            color: Colors.orange,
+            child: ListView.builder(
+              itemCount: selectedTab == 0
+                  ? filteredProducts.length
+                  : (widget.addonSections != null &&
+                          widget.addonSections!.isNotEmpty
+                      ? widget.addonSections!.length
+                      : 0),
+              itemBuilder: (context, categoryIndex) {
+                if (selectedTab == 0) {
+                  var product = filteredProducts[categoryIndex];
+                  return ListTile(
+                    leading: Container(
+                      width: 50,
+                      height: 50,
+                      color: Colors.grey[400],
+                      child: Center(child: Text("Ảnh")),
                     ),
-                  ),
-                  subtitle: Text("${product.price.toStringAsFixed(0)}đ"),
-                  trailing: Switch(
-                    value: product.available,
-                    onChanged: (value) {
-                      setState(() {
-                        switchAvailability(product.id);
-                      });
-                    },
-                    activeColor: Colors.orange,
-                  ),
-                );
-              } else {
-                if (widget.addonSections != null &&
-                    widget.addonSections!.isNotEmpty) {
-                  final addonSection = widget.addonSections![categoryIndex];
-                  final itemsList = addonSection['items'] as List<dynamic>;
-
-                  return GestureDetector(
                     onTap: () {
-                      GoRouter.of(context).push('/protected/food-link',
-                          extra: {'addonSectionId': addonSection['id']});
+                      GoRouter.of(context).push(
+                          "/protected/product-detail-restaurant",
+                          extra: product.id);
                     },
-                    child: Card(
-                      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      child: Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    addonSection['name'],
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text("Số lượng topping: ${itemsList.length}"),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    itemsList
-                                        .map((item) => item['name'])
-                                        .join(', '),
-                                    style: TextStyle(fontSize: 14),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Icon(
-                              Icons.chevron_right,
-                              color: Colors.grey,
-                            ),
-                          ],
-                        ),
+                    title: Text(
+                      product.name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
+                    ),
+                    subtitle: Text("${product.price.toStringAsFixed(0)}đ"),
+                    trailing: Switch(
+                      value: product.available,
+                      onChanged: (value) {
+                        setState(() {
+                          switchAvailability(product.id);
+                        });
+                      },
+                      activeColor: Colors.orange,
                     ),
                   );
                 } else {
-                  var item = widget.toppingGroups[categoryIndex];
-                  return GestureDetector(
-                    onTap: () {
-                      GoRouter.of(context).push('/protected/food-link',
-                          extra: {'addonSectionId': 1});
-                    },
-                    child: ListTile(
-                      title: Text(item["name"]),
-                      subtitle: Text("Số lượng topping: ${item["count"]}"),
-                    ),
-                  );
+                  if (widget.addonSections != null &&
+                      widget.addonSections!.isNotEmpty) {
+                    final addonSection = widget.addonSections![categoryIndex];
+                    final itemsList = addonSection['items'] as List<dynamic>;
+
+                    return GestureDetector(
+                      onTap: () {
+                        GoRouter.of(context).push('/protected/food-link',
+                            extra: {'addonSectionId': addonSection['id']});
+                      },
+                      child: Card(
+                        margin:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        child: Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      addonSection['name'],
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                        "Số lượng topping: ${itemsList.length}"),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      itemsList
+                                          .map((item) => item['name'])
+                                          .join(', '),
+                                      style: TextStyle(fontSize: 14),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Icon(
+                                Icons.chevron_right,
+                                color: Colors.grey,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  } else {
+                    // No topping groups to show
+                    return SizedBox.shrink();
+                  }
                 }
-              }
-            },
+              },
+            ),
           ),
         ),
       ],
