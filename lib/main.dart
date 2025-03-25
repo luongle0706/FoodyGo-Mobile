@@ -5,6 +5,7 @@ import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/service/notification_service.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/hub/hub_home_wrapper.dart';
+import 'package:foodygo/view/pages/about_foodygo.dart';
 import 'package:foodygo/view/pages/confirm_order_customer.dart';
 import 'package:foodygo/view/pages/default_order.dart';
 import 'package:foodygo/view/pages/map_page.dart';
@@ -49,6 +50,8 @@ import 'package:foodygo/view/pages/wallet/transfer_points_page.dart';
 import 'package:foodygo/view/pages/wallet/wallet_homepage.dart';
 import 'package:foodygo/view/pages/wallet/withdraw_page.dart';
 import 'package:go_router/go_router.dart';
+
+import 'view/pages/policy.dart';
 
 void main() async {
   // Setup Firebase
@@ -413,6 +416,21 @@ class Main extends StatelessWidget {
               int addonSectionId = extra['addonSectionId'];
               return MaterialPage(
                   child: FoodLinkPage(addonSectionId: addonSectionId));
+            },
+          ),
+
+          GoRoute(
+            name: 'policy', 
+            path: '/protected/policy',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: PolicyPage());
+            },
+          ),
+          GoRoute(
+            name: 'about-foodygo', 
+            path: '/protected/about',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: AboutFoodyGoPage());
             },
           ),
           GoRoute(

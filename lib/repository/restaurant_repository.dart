@@ -77,4 +77,20 @@ class RestaurantRepository {
     }
   }
 
+  Future<List<dynamic>?> searchRestaurants(String accessToken, String query) async {
+    final response = await http.get(
+      Uri.parse("$globalURL/api/v1/restaurants?name=$query"),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',},
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['data'] ?? [];
+    } else {
+      throw Exception("Failed to search restaurants");
+    }
+  }
+
 }
