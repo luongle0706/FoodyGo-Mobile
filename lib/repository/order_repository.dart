@@ -94,6 +94,7 @@ class OrderRepository {
     if (response.statusCode == 200 || response.statusCode == 400) {
       final jsonResponse = json.decode(response.body);
       dynamic data = jsonResponse['data'];
+      _logger.info(data.toString());
       return OrderDto.fromJson(data);
     } else {
       _logger.error('Failed to load data!');
