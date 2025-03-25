@@ -46,7 +46,7 @@ class _RegisterInfoState extends State<RegisterInfo> {
     super.initState();
     chosenBuildingId = widget.chosenBuildingId;
     _chosenBuildingName = widget.chosenBuildingName;
-    buildingController.text = _chosenBuildingName ?? ''; // Set initial text
+    buildingController.text = _chosenBuildingName ?? '';
     _loadAuthData();
   }
 
@@ -191,7 +191,7 @@ class _RegisterInfoState extends State<RegisterInfo> {
                 radius: 60,
                 backgroundColor: Colors.grey[300],
                 backgroundImage: _selectedImage != null
-                    ? FileImage(_selectedImage!) // Hiển thị ảnh đã chọn
+                    ? FileImage(_selectedImage!)
                     : AssetImage('assets/icons/ellispe-icon.png')
                         as ImageProvider,
                 child: _selectedImage == null
@@ -251,9 +251,20 @@ class _RegisterInfoState extends State<RegisterInfo> {
             SizedBox(height: 20.0),
 
             InkWell(
-              onTap: () {
-                GoRouter.of(context).push('/map/building',
-                    extra: {'callOfOrigin': '/register-info'});
+              onTap: () async {
+                final result =
+                    await GoRouter.of(context).push<Map<String, dynamic>>(
+                  '/map/building',
+                  extra: {'callOfOrigin': '/register-info'},
+                );
+
+                if (result != null && mounted) {
+                  setState(() {
+                    chosenBuildingId = result['buildingId'] as int?;
+                    _chosenBuildingName = result['buildingName'] as String?;
+                    buildingController.text = _chosenBuildingName ?? '';
+                  });
+                }
               },
               child: IgnorePointer(
                 child: IconTextField(

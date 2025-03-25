@@ -44,6 +44,12 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
     loadUser();
   }
 
+  Future<void> reloadCartItems() async {
+    if (_user != null) {
+      await fetchItemsInCart(user: _user!);
+    }
+  }
+
   Future<void> loadUser() async {
     String? userData = await _storage.get(key: 'user');
     SavedUser? user =
@@ -281,12 +287,18 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                         border: Border.all(color: Colors.grey),
                       ),
                       child: GestureDetector(
-                        onTap: () {
-                          GoRouter.of(context).push('/protected/product',
-                              extra: {
-                                'restaurantId': widget.restaurantId,
-                                'productId': item.id
-                              });
+                        onTap: () async {
+                          final result = await GoRouter.of(context)
+                              .push('/protected/product', extra: {
+                            'restaurantId': widget.restaurantId,
+                            'productId': item.id,
+                          });
+                          //code chap va :))
+                          if (result == true) {
+                            await reloadCartItems();
+                          } else {
+                            await reloadCartItems();
+                          }
                         },
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
