@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:foodygo/dto/restaurant_dto.dart';
 import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/restaurant_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
@@ -16,7 +15,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<dynamic>? _restaurants;
   List<dynamic>? _filteredRestaurants;
   bool _isLoading = true;
   bool _isSearching = false;
@@ -44,7 +42,6 @@ class _HomePageState extends State<HomePage> {
         List<dynamic> data = restaurants['data'];
         setState(() {
           _user = user;
-          _restaurants = data;
           _filteredRestaurants = data;
           _isLoading = false;
         });

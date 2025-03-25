@@ -59,7 +59,7 @@ class OrderDto {
       employeeName: json['employeeName'] ?? 'Unknown Employee',
       customerName: json['customerName'] ?? 'Unknown Customer',
       restaurantName: json['restaurantName'] ?? 'Unknown Restaurant',
-      restaurantId: json['restaurantId'] as int,
+      restaurantId: (json['restaurantId'] ?? 0) as int,
       image: json['image'] ??
           'https://via.placeholder.com/150', // Ảnh mặc định nếu null
       hubName: json['hubName'] ?? 'Unknown Hub',
