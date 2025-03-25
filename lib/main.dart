@@ -10,6 +10,7 @@ import 'package:foodygo/view/pages/confirm_order_customer.dart';
 import 'package:foodygo/view/pages/default_order.dart';
 import 'package:foodygo/view/pages/map_page.dart';
 import 'package:foodygo/view/pages/notification_page.dart';
+import 'package:foodygo/view/pages/register_continue.dart';
 import 'package:foodygo/view/pages/restaurant/add_dish_page.dart';
 import 'package:foodygo/view/pages/restaurant/edit_category.dart';
 import 'package:foodygo/view/pages/restaurant/add_topping_item.dart';
@@ -418,16 +419,15 @@ class Main extends StatelessWidget {
                   child: FoodLinkPage(addonSectionId: addonSectionId));
             },
           ),
-
           GoRoute(
-            name: 'policy', 
+            name: 'policy',
             path: '/protected/policy',
             pageBuilder: (context, state) {
               return MaterialPage(child: PolicyPage());
             },
           ),
           GoRoute(
-            name: 'about-foodygo', 
+            name: 'about-foodygo',
             path: '/protected/about',
             pageBuilder: (context, state) {
               return MaterialPage(child: AboutFoodyGoPage());
@@ -452,6 +452,17 @@ class Main extends StatelessWidget {
                 final extra = state.extra as Map<String, dynamic>?;
                 return MaterialPage(
                     child: RegisterInfo(
+                  chosenBuildingId: extra?['chosenBuildingId'],
+                  chosenBuildingName: extra?['chosenBuildingName'],
+                ));
+              }),
+          GoRoute(
+              name: 'register-continue', //S-003
+              path: '/register-continue',
+              pageBuilder: (context, state) {
+                final extra = state.extra as Map<String, dynamic>?;
+                return MaterialPage(
+                    child: RegisterContinue(
                   chosenBuildingId: extra?['chosenBuildingId'],
                   chosenBuildingName: extra?['chosenBuildingName'],
                 ));

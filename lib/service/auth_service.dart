@@ -57,7 +57,11 @@ class AuthService {
         storage.put(key: 'user', value: json.encode(user.toJson()));
 
         if (context.mounted) {
-          GoRouter.of(context).go('/protected/home');
+          if ((response['created'] ?? false) == true) {
+            GoRouter.of(context).go('/register-continue');
+          } else {
+            GoRouter.of(context).go('/protected/home');
+          }
         }
       } else {
         if (context.mounted) {
@@ -66,6 +70,7 @@ class AuthService {
       }
       // print(result.toString());
     } catch (error) {
+      print(error);
       if (context.mounted) {
         _showErrorDialog(context, "Google failed");
       }

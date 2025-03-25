@@ -38,8 +38,6 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
   RestaurantDto? _restaurant;
   bool _isLoading = true;
   int _totalPrice = 0;
-  int? chosenHubId;
-  String? chosenHubName;
   // Need to dynamically change (TODO)
   final int _shippingFee = 5;
   final DateTime _expectedDeliveryTime = DateTime.now().add(Duration(hours: 1));
@@ -51,19 +49,6 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
   void initState() {
     super.initState();
     loadUser();
-    setState(() {
-      chosenHubId = widget.chosenHubId;
-      chosenHubName = widget.chosenHubName;
-    });
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    setState(() {
-      chosenHubId = widget.chosenHubId;
-      chosenHubName = widget.chosenHubName;
-    });
   }
 
   Future<bool> fetchCustomerDataById(int userId, String accessToken) async {
@@ -72,7 +57,6 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
     if (userData != null) {
       setState(() {
         customerPhone = userData['phoneNumber'];
-        chosenHubName = userData['buildingName'];
         fullName = userData['fullName'];
       });
       return true;
@@ -146,7 +130,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
   }
 
   Future<void> placeOrder(BuildContext context) async {
-    if (chosenHubId == null) {
+    if (widget.chosenHubId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Vui lòng chọn Hub trước khi đặt hàng!")),
       );
@@ -163,7 +147,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
         notes: notes,
         customerId: _user!.customerId!,
         restaurantId: widget.restaurantId,
-        hubId: chosenHubId!,
+        hubId: widget.chosenHubId!,
         cartLists: _cartItems!);
     if (result != null) {
       _logger.info("Successfully ordered: Order ID=$result");
@@ -234,7 +218,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                                   '/protected/confirm-order-cart/${widget.restaurantId}'
                             });
                           },
-                          child: Text(chosenHubName ?? "Chọn Hub")),
+                          child: Text(widget.chosenHubName ?? "Chọn Hub")),
                     ],
                   ),
                 ),
