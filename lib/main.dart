@@ -489,9 +489,7 @@ class Main extends StatelessWidget {
               final restaurantId = map['restaurantId'] as int;
               return MaterialPage(
                   child: FoodDetailPage(
-                restaurantId: restaurantId,
-                productId: productId,
-              ));
+                      restaurantId: restaurantId, productId: productId));
             },
           ),
           GoRoute(
