@@ -5,6 +5,7 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/service/auth_service.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -84,11 +85,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 children: [
                   CircleAvatar(
                     radius: 25,
-                    backgroundColor: Colors.grey.shade300,
-                    child: Icon(Icons.person, color: Colors.black54),
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.person, color: Colors.black87),
                   ),
                   SizedBox(width: 16),
-                  Text("Anh Nguyen",
+                  Text('${user?.fullName}',
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ],
@@ -97,38 +98,46 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ),
           Divider(),
           _buildWallet(context),
-          _buildListTile("Địa chỉ"),
-          _buildListTile("Chính sách quy định"),
-          _buildListTile("Về FoodyGo"),
+          _buildListTile("Địa chỉ", (){}),
+          _buildListTile("Chính sách quy định", () {
+            GoRouter.of(context).push("/protected/policy");
+          }),
+          _buildListTile("Về FoodyGo", () {
+            GoRouter.of(context).push("/protected/about");
+          }),
           SizedBox(height: 20),
           _buildLogoutButton(context),
           Spacer(),
-          Text("Phiên bản 0.1", style: TextStyle(color: Colors.black54)),
+          Text("Phiên bản 0.1", style: TextStyle(color: Colors.black87)),
           SizedBox(height: 4),
-          Text("FoodyGo Corporation", style: TextStyle(color: Colors.black54)),
+          Text("FoodyGo Corporation", style: TextStyle(color: Colors.black87)),
           SizedBox(height: 16),
         ],
       ),
     );
   }
 
-  Widget _buildListTile(String title) {
+    Widget _buildListTile(String title, VoidCallback onTap) {
     return Column(
       children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(title, style: TextStyle(fontSize: 16)),
-              Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
-            ],
+        GestureDetector(
+          onTap: onTap, 
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(title, style: TextStyle(fontSize: 16)),
+                Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black87),
+              ],
+            ),
           ),
         ),
         Divider(),
       ],
     );
   }
+
 
   Widget _buildLogoutButton(BuildContext context) {
     return Padding(
@@ -137,13 +146,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         onPressed: () => authService.signOut(context),
         style: ElevatedButton.styleFrom(
           minimumSize: Size(double.infinity, 48),
-          backgroundColor: Colors.grey,
+          backgroundColor: AppColors.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
         ),
         child: Text("Đăng Xuất",
-            style: TextStyle(fontSize: 16, color: Colors.black)),
+            style: TextStyle(fontSize: 16, color: Colors.white)),
       ),
     );
   }
