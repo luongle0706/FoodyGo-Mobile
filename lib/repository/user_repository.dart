@@ -19,7 +19,6 @@ class UserRepository {
           "Content-Type": "application/json",
         },
       );
-      AppLogger.instance.info("userfgjhfgjgh" + json.decode(response.body));
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         if (data["data"] != null) {
