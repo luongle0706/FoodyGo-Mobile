@@ -246,7 +246,12 @@ class _DetailOrderState extends State<DetailOrder> {
                                     height: 80,
                                     color: Colors.grey[300],
                                     child: Center(
-                                      child: Text('Ảnh ${orderDetail.id}'),
+                                      child: Image.network(
+                                        orderDetail.image,
+                                        height: 300,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
                                   ),
                                   SizedBox(width: 16),

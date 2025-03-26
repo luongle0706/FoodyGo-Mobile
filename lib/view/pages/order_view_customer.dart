@@ -7,7 +7,6 @@ import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/pages/detail_order.dart';
-import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class OrderListCustomerPage extends StatefulWidget {
@@ -110,7 +109,7 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: AppColors.primary,
+              color: Colors.orange.shade700,
               boxShadow: [
                 BoxShadow(
                   color: Colors.orange.withValues(alpha: 0.3),
@@ -151,6 +150,10 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.orange.shade900,
+                        width: 2,
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.orange.withValues(alpha: 0.2),
@@ -200,7 +203,7 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.orange.shade900,
+                                  color: Colors.black87,
                                 ),
                               ),
                               SizedBox(width: 4),
@@ -233,7 +236,7 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: Image.network(
-                                    order.image,
+                                    order.restaurantImage,
                                     fit: BoxFit.cover,
                                     width: 60,
                                     height: 60,

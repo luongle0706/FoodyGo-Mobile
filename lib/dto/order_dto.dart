@@ -15,6 +15,7 @@ class OrderDto {
   final String restaurantName;
   final int restaurantId;
   final String image;
+  final String restaurantImage;
   final String hubName;
   final List<OrderDetail> orderDetails;
 
@@ -35,6 +36,7 @@ class OrderDto {
     required this.restaurantName,
     required this.restaurantId,
     required this.image,
+    required this.restaurantImage,
     required this.hubName,
     required this.orderDetails,
   });
@@ -61,7 +63,9 @@ class OrderDto {
       restaurantName: json['restaurantName'] ?? 'Unknown Restaurant',
       restaurantId: (json['restaurantId'] ?? 0) as int,
       image: json['image'] ??
-          'https://via.placeholder.com/150', // Ảnh mặc định nếu null
+          'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg/1200px-Good_Food_Display_-_NCI_Visuals_Online.jpg',
+      restaurantImage: json['restaurantImage'] ??
+          'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg/1200px-Good_Food_Display_-_NCI_Visuals_Online.jpg', // Ảnh mặc định nếu null
       hubName: json['hubName'] ?? 'Unknown Hub',
       orderDetails: (json['orderDetails'] as List<dynamic>?)
               ?.map((item) => OrderDetail.fromJson(item))
