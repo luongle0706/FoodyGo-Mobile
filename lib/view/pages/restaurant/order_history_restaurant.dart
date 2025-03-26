@@ -5,6 +5,7 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class OrderHistoryRestaurantScreen extends StatefulWidget {
@@ -110,53 +111,62 @@ class OrderHistoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "#${order['id']}",
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            const SizedBox(height: 5),
-            Row(
-              children: [
-                const Icon(Icons.access_time, color: Colors.grey, size: 16),
-                const SizedBox(width: 5),
-                Text(
-                  "Hoàn thành lúc: ${formatDateTime(order['completedAt'] as String?)}",
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                const Icon(Icons.person, color: Colors.grey, size: 16),
-                const SizedBox(width: 5),
-                Text("Khách hàng: ${order['customerName'] ?? 'N/A'}"),
-              ],
-            ),
-            const SizedBox(height: 5),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("${order['totalItems']} món",
-                    style: const TextStyle(fontSize: 14)),
-                Text(
-                  "${order['totalPrice'].round()} xu",
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ],
+    return GestureDetector(
+      onTap: () {
+        GoRouter.of(context).push(
+          '/protected/order-detail-restaurant',
+          extra: order['id'],
+        );
+      },
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 3,
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "#${order['id']}",
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+              const SizedBox(height: 5),
+              Row(
+                children: [
+                  const Icon(Icons.access_time, color: Colors.grey, size: 16),
+                  const SizedBox(width: 5),
+                  Text(
+                    "Hoàn thành lúc: ${formatDateTime(order['completedAt'] as String?)}",
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  const Icon(Icons.person, color: Colors.grey, size: 16),
+                  const SizedBox(width: 5),
+                  Text("Khách hàng: ${order['customerName'] ?? 'N/A'}"),
+                ],
+              ),
+              const SizedBox(height: 5),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("${order['totalItems']} món",
+                      style: const TextStyle(fontSize: 14)),
+                  Text(
+                    "${order['totalPrice'].round()} xu",
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

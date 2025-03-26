@@ -7,6 +7,7 @@ import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/theme.dart';
+import 'package:go_router/go_router.dart';
 
 class OrderDetailRestaurant extends StatefulWidget {
   final int orderId;
@@ -34,9 +35,11 @@ class _OrderDetailRestaurantState extends State<OrderDetailRestaurant> {
     OrderDto? fetchOrder =
         await _orderRepository.loadOrderById(accessToken, widget.orderId);
     if (fetchOrder != null) {
-      setState(() {
-        _orderDto = fetchOrder;
-      });
+      if (mounted) {
+        setState(() {
+          _orderDto = fetchOrder;
+        });
+      }
       return true;
     }
     return false;
@@ -50,19 +53,25 @@ class _OrderDetailRestaurantState extends State<OrderDetailRestaurant> {
       bool fetchOrderData = await fetchOrder(user.token);
 
       if (fetchOrderData) {
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       } else {
-        setState(() {
-          _isLoading = true;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     } else {
       _logger.info('Failed to load user');
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -77,11 +86,14 @@ class _OrderDetailRestaurantState extends State<OrderDetailRestaurant> {
         ),
         backgroundColor: AppColors.primary,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-          onPressed: () => {},
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            if (GoRouter.of(context).canPop()) {
+              GoRouter.of(context).pop();
+            } else {
+              GoRouter.of(context).go('/');
+            }
+          },
         ),
       ));
     }
@@ -94,7 +106,9 @@ class _OrderDetailRestaurantState extends State<OrderDetailRestaurant> {
         backgroundColor: AppColors.primary,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            GoRouter.of(context).pop();
+          },
         ),
       ),
       body: Padding(
