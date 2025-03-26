@@ -222,7 +222,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                         "${order.time.day}/${order.time.month}/${order.time.year} ${order.time.hour}:${order.time.minute}"),
                   ],
                 ),
-                Text("${order.restaurantName}",
+                Text(order.restaurantName,
                     style: TextStyle(color: Colors.grey)),
                 SizedBox(height: 10),
                 GestureDetector(

@@ -25,7 +25,7 @@ class AddToCartPopup extends StatefulWidget {
 class _AddToCartPopupState extends State<AddToCartPopup> {
   final CartRepository _cartRepository = CartRepository.instance;
   SavedUser? _user;
-  Map<int, bool> _selectedAddonsMap = {};
+  final Map<int, bool> _selectedAddonsMap = {};
   final _storage = SecureStorage.instance;
   final AppLogger _logger = AppLogger.instance;
 

@@ -174,8 +174,8 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
                                   color: Colors.orange.shade900),
                             ),
                             Text(
-                              "${order.expectedDeliveryTime.hour.toString().padLeft(2, '0')}:" +
-                                  "${order.expectedDeliveryTime.minute.toString().padLeft(2, '0')} - " +
+                              "${order.expectedDeliveryTime.hour.toString().padLeft(2, '0')}:"
+                                      "${order.expectedDeliveryTime.minute.toString().padLeft(2, '0')} - " +
                                   "${order.expectedDeliveryTime.day}/${order.expectedDeliveryTime.month}",
                               style:
                                   TextStyle(color: Colors.grey, fontSize: 14),

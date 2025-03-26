@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:foodygo/view/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class HubAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const HubAppBar({super.key});
+  final String hubName;
+  const HubAppBar({super.key, required this.hubName});
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +21,10 @@ class HubAppBar extends StatelessWidget implements PreferredSizeWidget {
       mainAxisSize: MainAxisSize.min, // Prevent unnecessary overflow
       children: [
         AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          title: const Text(
-            "Hub A3",
+          backgroundColor: AppColors.text,
+          elevation: 2,
+          title: Text(
+            hubName,
             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
           ),
           centerTitle: true,

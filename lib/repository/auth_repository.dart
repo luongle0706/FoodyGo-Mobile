@@ -131,7 +131,6 @@ class AuthRepository {
             headers: {'Content-Type': 'application/json'},
             body: json.encode(body))
         .timeout(const Duration(seconds: 10));
-    ;
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonResponse = json.decode(response.body);
       logger.info("jsonResponse$jsonResponse");

@@ -112,42 +112,83 @@ class _StaffArrivedPageState extends State<StaffArrivedPage> {
         final order = orders![index];
 
         return Card(
+          color: Colors.white,
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: Colors.grey[300]!, width: 1),
+          ),
           margin: const EdgeInsets.only(bottom: 12),
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("#${order['id']}",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                Text(order['customerName'] ?? "Khách hàng ẩn danh"),
-                Text("${order['totalItems']} Món | ${order['totalPrice']}đ"),
+                Text(
+                  "#${order['id']}",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  order['customerName'] ?? "Khách hàng ẩn danh",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  "${order['totalItems']} món | ${order['totalPrice'].toInt()} xu",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: Colors.orange),
+                ),
+                const SizedBox(height: 6),
                 ...order['orderDetails'].map<Widget>((item) {
-                  return Text("${item['quantity']} x ${item['productName']}");
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      "${item['quantity']} x ${item['productName']}",
+                      style: TextStyle(fontSize: 14, color: Colors.black87),
+                    ),
+                  );
                 }).toList(),
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(order['time']
-                        .toString()
-                        .split('T')[1]), // Hiển thị giờ đặt
+                    Text(
+                      order['time'].toString().split('T')[1],
+                      style: TextStyle(fontSize: 14, color: Colors.black54),
+                    ),
                     Row(
                       children: [
                         OutlinedButton(
-                            onPressed: () {
-                              GoRouter.of(context).push(
-                                  '/protected/order-detail-restaurant',
-                                  extra: order['id']);
-                            },
-                            child: Text("Xem thêm")),
+                          onPressed: () {
+                            GoRouter.of(context).push(
+                                '/protected/order-detail-restaurant',
+                                extra: order['id']);
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.blue,
+                            side: BorderSide(color: Colors.blue),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                          ),
+                          child: Text("Xem thêm"),
+                        ),
                         const SizedBox(width: 8),
                         ElevatedButton(
-                            onPressed: () {
-                              updateStatus(
-                                  orderId: order['id'], context: context);
-                            },
-                            child: Text("Đã nhận")),
+                          onPressed: () {
+                            updateStatus(
+                                orderId: order['id'], context: context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                          ),
+                          child: Text("Đã đến"),
+                        ),
                       ],
                     )
                   ],
