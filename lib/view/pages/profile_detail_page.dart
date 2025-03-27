@@ -76,11 +76,9 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
       'fieldValue': fieldValue,
       'fieldTitle': title,
       'userDetails': userDetails,
-    }).then((updatedValue) {
-      if (updatedValue != null) {
-        setState(() {
-          userDetails![fieldKey] = updatedValue;
-        });
+    }).then((result) {
+      if (result != null) {
+        fetchUserDetails(user!.userId, user!.token);
       }
     });
   }
@@ -98,46 +96,55 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Colors.grey.shade300,
-                        backgroundImage: userDetails?['image'] != null &&
-                                userDetails?['image'].isNotEmpty
-                            ? NetworkImage(userDetails!['image'])
-                            : null,
-                        child: userDetails?['image'] == null ||
-                                userDetails?['image'].isEmpty
-                            ? Icon(Icons.person,
-                                color: Colors.black54, size: 40)
-                            : null,
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  InkWell(
+                    onTap: () => _navigateToEditProfile(
+                        "Ảnh đại diện", "image", userDetails?['image'] ?? ""),
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 40,
+                            backgroundColor: Colors.grey.shade300,
+                            backgroundImage: userDetails?['image'] != null &&
+                                    userDetails?['image'].isNotEmpty
+                                ? NetworkImage(userDetails!['image'])
+                                : null,
+                            child: userDetails?['image'] == null ||
+                                    userDetails?['image'].isEmpty
+                                ? Icon(Icons.person,
+                                    color: Colors.black54, size: 40)
+                                : null,
+                          ),
+                          SizedBox(width: 16),
+                          Expanded(child: Text("Đổi hình đại diện")),
+                          Icon(Icons.arrow_forward_ios, size: 16),
+                        ],
                       ),
-                      SizedBox(width: 16),
-                      Expanded(child: Text("Đổi hình đại diện")),
-                      Icon(Icons.arrow_forward_ios, size: 16),
-                    ],
+                    ),
                   ),
-                ),
-                Divider(),
-                _buildRow("Số điện thoại", "phone",
-                    userDetails?['phone'] ?? "Chưa có",
-                    withArrow: true),
-                _buildRow(
-                    "Tên", "fullName", userDetails?['fullName'] ?? "Chưa có",
-                    withArrow: true),
-                _buildRow("Email", "email", userDetails?['email'] ?? "Chưa có",
-                    withArrow: true),
-                _buildRow("Ngày sinh", "dob", userDetails?['dob'] ?? "Chưa có",
-                    withArrow: true),
-                _buildRow("Tòa", "buildingName",
-                    userDetails?['buildingName'] ?? "Chưa có",
-                    withArrow: true),
-              ],
+                  Divider(),
+                  _buildRow("Số điện thoại", "phone",
+                      userDetails?['phone'] ?? "Chưa có",
+                      withArrow: true),
+                  _buildRow(
+                      "Tên", "fullName", userDetails?['fullName'] ?? "Chưa có",
+                      withArrow: true),
+                  _buildRow(
+                      "Email", "email", userDetails?['email'] ?? "Chưa có",
+                      withArrow: true),
+                  _buildRow(
+                      "Ngày sinh", "dob", userDetails?['dob'] ?? "Chưa có",
+                      withArrow: true),
+                  _buildRow("Tòa", "buildingName",
+                      userDetails?['buildingName'] ?? "Chưa có",
+                      withArrow: true),
+                ],
+              ),
             ),
     );
   }

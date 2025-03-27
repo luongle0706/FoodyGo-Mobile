@@ -5,6 +5,7 @@ import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/customer_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -26,13 +27,30 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
+  File? selectedImage;
+
+  Future<void> pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1800,
+      maxHeight: 1800,
+      imageQuality: 80, // Compress image
+    );
+
+    if (image != null) {
+      setState(() {
+        selectedImage = File(image.path);
+      });
+    }
+  }
+
   SavedUser? user;
   late TextEditingController _controller;
   DateTime? selectedDate;
   final CustomerRepository customerRepository = CustomerRepository.instance;
   bool isLoading = false;
   final _logger = AppLogger.instance;
-  File? selectedImage;
 
   @override
   void initState() {
@@ -98,10 +116,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
         accessToken: accessToken,
         buildingId: widget.userDetails["buildingID"] as int,
         dob: dobToUpdate,
+        fullName: widget.fieldKey == 'fullName'
+            ? _controller.text
+            : widget.userDetails["fullName"],
         phone: widget.fieldKey == 'phone'
             ? _controller.text
             : widget.userDetails["phone"],
-        image: null,
+        image: selectedImage,
       );
 
       if (result) {
@@ -148,20 +169,35 @@ class _EditProfilePageState extends State<EditProfilePage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            widget.fieldKey == 'dob'
-                ? TextField(
-                    controller: _controller,
-                    readOnly: true,
-                    onTap: () => _selectDate(context),
-                    decoration: InputDecoration(
-                      labelText: widget.fieldTitle,
-                      suffixIcon: Icon(Icons.calendar_today),
-                    ),
-                  )
-                : TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(labelText: widget.fieldTitle),
-                  ),
+            if (widget.fieldKey == 'image')
+              InkWell(
+                onTap: pickImage,
+                child: CircleAvatar(
+                  radius: 60,
+                  backgroundColor: Colors.grey[300],
+                  backgroundImage: selectedImage != null
+                      ? FileImage(selectedImage!)
+                      : (widget.fieldValue.isNotEmpty
+                          ? NetworkImage(widget.fieldValue)
+                          : null) as ImageProvider?,
+                  child: selectedImage == null && widget.fieldValue.isEmpty
+                      ? const Icon(Icons.camera_alt,
+                          size: 40, color: Colors.white)
+                      : null,
+                ),
+              ),
+            TextField(
+              controller: _controller,
+              readOnly: widget.fieldKey == 'image' || widget.fieldKey == 'dob',
+              onTap:
+                  widget.fieldKey == 'dob' ? () => _selectDate(context) : null,
+              decoration: InputDecoration(
+                labelText: widget.fieldTitle,
+                suffixIcon: widget.fieldKey == 'dob'
+                    ? Icon(Icons.calendar_today)
+                    : null,
+              ),
+            ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: isLoading ? null : updateCustomerInfo,

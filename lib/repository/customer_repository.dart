@@ -32,6 +32,7 @@ class CustomerRepository {
       required int userId,
       required int buildingId,
       String? phone,
+      String? fullName,
       DateTime? dob,
       File? image}) async {
     Uri uri = Uri.parse('$globalURL/api/v1/customers/$userId');
@@ -43,6 +44,7 @@ class CustomerRepository {
     Map<String, dynamic> customerUpdateRequest = {
       "buildingID": buildingId,
       "phone": phone,
+      "fullName": fullName,
       "dob": dob != null ? DateFormat('yyyy-MM-dd').format(dob) : null
     };
     String jsonData = json.encode(customerUpdateRequest);
