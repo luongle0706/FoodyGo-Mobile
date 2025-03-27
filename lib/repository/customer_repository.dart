@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -15,8 +16,8 @@ class CustomerRepository {
       {required String accessToken,
       required int userId,
       required int buildingId,
-      required String phone,
-      required DateTime dob,
+      String? phone,
+      DateTime? dob,
       File? image}) async {
     Uri uri = Uri.parse('$globalURL/api/v1/customers/$userId');
 
@@ -27,7 +28,7 @@ class CustomerRepository {
     Map<String, dynamic> customerUpdateRequest = {
       "buildingID": buildingId,
       "phone": phone,
-      "dob": DateFormat('yyyy-MM-dd').format(dob)
+      "dob": dob != null ? DateFormat('yyyy-MM-dd').format(dob) : null
     };
     String jsonData = json.encode(customerUpdateRequest);
     requestMultipart.files.add(
@@ -49,7 +50,7 @@ class CustomerRepository {
 
     var streamedResponse = await requestMultipart.send();
     var response = await http.Response.fromStream(streamedResponse);
-
+    AppLogger.instance.info(response.body.toString());
     if (response.statusCode == 200) {
       return true;
     }

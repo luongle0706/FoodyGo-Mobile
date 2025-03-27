@@ -5,6 +5,7 @@ import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/service/notification_service.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/hub/hub_home_wrapper.dart';
+import 'package:foodygo/view/pages/edit_profile_page.dart';
 import 'package:foodygo/view/pages/about_foodygo.dart';
 import 'package:foodygo/view/pages/confirm_order_customer.dart';
 import 'package:foodygo/view/pages/default_order.dart';
@@ -491,6 +492,27 @@ class Main extends StatelessWidget {
               return MaterialPage(
                   child: FoodDetailPage(
                       restaurantId: restaurantId, productId: productId));
+            },
+          ),
+          GoRoute(
+            path: '/edit-profile',
+            builder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>?;
+              if (extra == null ||
+                  !extra.containsKey('fieldKey') ||
+                  !extra.containsKey('fieldValue') ||
+                  !extra.containsKey('fieldTitle') ||
+                  !extra.containsKey('userDetails')) {
+                return Scaffold(
+                  body: Center(child: Text("Lỗi: Thiếu thông tin chỉnh sửa!")),
+                );
+              }
+              return EditProfilePage(
+                fieldKey: extra['fieldKey'],
+                fieldValue: extra['fieldValue'],
+                fieldTitle: extra['fieldTitle'],
+                userDetails: extra['userDetails'],
+              );
             },
           ),
           GoRoute(
