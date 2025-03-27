@@ -112,7 +112,6 @@ class _OrderMapState extends State<OrderMap> {
     //     'https://router.project-osrm.org/route/v1/driving/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?geometries=geojson';
     final url =
         'https://routing.openstreetmap.de/routed-car/route/v1/driving/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?geometries=geojson';
-
     try {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {

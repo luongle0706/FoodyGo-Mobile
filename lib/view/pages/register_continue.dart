@@ -108,14 +108,18 @@ class _RegisterContinueState extends State<RegisterContinue> {
         // );
         if (mounted) GoRouter.of(context).push('/protected/home');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Cập nhật thông tin thất bại!")),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Cập nhật thông tin thất bại!")),
+          );
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Cập nhật thất bại: $e")),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Cập nhật thất bại: $e")),
+        );
+      }
     }
   }
 
