@@ -23,6 +23,20 @@ class OrderRepository {
       required int restaurantId,
       required int hubId,
       required List<dynamic> cartLists}) async {
+    // Create order details with properly serialized addon items
+    List<Map<String, dynamic>> orderDetails = cartLists.map((e) {
+      // Just convert the addon items to JSON string - no price calculation here
+      List<dynamic> addons = e['cartAddOnItems'] ?? [];
+      String addonItemsJson = jsonEncode(addons);
+
+      return {
+        "quantity": e['quantity'],
+        "price": e['price'],
+        "addonItems": addonItemsJson,
+        "productId": e['productId']
+      };
+    }).toList();
+
     Map<String, dynamic> body = {
       "shippingFee": shippingFee,
       "productPrice": productFee,
@@ -33,15 +47,9 @@ class OrderRepository {
       "customerId": customerId,
       "restaurantId": restaurantId,
       "hubId": hubId,
-      "orderDetails": cartLists
-          .map((e) => {
-                "quantity": e['quantity'],
-                "price": e['price'],
-                "addonItems": e['cartAddonItems'].toString(),
-                "productId": e['productId']
-              })
-          .toList()
+      "orderDetails": orderDetails
     };
+
     final response = await http.post(Uri.parse('$globalURL/api/v1/orders'),
         headers: {
           'Content-Type': 'application/json',
@@ -168,6 +176,7 @@ class OrderRepository {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $accessToken'
     });
+    _logger.info('$globalURL/api/v1/orders$params');
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonResponse = json.decode(response.body);
       return jsonResponse;

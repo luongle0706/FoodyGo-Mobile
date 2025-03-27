@@ -234,6 +234,10 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
             _buildOrderDetail("Thời gian lấy hàng dự kiến",
                 formatDateTime(widget.order['expectedDeliveryTime'])),
             if (hub != null)
+              Text(
+                "$locationURL/?orderId=${widget.order['id']}&destination=${hub['latitude']},${hub['longitude']}",
+              ),
+            if (hub != null)
               Center(
                 child: QrImageView(
                   data:

@@ -103,17 +103,29 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
         accessToken: _user?.token,
         userId: _user?.userId,
         restaurantId: widget.restaurantId);
+
     if (data != null) {
-      int totalPrice = data.fold(
-            0,
-            (sum, item) =>
-                sum! +
-                ((item['price'] as num).toInt() *
-                    (item['quantity'] as num).toInt()),
-          ) ??
-          0;
+      int total = 0;
+
+      // Calculate total price including addons
+      for (var item in data) {
+        double itemPrice = (item['price'] as num).toDouble();
+        int quantity = (item['quantity'] as num).toInt();
+
+        // Add base product price
+        total += (itemPrice * quantity).toInt();
+
+        // Add addon prices
+        List<dynamic> addons = item['cartAddOnItems'] ?? [];
+        for (var addon in addons) {
+          total += ((addon['price'] as num).toDouble() *
+                  (addon['quantity'] as num).toInt())
+              .toInt();
+        }
+      }
+
       setState(() {
-        _totalPrice = totalPrice;
+        _totalPrice = total;
         _cartItems = data;
       });
       return true;
@@ -267,60 +279,90 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                 itemCount: _cartItems?.length ?? 0,
                 itemBuilder: (context, index) {
                   final item = _cartItems![index];
+                  List<dynamic> addons = item['cartAddOnItems'] ?? [];
 
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      children: [
-                        // Image Placeholder
-                        Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          alignment: Alignment.center,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              item['image'] ??
-                                  'https://via.placeholder.com/60', // Placeholder image
-                              loadingBuilder: (context, child, progress) {
-                                if (progress == null) {
-                                  return child;
-                                } else {
-                                  return Center(
-                                      child: CircularProgressIndicator());
-                                }
-                              },
-                              errorBuilder: (context, error, stackTrace) {
-                                return Icon(Icons.error);
-                              },
-                              fit: BoxFit.cover,
+                  // Calculate item total price including addons
+                  double itemTotalPrice = (item['price'] as num).toDouble();
+                  for (var addon in addons) {
+                    itemTotalPrice += (addon['price'] as num).toDouble() *
+                        (addon['quantity'] as num).toInt();
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          children: [
+                            // Image Placeholder
+                            Container(
                               width: 60,
                               height: 60,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              alignment: Alignment.center,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  item['image'] ??
+                                      'https://via.placeholder.com/60',
+                                  loadingBuilder: (context, child, progress) {
+                                    if (progress == null) {
+                                      return child;
+                                    } else {
+                                      return Center(
+                                          child: CircularProgressIndicator());
+                                    }
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Icon(Icons.error);
+                                  },
+                                  fit: BoxFit.cover,
+                                  width: 60,
+                                  height: 60,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        SizedBox(width: 8),
+                            SizedBox(width: 8),
 
-                        // Item Name & Price
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  "${item['quantity']} x ${item['productName']}"),
-                            ],
-                          ),
+                            // Item Name & Price
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                      "${item['quantity']} x ${item['productName']}"),
+
+                                  // Show addon items if any
+                                  if (addons.isNotEmpty)
+                                    ...addons
+                                        .map((addon) => Padding(
+                                              padding: EdgeInsets.only(
+                                                  left: 12, top: 4),
+                                              child: Text(
+                                                "+ ${addon['addOnItemName']} (${NumberFormat("#,###", "vi_VN").format(addon['price'])} xu)",
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey[700],
+                                                ),
+                                              ),
+                                            ))
+                                        .toList(),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              "${NumberFormat("#,###", "vi_VN").format(itemTotalPrice * item['quantity'])} xu",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
-                        Text(
-                          "${NumberFormat("#,###", "vi_VN").format(item['price'])} xu",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
+                      ),
+                      Divider(),
+                    ],
                   );
                 },
               ),

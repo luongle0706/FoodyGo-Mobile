@@ -139,23 +139,71 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
     }
   }
 
+  Future<void> removeSpecificCartItem(dynamic cartItem) async {
+    // Since we don't have a unique ID, we need to:
+    // 1. Generate a fingerprint for the current item
+    // 2. Find all items in cart with same productId
+    // 3. Remove the one with matching addons
+
+    String targetFingerprint =
+        _cartRepository.generateItemFingerprint(cartItem);
+
+    // Get current cart items
+    List<dynamic>? currentCartItems = await _cartRepository.getCartByRestaurant(
+        accessToken: _user?.token,
+        userId: _user?.userId,
+        restaurantId: widget.restaurantId);
+
+    if (currentCartItems == null) return;
+
+    // Find the exact match
+    bool result = false;
+    for (var item in currentCartItems) {
+      if (_cartRepository.generateItemFingerprint(item) == targetFingerprint) {
+        // Found the exact match, remove it
+        result = await _cartRepository.removeFromCart(
+            productId: item['productId'],
+            userId: _user?.userId,
+            accessToken: _user?.token);
+        break;
+      }
+    }
+
+    if (result) {
+      await fetchItemsInCart(user: _user!);
+    } else {
+      _logger.info('Failed to delete specific item from cart');
+    }
+  }
+
   Future<bool> fetchItemsInCart({required SavedUser user}) async {
     List<dynamic>? data = await _cartRepository.getCartByRestaurant(
         accessToken: _user?.token,
         userId: _user?.userId,
         restaurantId: widget.restaurantId);
+
     if (data != null) {
-      int total = data.isNotEmpty
-          ? data
-              .map((item) => ((item['price'] as num).toInt() *
-                  (item['quantity'] as num).toInt()))
-              .reduce((a, b) => a + b)
-          : 0;
-      int totalQuantity = data.isNotEmpty
-          ? data
-              .map((item) => (item['quantity'] as num).toInt())
-              .reduce((a, b) => a + b)
-          : 0;
+      int total = 0;
+      int totalQuantity = 0;
+
+      // Calculate total price including addons
+      for (var item in data) {
+        double itemPrice = (item['price'] as num).toDouble();
+        int quantity = (item['quantity'] as num).toInt();
+
+        // Add base product price
+        total += (itemPrice * quantity).toInt();
+        totalQuantity += quantity;
+
+        // Add addon prices
+        List<dynamic> addons = item['cartAddOnItems'] ?? [];
+        for (var addon in addons) {
+          total += ((addon['price'] as num).toDouble() *
+                  (addon['quantity'] as num).toInt())
+              .toInt();
+        }
+      }
+
       setState(() {
         _cartItems = data;
         _cartItemCount = totalQuantity;
@@ -231,7 +279,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.network(
-                      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg/1280px-Cơm_Tấm%2C_Da_Nang%2C_Vietnam.jpg',
+                      _restaurant?.image ?? '',
                       height: 100,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -333,63 +381,36 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                 ],
                               ),
                             ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () =>
-                                      removeFromCart(product: item),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.orange,
-                                    minimumSize: Size(32, 32),
-                                    padding: EdgeInsets.zero,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(4)),
-                                  ),
-                                  child: Icon(Icons.remove,
-                                      color: Colors.white, size: 18),
-                                ),
-                                SizedBox(width: 8),
-                                Text(
-                                  '${_cartItems?.firstWhere((i) => i['productId'] == item.id, orElse: () => {
-                                        'quantity': 0
-                                      })['quantity']}',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(width: 8),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    if (item.addonSections != null &&
-                                        item.addonSections!.isNotEmpty) {
-                                      showModalBottomSheet(
-                                        context: context,
-                                        isScrollControlled: true,
-                                        backgroundColor: Colors.transparent,
-                                        builder: (context) => AddToCartPopup(
-                                          product: item,
-                                          restaurantId: widget.restaurantId,
-                                          onCartUpdated: () {
-                                            fetchItemsInCart(user: _user!);
-                                          },
-                                        ),
-                                      );
-                                    } else {
-                                      addToCart(product: item);
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.orange,
-                                    minimumSize: const Size(32, 32),
-                                    padding: EdgeInsets.zero,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(4)),
-                                  ),
-                                  child: const Icon(Icons.add,
-                                      color: Colors.white, size: 18),
-                                ),
-                              ],
+                            // Only keep the ADD button
+                            ElevatedButton(
+                              onPressed: () {
+                                if (item.addonSections != null &&
+                                    item.addonSections!.isNotEmpty) {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    builder: (context) => AddToCartPopup(
+                                      product: item,
+                                      restaurantId: widget.restaurantId,
+                                      onCartUpdated: () {
+                                        fetchItemsInCart(user: _user!);
+                                      },
+                                    ),
+                                  );
+                                } else {
+                                  addToCart(product: item);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                                minimumSize: const Size(32, 32),
+                                padding: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4)),
+                              ),
+                              child: const Icon(Icons.add,
+                                  color: Colors.white, size: 18),
                             ),
                           ],
                         ),
@@ -452,81 +473,121 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                             itemCount: _cartItems!.length,
                                             itemBuilder: (context, index) {
                                               final item = _cartItems![index];
-                                              final product = ProductDto(
-                                                  id: item['productId'],
-                                                  image: item['image'],
-                                                  code: item['productId']
-                                                      .toString(),
-                                                  name: item['productName'],
-                                                  price: item['price'],
-                                                  description: '',
-                                                  prepareTime: 0.0,
-                                                  available: true);
-                                              return ListTile(
-                                                leading: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                  child: Image.network(
-                                                    item['image'],
-                                                    width: 50,
-                                                    height: 50,
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                                title:
-                                                    Text(item['productName']),
-                                                subtitle: Text(
-                                                    "Giá: ${(item['price']).toStringAsFixed(0)} xu"),
-                                                trailing: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    IconButton(
-                                                      icon: Icon(Icons.remove,
+                                              List<dynamic> addons =
+                                                  item['cartAddOnItems'] ?? [];
+
+                                              return Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  ListTile(
+                                                    leading: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                      child: Image.network(
+                                                        item['image'],
+                                                        width: 50,
+                                                        height: 50,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                    title: Row(
+                                                      children: [
+                                                        Text(item[
+                                                            'productName']),
+                                                        SizedBox(width: 8),
+                                                        // Show quantity
+                                                        Container(
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal: 8,
+                                                                  vertical: 2),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Colors
+                                                                .grey[200],
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12),
+                                                          ),
+                                                          child: Text(
+                                                            "x${item['quantity']}",
+                                                            style: TextStyle(
+                                                              color: Colors
+                                                                  .black87,
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    subtitle: () {
+                                                      // Calculate item total price including addons
+                                                      double itemUnitPrice =
+                                                          item['price'];
+                                                      double totalAddonPrice =
+                                                          0;
+
+                                                      // Add prices of all addons
+                                                      for (var addon
+                                                          in addons) {
+                                                        totalAddonPrice +=
+                                                            addon['price'] *
+                                                                addon[
+                                                                    'quantity'];
+                                                      }
+
+                                                      double itemTotalPrice =
+                                                          (itemUnitPrice +
+                                                                  totalAddonPrice) *
+                                                              item['quantity'];
+
+                                                      return Text(
+                                                          "Giá: ${(itemTotalPrice).toStringAsFixed(0)} xu");
+                                                    }(),
+                                                    trailing: IconButton(
+                                                      icon: Icon(Icons.delete,
                                                           color: Colors.red),
                                                       onPressed: () async {
-                                                        await removeFromCart(
-                                                            product: product);
+                                                        await removeSpecificCartItem(
+                                                            item);
                                                         setModalState(() {});
                                                       },
                                                     ),
-                                                    Text("${item['quantity']}"),
-                                                    IconButton(
-                                                      icon: Icon(Icons.add,
-                                                          color: Colors.green),
-                                                      onPressed: () async {
-                                                        if (product
-                                                            .addonSections!
-                                                            .isNotEmpty) {
-                                                          showModalBottomSheet(
-                                                            context: context,
-                                                            isScrollControlled:
-                                                                true,
-                                                            backgroundColor:
-                                                                Colors
-                                                                    .transparent,
-                                                            builder: (context) =>
-                                                                AddToCartPopup(
-                                                              product: item,
-                                                              restaurantId: widget
-                                                                  .restaurantId,
-                                                              onCartUpdated:
-                                                                  () {
-                                                                fetchItemsInCart(
-                                                                    user:
-                                                                        _user!);
-                                                              },
-                                                            ),
+                                                  ),
+
+                                                  // Display addon items if any
+                                                  if (addons.isNotEmpty)
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 70,
+                                                              bottom: 8),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: addons
+                                                            .map<Widget>(
+                                                                (addon) {
+                                                          return Text(
+                                                            "- ${addon['addOnItemName']} (+${addon['price'].toStringAsFixed(0)} xu)",
+                                                            style: TextStyle(
+                                                                fontSize: 12,
+                                                                color: Colors
+                                                                    .grey),
                                                           );
-                                                        } else {
-                                                          await addToCart(
-                                                              product: product);
-                                                          setModalState(() {});
-                                                        }
-                                                      },
+                                                        }).toList(),
+                                                      ),
                                                     ),
-                                                  ],
-                                                ),
+
+                                                  Divider(),
+                                                ],
                                               );
                                             },
                                           ),

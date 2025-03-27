@@ -1,21 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:foodygo/view/theme.dart';
-import 'package:go_router/go_router.dart';
 
-class HubAppBar extends StatelessWidget implements PreferredSizeWidget {
+class HubAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String hubName;
-  const HubAppBar({super.key, required this.hubName});
+  final int selectedIndex;
+  final void Function(int) onTapTapped;
+
+  const HubAppBar(
+      {super.key,
+      required this.hubName,
+      required this.selectedIndex,
+      required this.onTapTapped});
 
   @override
-  Widget build(BuildContext context) {
-    String currentRoute = GoRouterState.of(context).matchedLocation;
+  State<HubAppBar> createState() => _HubAppBarState();
 
-    int selectedIndex = 0;
-    if (currentRoute.contains("/protected/staff-home-arrived")) {
-      selectedIndex = 1;
-    } else if (currentRoute.contains("/procted/staff-home-history")) {
-      selectedIndex = 2;
-    }
+  @override
+  Size get preferredSize => Size.fromHeight(150);
+}
+
+class _HubAppBarState extends State<HubAppBar> {
+  @override
+  Widget build(BuildContext context) {
+    // String currentRoute = GoRouterState.of(context).matchedLocation;
 
     return Column(
       mainAxisSize: MainAxisSize.min, // Prevent unnecessary overflow
@@ -24,7 +31,7 @@ class HubAppBar extends StatelessWidget implements PreferredSizeWidget {
           backgroundColor: AppColors.text,
           elevation: 2,
           title: Text(
-            hubName,
+            widget.hubName,
             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
           ),
           centerTitle: true,
@@ -49,26 +56,14 @@ class HubAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         DefaultTabController(
           length: 3,
-          initialIndex: selectedIndex,
+          initialIndex: widget.selectedIndex,
           child: SizedBox(
             height: 50, // Fixed height for TabBar
             child: TabBar(
               labelColor: Colors.black,
               unselectedLabelColor: Colors.grey,
               indicatorColor: Colors.blue,
-              onTap: (index) {
-                switch (index) {
-                  case 0:
-                    GoRouter.of(context).go("/protected/staff-home");
-                    break;
-                  case 1:
-                    GoRouter.of(context).go("/protected/staff-home-arrived");
-                    break;
-                  case 2:
-                    GoRouter.of(context).go("/protected/staff-home-history");
-                    break;
-                }
-              },
+              onTap: widget.onTapTapped,
               tabs: const [
                 Tab(text: "Đang đến"),
                 Tab(text: "Đã giao đến Hub"),
@@ -80,7 +75,4 @@ class HubAppBar extends StatelessWidget implements PreferredSizeWidget {
       ],
     );
   }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(150);
 }

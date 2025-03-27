@@ -60,6 +60,7 @@ class _StaffArrivedPageState extends State<StaffArrivedPage> {
         params:
             '?hubId=${user.hubId}&sortBy=time&status=$status&pageNo=$pageNo&pageSize=$pageSize');
     if (response != null && response['data'] != null) {
+      _logger.info(response['data'].toString());
       setState(() {
         orders = response['data'];
       });

@@ -161,14 +161,14 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
           SnackBar(content: Text("Món ăn đã được xóa thành công!")),
         );
         // Quay về trang menu và reload dữ liệu
-        GoRouter.of(context)
-            .go('/protected/restaurant_menu', extra: _user!.restaurantId);
+        if (mounted) GoRouter.of(context).go('/protected/restaurant-foodygo');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Xóa món ăn thất bại!")),
         );
       }
     } catch (error) {
+      _logger.error(error.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Lỗi mạng, vui lòng thử lại!")),
       );
@@ -192,7 +192,7 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
 
       bool success = await _productRepository.updateProduct(
         _productDto!.id,
-        _selectedImage!,
+        _selectedImage,
         editProduct,
         _user!.token,
       );
@@ -201,14 +201,15 @@ class _ProductDetailRestaurantState extends State<ProductDetailRestaurant> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Cập nhật thành công!")),
         );
-        GoRouter.of(context)
-            .go('/protected/restaurant_menu', extra: _user!.restaurantId);
+        if (mounted) GoRouter.of(context).go('/protected/restaurant-foodygo');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Cập nhật thất bại!")),
         );
       }
     } catch (error) {
+      print(error);
+      _logger.error(error.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Lỗi mạng, vui lòng thử lại!")),
       );

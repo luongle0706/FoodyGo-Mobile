@@ -9,12 +9,18 @@ class AboutFoodyGoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Về FoodyGo", style: TextStyle(color: Colors.white),),
+        title: Text(
+          "Về FoodyGo",
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: AppColors.primary,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white,),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
           onPressed: () {
-            GoRouter.of(context).pop(); 
+            GoRouter.of(context).pop();
           },
         ),
       ),
@@ -42,14 +48,15 @@ class AboutFoodyGoPage extends StatelessWidget {
                 "📞 Liên hệ với chúng tôi:\n"
                 "   - Email: support@foodygo.com\n"
                 "   - Hotline: 1900-xxxxxx\n"
-                "   - Website: www.foodygo.com\n",
+                "   - Website: www.foodygo.com\n"
+                "",
                 style: TextStyle(fontSize: 16),
               ),
               SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    GoRouter.of(context).pop(); 
+                    GoRouter.of(context).pop();
                   },
                   child: Text("Quay lại"),
                 ),

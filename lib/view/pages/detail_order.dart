@@ -284,25 +284,99 @@ class _DetailOrderState extends State<DetailOrder> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              '${orderDetail.quantity} x ${orderDetail.productName}',
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              orderDetail.addonItems ??
-                                                  'Không có món thêm',
-                                              style:
-                                                  TextStyle(color: Colors.grey),
-                                            ),
-                                          ],
+                                        Expanded(
+                                          child: Builder(
+                                            builder: (context) {
+                                              if (orderDetail.addonItems !=
+                                                      null &&
+                                                  orderDetail.addonItems !=
+                                                      'null') {
+                                                try {
+                                                  // Parse the JSON string back to a list
+                                                  List<dynamic> addons =
+                                                      jsonDecode(orderDetail
+                                                          .addonItems!);
+
+                                                  // Return a Column with each addon item displayed
+                                                  return Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        '${orderDetail.quantity} x ${orderDetail.productName}',
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      ...addons
+                                                          .map((addon) =>
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left: 8,
+                                                                        top: 2),
+                                                                child: Text(
+                                                                  "+ ${addon['addOnItemName']} (${addon['price'].toStringAsFixed(0)} xu)",
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .grey,
+                                                                      fontSize:
+                                                                          12),
+                                                                ),
+                                                              ))
+                                                          .toList(),
+                                                    ],
+                                                  );
+                                                } catch (e) {
+                                                  // Fallback in case parsing fails
+                                                  return Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        '${orderDetail.quantity} x ${orderDetail.productName}',
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      Text(
+                                                        'Không có món thêm',
+                                                        style: TextStyle(
+                                                            color: Colors.grey),
+                                                      ),
+                                                    ],
+                                                  );
+                                                }
+                                              } else {
+                                                return Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      '${orderDetail.quantity} x ${orderDetail.productName}',
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    Text(
+                                                      'Không có món thêm',
+                                                      style: TextStyle(
+                                                          color: Colors.grey),
+                                                    ),
+                                                  ],
+                                                );
+                                              }
+                                            },
+                                          ),
                                         ),
-                                        Spacer(),
                                         Text(
                                           '${orderDetail.price.toStringAsFixed(0)} xu',
                                           style: TextStyle(

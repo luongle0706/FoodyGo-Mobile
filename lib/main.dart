@@ -27,8 +27,6 @@ import 'package:foodygo/view/pages/restaurant/topping_section_setting.dart';
 import 'package:foodygo/view/pages/restaurant_home.dart';
 import 'package:foodygo/view/pages/wallet/foodyxu_history_page.dart';
 import 'package:foodygo/view/pages/home.dart';
-import 'package:foodygo/view/pages/hub/staff_arrived_page.dart';
-import 'package:foodygo/view/pages/hub/staff_home_history_page.dart';
 import 'package:foodygo/view/pages/login.dart';
 import 'package:foodygo/view/pages/order_view_customer.dart';
 import 'package:foodygo/view/pages/restaurant/order_view_restaurant.dart';
@@ -44,7 +42,6 @@ import 'package:foodygo/view/pages/register_success.dart';
 import 'package:foodygo/view/pages/restaurant/food_link_page.dart';
 import 'package:foodygo/view/pages/restaurant/topping_selection_page.dart';
 import 'package:foodygo/view/pages/restaurant_detail.dart';
-import 'package:foodygo/view/pages/hub/staff_home_page.dart';
 import 'package:foodygo/view/pages/wallet/payment_history_page.dart';
 import 'package:foodygo/view/pages/wallet/topup_page.dart';
 import 'package:foodygo/view/pages/wallet/transaction_detail_detail.dart';
@@ -118,29 +115,29 @@ class Main extends StatelessWidget {
                   name: 'protected_staff_home', // S-040
                   path: '/protected/staff-home',
                   pageBuilder: (context, state) {
-                    return MaterialPage(
-                        child: HubHomeWrapper(child: StaffHomePage()));
+                    return MaterialPage(child: HubHomeWrapper());
                   },
                 ),
-                GoRoute(
-                  name: 'protected_staff_home_arrived', //S-041
-                  path: '/protected/staff-home-arrived',
-                  pageBuilder: (context, state) {
-                    return MaterialPage(
-                        child: HubHomeWrapper(child: StaffArrivedPage()));
-                  },
-                ),
-                GoRoute(
-                  name: 'protected_staff_home_history', //S-042
-                  path: '/protected/staff-home-history',
-                  pageBuilder: (context, state) {
-                    return MaterialPage(
-                        child: HubHomeWrapper(child: StaffHomeHistoryPage()));
-                  },
-                ),
+                // GoRoute(
+                //   name: 'protected_staff_home_arrived', //S-041
+                //   path: '/protected/staff-home-arrived',
+                //   pageBuilder: (context, state) {
+                //     return MaterialPage(
+                //         child: HubHomeWrapper(child: StaffArrivedPage()));
+                //   },
+                // ),
+                // GoRoute(
+                //   name: 'protected_staff_home_history', //S-042
+                //   path: '/protected/staff-home-history',
+                //   pageBuilder: (context, state) {
+                //     return MaterialPage(
+                //         child: HubHomeWrapper(child: StaffHomeHistoryPage()));
+                //   },
+                // ),
                 GoRoute(
                     name: 'order_list_restaurant',
-                    path: '/protected/restaurant-foodygo', //S-022
+                    path:
+                        '/protected/restaurant-foodygo', //S-022 + S-016 + S-025
                     pageBuilder: (context, state) {
                       return MaterialPage(child: OrderListRestaurantPage());
                     }),
@@ -293,14 +290,6 @@ class Main extends StatelessWidget {
                     return MaterialPage(child: RestaurantHome());
                   },
                 ),
-                // Can't be accessed directly, must be through S-022
-                // GoRoute(
-                //   name: 'restaurant_menu', // S-016
-                //   path: '/protected/restaurant_menu',
-                //   pageBuilder: (context, state) {
-                //     return MaterialPage(child: RestaurantMenu());
-                //   },
-                // ),
                 GoRoute(
                   name: 'protected_user',
                   path: '/protected/user',
