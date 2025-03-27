@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/repository/customer_repository.dart';
 import 'package:foodygo/service/auth_service.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
@@ -21,6 +22,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   final authService = AuthService.instance;
   final logger = AppLogger.instance;
   final storage = SecureStorage.instance;
+  final customerRepo = CustomerRepository.instance;
 
   @override
   void initState() {
@@ -30,10 +32,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   Future<void> loadUser() async {
     String? data = await storage.get(key: 'user');
-    if (data != null) {
+    SavedUser? userData =
+        data != null ? SavedUser.fromJson(json.decode(data)) : null;
+    if (userData != null) {
       logger.info('Data $data');
+      // customerRepo.getCustomerById(user: userData);
       setState(() {
-        user = SavedUser.fromJson(json.decode(data));
+        user = userData;
         isLoading = false;
       });
     } else {

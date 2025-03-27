@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -10,6 +12,20 @@ import 'package:path/path.dart';
 class CustomerRepository {
   CustomerRepository._();
   static final instance = CustomerRepository._();
+
+  final logger = AppLogger.instance;
+
+  Future<void> getCustomerById({required SavedUser user}) async {
+    Uri uri = Uri.parse('$globalURL/api/v1/customers/${user.customerId}');
+    final response = await http.get(uri, headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${user.token}'
+    });
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      logger.info(jsonResponse.toString());
+    }
+  }
 
   Future<bool> updateCustomer(
       {required String accessToken,

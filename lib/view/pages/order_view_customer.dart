@@ -81,6 +81,7 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
         user.token, user.customerId!);
 
     if (fetchOrder != null) {
+      if (!mounted) return false;
       setState(() {
         _orderDto = fetchOrder;
 
@@ -102,6 +103,8 @@ class _OrderListCustomerPageState extends State<OrderListCustomerPage> {
         userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
     if (user != null) {
       bool fetchOrderData = await fetchOrder(user: user);
+
+      if (!mounted) return;
 
       if (fetchOrderData) {
         setState(() {
