@@ -172,7 +172,7 @@ class _RestaurantHomeState extends State<RestaurantHome> {
     return GestureDetector(
       onTap: () {
         if (title == "Thực đơn") {
-          GoRouter.of(context).go('/protected/restaurant_menu');
+          //GoRouter.of(context).go('/protected/restaurant_menu');
         } else if (title == "Đơn hàng") {
           GoRouter.of(context).push('/protected/restaurant-foodygo');
         } else if (title == "Báo cáo") {
