@@ -12,7 +12,7 @@ class RestaurantRepository {
 
   Future<Map<String, dynamic>> loadRestaurants(String accessToken) async {
     final response = await http.get(
-      Uri.parse('$globalURL/api/v1/restaurants'),
+      Uri.parse('$globalURL/api/v1/restaurants?pageNo=1&pageSize=-1'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $accessToken'

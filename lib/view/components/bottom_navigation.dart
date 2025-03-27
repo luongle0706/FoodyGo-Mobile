@@ -172,6 +172,11 @@ class _FoodyGoNavigationBarState extends State<FoodyGoNavigationBar> {
                           extra: user?.customerId),
                       _getNavComp(
                           context: context,
+                          path: '/protected/chat',
+                          icon: 'chat',
+                          name: 'Trợ lý'),
+                      _getNavComp(
+                          context: context,
                           path: '/protected/notifications',
                           icon: 'bell',
                           name: 'Thông báo'),

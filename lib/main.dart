@@ -6,6 +6,7 @@ import 'package:foodygo/service/notification_service.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/hub/hub_home_wrapper.dart';
 import 'package:foodygo/view/pages/about_foodygo.dart';
+import 'package:foodygo/view/pages/ai/chat_page.dart';
 import 'package:foodygo/view/pages/confirm_order_customer.dart';
 import 'package:foodygo/view/pages/default_order.dart';
 import 'package:foodygo/view/pages/map_page.dart';
@@ -86,17 +87,18 @@ class Main extends StatelessWidget {
                         location: location,
                         callOfOrigin: extra?['callOfOrigin']));
               }),
-          // GoRoute(
-          //     name: 'pathfinding',
-          //     path: '/test-mapping',
-          //     pageBuilder: (context, state) {
-          //       return MaterialPage(child: TestMapPage());
-          //     }),
           ShellRoute(
               builder: (context, state, child) {
                 return ProtectedRoutes(child: child);
               },
               routes: [
+                GoRoute(
+                  name: 'ai-chat', // S-006
+                  path: '/protected/chat',
+                  pageBuilder: (context, state) {
+                    return MaterialPage(child: ChatPage());
+                  },
+                ),
                 GoRoute(
                   name: 'protected_home', // S-006
                   path: '/protected/home',
