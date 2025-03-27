@@ -86,7 +86,7 @@ class _StaffHomePageState extends State<StaffHomePage> {
       await fetchOrders(user: user!);
       return;
     }
-    _logger.error("FAILED");
+    _logger.error("Thất bại");
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("Cập nhật thất bại!"),

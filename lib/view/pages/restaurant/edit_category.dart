@@ -87,6 +87,8 @@ class _EditCategoryState extends State<EditCategory> {
         }
       }
     } catch (error) {
+      print(error);
+      _logger.error(error.toString());
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Lỗi mạng, vui lòng thử lại!")),

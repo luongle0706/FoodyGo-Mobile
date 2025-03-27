@@ -12,11 +12,15 @@ class AddToCartPopup extends StatefulWidget {
   final dynamic restaurantId;
   final _logger = AppLogger.instance;
   final VoidCallback onCartUpdated;
-  AddToCartPopup(
-      {super.key,
-      required this.product,
-      required this.restaurantId,
-      required this.onCartUpdated});
+  final List<dynamic>? existingAddons;
+
+  AddToCartPopup({
+    super.key,
+    required this.product,
+    required this.restaurantId,
+    required this.onCartUpdated,
+    this.existingAddons,
+  });
 
   @override
   State<AddToCartPopup> createState() => _AddToCartPopupState();
@@ -26,6 +30,7 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
   final CartRepository _cartRepository = CartRepository.instance;
   SavedUser? _user;
   final Map<int, bool> _selectedAddonsMap = {};
+  final Map<int, int> _addonToSectionMap = {};
   final _storage = SecureStorage.instance;
   final AppLogger _logger = AppLogger.instance;
 
@@ -36,6 +41,14 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
         "Description: ${widget.product.description}, "
         "Price: ${widget.product.price}, "
         "AddOnSections: ${widget.product.addonSections}");
+    // Map each addon item to its section ID for later reference
+    if (widget.product.addonSections != null) {
+      for (var section in widget.product.addonSections) {
+        for (var item in section.items) {
+          _addonToSectionMap[item.id] = section.id;
+        }
+      }
+    }
     loadUser();
   }
 
@@ -73,13 +86,20 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
       }
     }
 
+    // Ensure price calculation includes addons in the UI
+    // double totalPrice = widget.product.price;
+    // for (var addon in selectedAddons) {
+    //   totalPrice += (addon["price"] as double) * (addon["quantity"] as int);
+    // }
+
+    // Pass the calculated price or let backend do it
     bool result = await _cartRepository.addToCart(
       accessToken: _user!.token,
       userId: _user!.userId,
       restaurantId: widget.restaurantId,
       productId: widget.product.id,
       productName: widget.product.name,
-      price: widget.product.price,
+      price: widget.product.price, // Base price only
       quantity: 1,
       image: widget.product.image,
       cartAddonItems: selectedAddons,
@@ -101,8 +121,19 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
     }
   }
 
+  // Get the number of selected items in a specific section
+  int getSelectedCountForSection(int sectionId) {
+    int count = 0;
+    _selectedAddonsMap.forEach((itemId, isSelected) {
+      if (isSelected && _addonToSectionMap[itemId] == sectionId) {
+        count++;
+      }
+    });
+    return count;
+  }
+
   Widget _buildToppingItem(
-      String name, String price, int itemId, int maxChoice) {
+      String name, String price, int itemId, int sectionId, int maxChoice) {
     return ListTile(
       title: Text(name),
       subtitle:
@@ -112,16 +143,20 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
         onChanged: (bool? value) {
           setState(() {
             if (value == true) {
-              if (_selectedAddonsMap.values.where((v) => v).length >=
-                  maxChoice) {
-                // Lấy ID của phần tử đầu tiên đang được chọn
-                int firstSelectedKey = _selectedAddonsMap.entries
-                    .firstWhere((entry) => entry.value,
-                        orElse: () => const MapEntry(-1, false))
-                    .key;
+              // Check if adding this item would exceed the section's max choice
+              if (getSelectedCountForSection(sectionId) >= maxChoice) {
+                // Find the first selected item in this section to unselect
+                int? firstSelectedKey;
+                _selectedAddonsMap.forEach((id, selected) {
+                  if (selected &&
+                      _addonToSectionMap[id] == sectionId &&
+                      firstSelectedKey == null) {
+                    firstSelectedKey = id;
+                  }
+                });
 
-                if (firstSelectedKey != -1) {
-                  _selectedAddonsMap[firstSelectedKey] = false;
+                if (firstSelectedKey != null) {
+                  _selectedAddonsMap[firstSelectedKey!] = false;
                 }
               }
               _selectedAddonsMap[itemId] = true;
@@ -188,6 +223,7 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
                                       item.name,
                                       "${item.price.toInt()}đ",
                                       item.id,
+                                      section.id,
                                       section.maxChoice))
                                   .toList(),
                             ],

@@ -4,13 +4,14 @@ import 'package:foodygo/repository/user_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/hub/hub_app_bar.dart';
+import 'package:foodygo/view/pages/hub/staff_arrived_page.dart';
+import 'package:foodygo/view/pages/hub/staff_home_history_page.dart';
+import 'package:foodygo/view/pages/hub/staff_home_page.dart';
 import 'package:foodygo/view/theme.dart';
 import 'dart:convert';
 
 class HubHomeWrapper extends StatefulWidget {
-  final Widget child;
-
-  const HubHomeWrapper({super.key, required this.child});
+  const HubHomeWrapper({super.key});
 
   @override
   State<HubHomeWrapper> createState() => _HubHomeWrapperState();
@@ -24,6 +25,7 @@ class _HubHomeWrapperState extends State<HubHomeWrapper> {
   bool _isLoading = true;
   String hubName = "Đang tải...";
   SavedUser? _user;
+  int selectedIndex = 0;
 
   @override
   void initState() {
@@ -85,12 +87,22 @@ class _HubHomeWrapperState extends State<HubHomeWrapper> {
           preferredSize: Size.fromHeight(500),
           child: HubAppBar(
             hubName: hubName,
+            selectedIndex: selectedIndex,
+            onTapTapped: (int index) {
+              setState(() {
+                selectedIndex = index;
+              });
+            },
           )),
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.background,
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : widget.child,
+          : selectedIndex == 0
+              ? StaffHomePage()
+              : selectedIndex == 1
+                  ? StaffArrivedPage()
+                  : StaffHomeHistoryPage(),
     );
   }
 }

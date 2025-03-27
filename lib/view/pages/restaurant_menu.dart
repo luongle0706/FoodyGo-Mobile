@@ -195,7 +195,8 @@ class _MenuScreenState extends State<MenuScreen> {
     List<ProductDto> filteredProducts = widget.productDto!
         .where((product) =>
             product.name.toLowerCase().contains(searchQuery.toLowerCase()))
-        .toList();
+        .toList()
+      ..sort((a, b) => b.id.compareTo(a.id));
 
     Future<void> switchAvailability(int productId) async {
       try {
@@ -346,7 +347,12 @@ class _MenuScreenState extends State<MenuScreen> {
                       width: 50,
                       height: 50,
                       color: Colors.grey[400],
-                      child: Center(child: Text("Ảnh")),
+                      child: Image.network(
+                        product.image,
+                        height: 300,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                     onTap: () {
                       GoRouter.of(context).push(
