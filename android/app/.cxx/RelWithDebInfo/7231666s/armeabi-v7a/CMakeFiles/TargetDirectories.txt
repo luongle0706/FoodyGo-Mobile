@@ -1,0 +1,2 @@
+C:/Users/THEANH/Downloads/GIT/FoodyGo-Mobile/android/app/.cxx/RelWithDebInfo/7231666s/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/THEANH/Downloads/GIT/FoodyGo-Mobile/android/app/.cxx/RelWithDebInfo/7231666s/armeabi-v7a/CMakeFiles/rebuild_cache.dir

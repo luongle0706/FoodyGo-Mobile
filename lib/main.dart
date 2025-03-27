@@ -141,7 +141,19 @@ class Main extends StatelessWidget {
                     path:
                         '/protected/restaurant-foodygo', //S-022 + S-016 + S-025
                     pageBuilder: (context, state) {
-                      return MaterialPage(child: OrderListRestaurantPage());
+                      int? chosenTab;
+                      int? chosenSubTab;
+                      Map<String, dynamic>? extra =
+                          state.extra as Map<String, dynamic>?;
+                      if (extra != null) {
+                        chosenTab = extra['chosenTab'];
+                        chosenSubTab = extra['chosenSubTab'];
+                      }
+                      return MaterialPage(
+                          child: OrderListRestaurantPage(
+                        chosenSubTab: chosenSubTab,
+                        chosenTab: chosenTab,
+                      ));
                     }),
                 // Merged with S-022
                 // GoRoute(

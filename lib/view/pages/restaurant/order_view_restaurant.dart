@@ -14,7 +14,9 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class OrderListRestaurantPage extends StatefulWidget {
-  const OrderListRestaurantPage({super.key});
+  final int? chosenTab;
+  final int? chosenSubTab;
+  const OrderListRestaurantPage({super.key, this.chosenTab, this.chosenSubTab});
 
   @override
   State<OrderListRestaurantPage> createState() =>
@@ -35,6 +37,21 @@ class _OrderListRestaurantPageState extends State<OrderListRestaurantPage> {
   void initState() {
     super.initState();
     loadUser();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.chosenTab != null) {
+      setState(() {
+        selectedTab = widget.chosenTab!;
+      });
+    }
+    if (widget.chosenSubTab != null) {
+      setState(() {
+        selectedSubTab = widget.chosenSubTab!;
+      });
+    }
   }
 
   void selectTab({required int tabIndex}) async {

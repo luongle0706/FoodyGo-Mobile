@@ -58,7 +58,7 @@ class _StaffHomePageState extends State<StaffHomePage> {
     Map<String, dynamic>? response = await _orderRepository.getOrders(
         accessToken: user.token,
         params:
-            '?sortBy=time&status=$status&pageNo=$pageNo&pageSize=$pageSize');
+            '?hubId=${user.hubId}&sortBy=time&status=$status&pageNo=$pageNo&pageSize=$pageSize');
     _logger.info(response.toString());
     if (response != null && response['data'] != null) {
       setState(() {

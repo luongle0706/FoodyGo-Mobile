@@ -171,12 +171,15 @@ class _RestaurantHomeState extends State<RestaurantHome> {
   Widget _buildMenuItem(IconData icon, String title) {
     return GestureDetector(
       onTap: () {
+        setState(() {});
         if (title == "Thực đơn") {
+          GoRouter.of(context)
+              .go('/protected/restaurant-foodygo', extra: {'chosenTab': 1});
         } else if (title == "Đơn hàng") {
-          GoRouter.of(context).push('/protected/restaurant-foodygo');
+          GoRouter.of(context).go('/protected/restaurant-foodygo');
         } else if (title == "Báo cáo") {
         } else if (title == "Thông tin") {
-          GoRouter.of(context).push('/protected/notifications');
+          GoRouter.of(context).go('/protected/notifications');
         }
       },
       child: Container(
