@@ -86,7 +86,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   CircleAvatar(
                     radius: 25,
                     backgroundColor: Colors.white,
-                    child: Icon(Icons.person, color: Colors.black87),
+                    backgroundImage: AssetImage('assets/images/profile_pic.png')
+                        as ImageProvider,
                   ),
                   SizedBox(width: 16),
                   Text('${user?.fullName}',
@@ -98,7 +99,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ),
           Divider(),
           _buildWallet(context),
-          _buildListTile("Địa chỉ", (){}),
+          _buildListTile("Địa chỉ", () {}),
           _buildListTile("Chính sách quy định", () {
             GoRouter.of(context).push("/protected/policy");
           }),
@@ -117,11 +118,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-    Widget _buildListTile(String title, VoidCallback onTap) {
+  Widget _buildListTile(String title, VoidCallback onTap) {
     return Column(
       children: [
         GestureDetector(
-          onTap: onTap, 
+          onTap: onTap,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
@@ -137,7 +138,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       ],
     );
   }
-
 
   Widget _buildLogoutButton(BuildContext context) {
     return Padding(
