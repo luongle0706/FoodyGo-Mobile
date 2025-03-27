@@ -16,6 +16,7 @@ class OrderDtoV2 {
   final String customerAddress;
   final String restaurantAddress;
   final String image;
+  final int hubId;
   final String hubName;
   final List<OrderDetail> orderDetails;
 
@@ -37,6 +38,7 @@ class OrderDtoV2 {
     required this.customerAddress,
     required this.restaurantAddress,
     required this.image,
+    required this.hubId,
     required this.hubName,
     required this.orderDetails,
   });
@@ -58,10 +60,12 @@ class OrderDtoV2 {
       employeeName: json['employeeName'] ?? 'Unknown Employee',
       customerName: json['customerName'] ?? 'Unknown Customer',
       customerAddress: json['customerAddress'] ?? 'Unknown customer address',
-      restaurantAddress: json['restaurantAddress'] ?? 'Unknown restaurant address',
+      restaurantAddress:
+          json['restaurantAddress'] ?? 'Unknown restaurant address',
       restaurantName: json['restaurantName'] ?? 'Unknown Restaurant',
       image: json['image'] ??
           'https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chorizo-mozarella-gnocchi-bake-cropped-9ab73a3.jpg?resize=768,574',
+      hubId: json['hubId'],
       hubName: json['hubName'] ?? 'Unknown Hub',
       orderDetails: (json['orderDetails'] as List<dynamic>)
           .map((item) => OrderDetail.fromJson(item))

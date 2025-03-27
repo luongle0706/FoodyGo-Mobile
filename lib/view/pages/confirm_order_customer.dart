@@ -9,18 +9,22 @@ import 'package:foodygo/repository/restaurant_repository.dart';
 import 'package:foodygo/repository/user_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:foodygo/view/components/map/pathfinding.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:latlong2/latlong.dart';
 
 class ConfirmOrderPage extends StatefulWidget {
   final int restaurantId;
   final int? chosenHubId;
   final String? chosenHubName;
+  final LatLng? hubLocation;
   const ConfirmOrderPage(
       {super.key,
       required this.restaurantId,
       this.chosenHubId,
-      this.chosenHubName});
+      this.chosenHubName,
+      this.hubLocation});
 
   @override
   State<ConfirmOrderPage> createState() => _ConfirmOrderPageState();
@@ -39,7 +43,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
   bool _isLoading = true;
   int _totalPrice = 0;
   // Need to dynamically change (TODO)
-  final int _shippingFee = 5;
+  final int _shippingFee = 0;
   final DateTime _expectedDeliveryTime = DateTime.now().add(Duration(hours: 1));
   String customerPhone = "";
   String fullName = "";
@@ -190,64 +194,76 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
       ),
       body: Padding(
         padding: EdgeInsets.only(top: 0, left: 16, right: 16, bottom: 16),
-        child: Column(
-          children: [
-            // Address Section
-            Divider(),
-            Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(bottom: 40),
-                  child: Icon(Icons.location_on),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Địa chỉ giao hàng",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                      Text("Quận Nguyễn | 0113114115"),
-                      GestureDetector(
-                          onTap: () {
-                            GoRouter.of(context).go('/map/hub', extra: {
-                              'callOfOrigin':
-                                  '/protected/confirm-order-cart/${widget.restaurantId}'
-                            });
-                          },
-                          child: Text(widget.chosenHubName ?? "Chọn Hub")),
-                    ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // Address Section
+              Divider(),
+              Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 40),
+                    child: Icon(Icons.location_on),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Divider(),
-            const SizedBox(height: 10),
-
-            // Restaurant Name
-            Row(
-              children: [
-                Icon(Icons.local_restaurant),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    _restaurant!.name,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Địa chỉ giao hàng",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        Text("Quận Nguyễn | 0113114115"),
+                        GestureDetector(
+                            onTap: () {
+                              GoRouter.of(context).go('/map/hub', extra: {
+                                'callOfOrigin':
+                                    '/protected/confirm-order-cart/${widget.restaurantId}',
+                              });
+                            },
+                            child: Text(widget.chosenHubName ?? "Chọn Hub")),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Divider(),
+              const SizedBox(height: 10),
 
-            // Order Details
-            Expanded(
-              child: ListView.builder(
+              if (widget.hubLocation != null && _restaurant != null)
+                SizedBox(
+                    height: 300,
+                    child: OrderMap(
+                      hubLocation: widget.hubLocation!,
+                      restaurantLocation:
+                          LatLng(_restaurant!.latitude, _restaurant!.longitude),
+                    )),
+
+              const SizedBox(height: 10),
+              // Restaurant Name
+              Row(
+                children: [
+                  Icon(Icons.local_restaurant),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _restaurant!.name,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+
+              // Order Details
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
                 itemCount: _cartItems?.length ?? 0,
                 itemBuilder: (context, index) {
                   final item = _cartItems![index];
@@ -308,60 +324,62 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                   );
                 },
               ),
-            ),
 
-            // Price Breakdown
-            Divider(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Tổng giá món"),
-                Text(
-                    "${NumberFormat("#,###", "vi_VN").format(_totalPrice)} xu"),
-              ],
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Phí giao hàng"),
-                Text('$_shippingFee xu'),
-              ],
-            ),
-            Divider(),
-
-            // Total Price
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Tổng thanh toán",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                Text(
-                    "${NumberFormat("#,###", "vi_VN").format(_totalPrice + _shippingFee)} xu",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              ],
-            ),
-            Spacer(),
-
-            // Order Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 189, 75, 3),
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                onPressed: () async {
-                  await placeOrder(context);
-                },
-                child: Text("Đặt Đơn", style: TextStyle(color: Colors.white)),
+              // Price Breakdown
+              Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Tổng giá món"),
+                  Text(
+                      "${NumberFormat("#,###", "vi_VN").format(_totalPrice)} xu"),
+                ],
               ),
-            ),
-          ],
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Phí giao hàng"),
+                  Text('$_shippingFee xu'),
+                ],
+              ),
+              Divider(),
+
+              // Total Price
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Tổng thanh toán",
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                      "${NumberFormat("#,###", "vi_VN").format(_totalPrice + _shippingFee)} xu",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                ],
+              ),
+              SizedBox(
+                height: 16,
+              ),
+
+              // Order Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 189, 75, 3),
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: () async {
+                    await placeOrder(context);
+                  },
+                  child: Text("Đặt Đơn", style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

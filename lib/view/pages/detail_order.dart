@@ -3,11 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:foodygo/dto/order_dto_v2.dart';
 import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/repository/hub_repository.dart';
 import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
+import 'package:foodygo/view/components/map/pathfinding.dart';
 import 'package:foodygo/view/pages/welcome_screen.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
 
 class DetailOrder extends StatefulWidget {
   final int orderId;
@@ -23,8 +26,10 @@ class _DetailOrderState extends State<DetailOrder> {
   final AppLogger _logger = AppLogger.instance;
 
   final OrderRepository _orderRepository = OrderRepository.instance;
+  final HubRepository hubRepository = HubRepository.instance;
 
   OrderDtoV2? _orderDto;
+  dynamic hub;
 
   bool _isLoading = true;
 
@@ -55,9 +60,18 @@ class _DetailOrderState extends State<DetailOrder> {
           status = 5;
         }
       });
+      fetchHubInfo(accessToken);
       return true;
     }
     return false;
+  }
+
+  Future<void> fetchHubInfo(String accessToken) async {
+    dynamic hubData = await hubRepository.getHubById(
+        accessToken: accessToken, hubId: _orderDto!.hubId);
+    setState(() {
+      hub = hubData;
+    });
   }
 
   Future<void> loadUser() async {
@@ -111,11 +125,21 @@ class _DetailOrderState extends State<DetailOrder> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (_orderDto?.status == "SHIPPING" && hub != null)
+                SizedBox(
+                  height: 300,
+                  child: OrderMap(
+                      orderId: _orderDto!.id,
+                      hubLocation: LatLng(hub['latitude'], hub['longitude'])),
+                ),
               Stack(
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      SizedBox(
+                        height: 10,
+                      ),
                       Text(
                         getStatusText(status),
                         style: TextStyle(

@@ -103,10 +103,10 @@ class _RegisterContinueState extends State<RegisterContinue> {
       );
 
       if (result) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Cập nhật thông tin thành công!")),
-        );
-        GoRouter.of(context).push('/protected/home');
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(content: Text("Cập nhật thông tin thành công!")),
+        // );
+        if (mounted) GoRouter.of(context).push('/protected/home');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Cập nhật thông tin thất bại!")),

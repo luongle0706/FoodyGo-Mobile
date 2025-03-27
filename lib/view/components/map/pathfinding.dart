@@ -9,9 +9,14 @@ import 'package:stomp_dart_client/stomp_dart_client.dart';
 import 'package:http/http.dart' as http;
 
 class OrderMap extends StatefulWidget {
-  final int orderId;
+  final int? orderId;
   final LatLng hubLocation;
-  const OrderMap({super.key, required this.orderId, required this.hubLocation});
+  final LatLng? restaurantLocation;
+  const OrderMap(
+      {super.key,
+      this.orderId,
+      required this.hubLocation,
+      this.restaurantLocation});
 
   @override
   State<OrderMap> createState() => _OrderMapState();
@@ -24,21 +29,27 @@ class _OrderMapState extends State<OrderMap> {
   LatLng? currentLocation;
   LatLng? shipperLocation;
   List<LatLng> route = [];
+  List<LatLng> routeFromCustomer = [];
   late StompClient stompClient;
 
   @override
   void initState() {
+    logger.info('Received: ${widget.orderId}');
+    logger.info('Received ${widget.hubLocation.toString()}');
     super.initState();
     getUserLocation();
-    connectWebSocket();
+    if (widget.orderId != null) connectWebSocket();
   }
 
   // Initialize user's current location using Geolocator
   Future<void> getUserLocation() async {
     try {
       Position position = await locationService.getUserLocation();
+      List<LatLng> routeToCustomerData = await fetchRoute(
+          start: LatLng(position.latitude, position.longitude));
       setState(() {
         currentLocation = LatLng(position.latitude, position.longitude);
+        routeFromCustomer = routeToCustomerData;
       });
     } catch (e) {
       logger.error("Failed to get user's current location");
@@ -50,9 +61,20 @@ class _OrderMapState extends State<OrderMap> {
     stompClient = StompClient(
       config: StompConfig(
         url:
-            'ws://10.0.2.2:8080/ws', // Replace with your websocket endpoint URL
+            // 'ws://10.0.2.2:8080/ws', // Replace with your websocket endpoint URL
+            'ws://foodygo.theanh0804.duckdns.org/ws',
         onConnect: subscribeOrderLocation,
-        onWebSocketError: (dynamic error) => {logger.error(error.toString())},
+        onWebSocketError: (dynamic error) {
+          logger.error("WebSocket Error: ${error.toString()}");
+        },
+        onStompError: (dynamic error) {
+          logger.error("STOMP Error: ${error.toString()}");
+        },
+        onDisconnect: (dynamic frame) {
+          logger.info("Disconnected from WebSocket");
+        },
+        // Add reconnect delay
+        reconnectDelay: Duration(seconds: 2),
       ),
     );
     stompClient.activate();
@@ -66,15 +88,18 @@ class _OrderMapState extends State<OrderMap> {
         if (frame.body != null) {
           final Map<String, dynamic> result = jsonDecode(frame.body!);
           logger.info('Received: ${result.toString()}');
-          double latitude = result['latitude'];
-          double longitude = result['longitude'];
+          if (result.containsKey('latitude') &&
+              result.containsKey('longitude')) {
+            double latitude = result['latitude'];
+            double longitude = result['longitude'];
 
-          LatLng shipperData = LatLng(latitude, longitude);
-          List<LatLng> routeData = await fetchRoute(start: shipperData);
-          setState(() {
-            shipperLocation = shipperData;
-            route = routeData;
-          });
+            LatLng shipperData = LatLng(latitude, longitude);
+            List<LatLng> routeData = await fetchRoute(start: shipperData);
+            setState(() {
+              shipperLocation = shipperData;
+              route = routeData;
+            });
+          }
         }
       },
     );
@@ -83,8 +108,11 @@ class _OrderMapState extends State<OrderMap> {
   // Fetch the route from the OSRM API
   Future<List<LatLng>> fetchRoute({required LatLng start}) async {
     final end = widget.hubLocation;
+    // final url =
+    //     'https://router.project-osrm.org/route/v1/driving/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?geometries=geojson';
     final url =
-        'https://router.project-osrm.org/route/v1/driving/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?geometries=geojson';
+        'https://routing.openstreetmap.de/routed-car/route/v1/driving/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?geometries=geojson';
+
     try {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
@@ -120,6 +148,18 @@ class _OrderMapState extends State<OrderMap> {
       ),
     );
 
+    //Restaurant Marker
+    if (widget.restaurantLocation != null) {
+      markers.add(
+        Marker(
+          width: 80,
+          height: 80,
+          point: widget.restaurantLocation!,
+          child: Icon(Icons.restaurant, color: Colors.orange, size: 40),
+        ),
+      );
+    }
+
     // User marker
     if (currentLocation != null) {
       markers.add(
@@ -143,12 +183,15 @@ class _OrderMapState extends State<OrderMap> {
         ),
       );
     }
+
     return markers;
   }
 
   @override
   void dispose() {
-    stompClient.deactivate();
+    if (widget.orderId != null) {
+      stompClient.deactivate();
+    }
     super.dispose();
   }
 
@@ -172,6 +215,7 @@ class _OrderMapState extends State<OrderMap> {
         MarkerLayer(
           markers: _buildMarkers(),
         ),
+
         // Polyline layer for the fetched route
         if (route.isNotEmpty)
           PolylineLayer(
@@ -180,6 +224,17 @@ class _OrderMapState extends State<OrderMap> {
                 points: route,
                 strokeWidth: 4.0,
                 color: Colors.blue,
+              ),
+            ],
+          ),
+
+        if (routeFromCustomer.isNotEmpty)
+          PolylineLayer(
+            polylines: [
+              Polyline(
+                points: routeFromCustomer,
+                strokeWidth: 4.0,
+                color: Colors.orange,
               ),
             ],
           ),

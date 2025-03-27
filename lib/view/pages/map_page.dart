@@ -273,7 +273,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                                   } else {
                                     Map<String, dynamic> extra = {
                                       'chosenHubId': selectedItem['id'],
-                                      'chosenHubName': selectedItem['name']
+                                      'chosenHubName': selectedItem['name'],
+                                      'hubLocation': LatLng(
+                                          selectedItem['latitude'],
+                                          selectedItem['longitude'])
                                     };
                                     _logger.info("Passing $extra");
                                     GoRouter.of(context)

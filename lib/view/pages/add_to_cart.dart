@@ -19,7 +19,7 @@ class AddToCartPopup extends StatefulWidget {
       required this.onCartUpdated});
 
   @override
-  _AddToCartPopupState createState() => _AddToCartPopupState();
+  State<AddToCartPopup> createState() => _AddToCartPopupState();
 }
 
 class _AddToCartPopupState extends State<AddToCartPopup> {
@@ -53,7 +53,7 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
     }
   }
 
-  Future<void> addToCart() async {
+  Future<void> addToCart(BuildContext context) async {
     if (_user == null) {
       widget._logger.info("User not found! Please log in.");
       return;
@@ -88,14 +88,16 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
     if (result) {
       widget._logger.info("Add to cart successfully!");
       widget.onCartUpdated();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Đã thêm vào giỏ hàng!"),
-          duration: Duration(seconds: 2),
-          backgroundColor: Colors.green,
-        ),
-      );
-      GoRouter.of(context).pop();
+      if (context.mounted) {
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(
+        //     content: Text("Đã thêm vào giỏ hàng!"),
+        //     duration: Duration(seconds: 2),
+        //     backgroundColor: Colors.green,
+        //   ),
+        // );
+        GoRouter.of(context).pop();
+      }
     }
   }
 
@@ -201,7 +203,7 @@ class _AddToCartPopupState extends State<AddToCartPopup> {
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     onPressed: () {
-                      addToCart();
+                      addToCart(context);
                     },
                     child: const Text("Thêm vào giỏ hàng",
                         style: TextStyle(

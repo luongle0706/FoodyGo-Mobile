@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:foodygo/dto/user_dto.dart';
+import 'package:foodygo/repository/hub_repository.dart';
 import 'package:foodygo/repository/order_repository.dart';
 import 'package:foodygo/utils/app_logger.dart';
+import 'package:foodygo/utils/constants.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class OrderConfirmationScreen extends StatefulWidget {
   final dynamic order;
@@ -18,16 +21,28 @@ class OrderConfirmationScreen extends StatefulWidget {
 
 class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
   final OrderRepository orderRepository = OrderRepository.instance;
+  final hubRepository = HubRepository.instance;
   SavedUser? user;
   bool _isLoading = true;
   final SecureStorage _storage = SecureStorage.instance;
   final _logger = AppLogger.instance;
-  late final String hubId;
+  late final String hubName;
+  dynamic hub;
+
+  Future<void> fetchHubInfo(String accessToken) async {
+    dynamic hubData = await hubRepository.getHubById(
+        accessToken: accessToken, hubId: widget.order['hubId']);
+    _logger.debug(hubData.toString());
+    setState(() {
+      hub = hubData;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     _loadUserAndFetchOrders();
-    hubId = widget.order['hubName'].toString();
+    hubName = widget.order['hubName'].toString();
   }
 
   Future<void> _confirmDelivery() async {
@@ -55,9 +70,12 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
   Future<void> _loadUserAndFetchOrders() async {
     try {
       String? userData = await _storage.get(key: 'user');
-      if (userData != null) {
+      SavedUser? fakeUser =
+          userData != null ? SavedUser.fromJson(json.decode(userData)) : null;
+      if (fakeUser != null) {
+        fetchHubInfo(fakeUser.token);
         setState(() {
-          user = SavedUser.fromJson(json.decode(userData));
+          user = fakeUser;
           _isLoading = false;
         });
       } else {
@@ -215,6 +233,16 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                 "Thời gian đặt hàng", formatDateTime(widget.order['time'])),
             _buildOrderDetail("Thời gian lấy hàng dự kiến",
                 formatDateTime(widget.order['expectedDeliveryTime'])),
+            if (hub != null)
+              Center(
+                child: QrImageView(
+                  data:
+                      "$locationURL/?orderId=${widget.order['id']}&destination=${hub['latitude']},${hub['longitude']}",
+                  version: QrVersions.auto,
+                  size: 200.0,
+                  gapless: false,
+                ),
+              )
           ],
         ),
       ),

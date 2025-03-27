@@ -5,7 +5,6 @@ import 'package:foodygo/firebase_options.dart';
 import 'package:foodygo/service/notification_service.dart';
 import 'package:foodygo/utils/secure_storage.dart';
 import 'package:foodygo/view/components/hub/hub_home_wrapper.dart';
-import 'package:foodygo/view/components/map/sample_map_page.dart';
 import 'package:foodygo/view/pages/about_foodygo.dart';
 import 'package:foodygo/view/pages/confirm_order_customer.dart';
 import 'package:foodygo/view/pages/default_order.dart';
@@ -90,12 +89,12 @@ class Main extends StatelessWidget {
                         location: location,
                         callOfOrigin: extra?['callOfOrigin']));
               }),
-          GoRoute(
-              name: 'pathfinding',
-              path: '/test-mapping',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: TestMapPage());
-              }),
+          // GoRoute(
+          //     name: 'pathfinding',
+          //     path: '/test-mapping',
+          //     pageBuilder: (context, state) {
+          //       return MaterialPage(child: TestMapPage());
+          //     }),
           ShellRoute(
               builder: (context, state, child) {
                 return ProtectedRoutes(child: child);
@@ -161,9 +160,11 @@ class Main extends StatelessWidget {
                       final extra = state.extra as Map<String, dynamic>?;
                       return MaterialPage(
                           child: ConfirmOrderPage(
-                              restaurantId: restaurantId,
-                              chosenHubId: extra?['chosenHubId'],
-                              chosenHubName: extra?['chosenHubName']));
+                        restaurantId: restaurantId,
+                        chosenHubId: extra?['chosenHubId'],
+                        chosenHubName: extra?['chosenHubName'],
+                        hubLocation: extra?['hubLocation'],
+                      ));
                     }),
                 // Merged with S-022
                 // GoRoute(

@@ -46,14 +46,17 @@ class RestaurantRepository {
           email: data['email'],
           address: data['address'],
           image: data['image'],
-          available: data['available']);
+          available: data['available'],
+          latitude: data['latitude'],
+          longitude: data['longitude']);
     } else {
       logger.error('Failed to load data! ${response.body}');
       return null;
     }
   }
 
-  Future<List<ProductDto>?> getProductsByRestaurantId(String accessToken, int restaurantId) async {
+  Future<List<ProductDto>?> getProductsByRestaurantId(
+      String accessToken, int restaurantId) async {
     final response = await http.get(
       Uri.parse('$globalURL/api/v1/restaurants/$restaurantId/products'),
       headers: {
@@ -77,12 +80,14 @@ class RestaurantRepository {
     }
   }
 
-  Future<List<dynamic>?> searchRestaurants(String accessToken, String query) async {
+  Future<List<dynamic>?> searchRestaurants(
+      String accessToken, String query) async {
     final response = await http.get(
       Uri.parse("$globalURL/api/v1/restaurants?name=$query"),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $accessToken',},
+        'Authorization': 'Bearer $accessToken',
+      },
     );
 
     if (response.statusCode == 200) {
@@ -92,5 +97,4 @@ class RestaurantRepository {
       throw Exception("Failed to search restaurants");
     }
   }
-
 }
