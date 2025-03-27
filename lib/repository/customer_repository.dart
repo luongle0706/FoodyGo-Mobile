@@ -31,8 +31,9 @@ class CustomerRepository {
       {required String accessToken,
       required int userId,
       required int buildingId,
-      required String phone,
-      required DateTime dob,
+      String? phone,
+      String? fullName,
+      DateTime? dob,
       File? image}) async {
     Uri uri = Uri.parse('$globalURL/api/v1/customers/$userId');
 
@@ -43,7 +44,8 @@ class CustomerRepository {
     Map<String, dynamic> customerUpdateRequest = {
       "buildingID": buildingId,
       "phone": phone,
-      "dob": DateFormat('yyyy-MM-dd').format(dob)
+      "fullName": fullName,
+      "dob": dob != null ? DateFormat('yyyy-MM-dd').format(dob) : null
     };
     String jsonData = json.encode(customerUpdateRequest);
     requestMultipart.files.add(
@@ -65,7 +67,7 @@ class CustomerRepository {
 
     var streamedResponse = await requestMultipart.send();
     var response = await http.Response.fromStream(streamedResponse);
-
+    AppLogger.instance.info(response.body.toString());
     if (response.statusCode == 200) {
       return true;
     }

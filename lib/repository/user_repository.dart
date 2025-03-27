@@ -54,7 +54,7 @@ class UserRepository {
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         AppLogger.instance.info("User API Response: ${response.body}");
-
+        AppLogger.instance.info(responseData["data"].toString());
         if (responseData.containsKey("data")) {
           return responseData["data"];
         } else {
@@ -68,6 +68,6 @@ class UserRepository {
     } catch (e) {
       AppLogger.instance.error("Error fetching user info: $e");
     }
-    return null; // Trả về null nếu có lỗi
+    return null;
   }
 }

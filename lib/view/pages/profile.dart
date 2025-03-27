@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:foodygo/dto/user_dto.dart';
 import 'package:foodygo/repository/customer_repository.dart';
+import 'package:foodygo/repository/user_repository.dart';
 import 'package:foodygo/service/auth_service.dart';
 import 'package:foodygo/utils/app_logger.dart';
 import 'package:foodygo/utils/secure_storage.dart';
@@ -23,6 +24,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   final logger = AppLogger.instance;
   final storage = SecureStorage.instance;
   final customerRepo = CustomerRepository.instance;
+  Map<String, dynamic>? userDetails;
+  final UserRepository userRepository = UserRepository.instance;
 
   @override
   void initState() {
@@ -36,13 +39,32 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         data != null ? SavedUser.fromJson(json.decode(data)) : null;
     if (userData != null) {
       logger.info('Data $data');
-      // customerRepo.getCustomerById(user: userData);
+      await fetchUserDetails(userData.userId, userData.token);
       setState(() {
         user = userData;
         isLoading = false;
       });
     } else {
       isLoading = false;
+    }
+  }
+
+  Future<void> fetchUserDetails(int userId, String accessToken) async {
+    try {
+      final data = await userRepository.getUserById(userId, accessToken);
+      if (data != null) {
+        setState(() {
+          userDetails = data;
+        });
+      } else {
+        AppLogger.instance.error("Failed to fetch user details");
+      }
+    } catch (e) {
+      AppLogger.instance.error("Error fetching user details: $e");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -81,7 +103,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         children: [
           GestureDetector(
             onTap: () {
-              GoRouter.of(context).push("/protected/user/detail");
+              GoRouter.of(context).push("/protected/user/detail").then((_) {
+                loadUser();
+              });
             },
             child: Padding(
               padding:
@@ -91,8 +115,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   CircleAvatar(
                     radius: 25,
                     backgroundColor: Colors.white,
-                    backgroundImage: AssetImage('assets/images/profile_pic.png')
-                        as ImageProvider,
+                    backgroundImage: userDetails?['image'] != null &&
+                            userDetails?['image'].isNotEmpty
+                        ? NetworkImage(userDetails!['image'])
+                        : AssetImage('assets/images/profile_pic.png')
+                            as ImageProvider,
                   ),
                   SizedBox(width: 16),
                   Text('${user?.fullName}',
